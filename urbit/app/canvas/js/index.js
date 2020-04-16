@@ -54666,35 +54666,38 @@
             class Hexagons extends react_1 {
               constructor(props) {
                 super(props);
-
+                const width = 960, height = 500, radius = 20;
                 this.state = {
-                  width: 960,
-                  height: 500,
-                  radius: 20
+                  width: width,
+                  height: height,
+                  radius: radius
                 };
               }
 
               componentDidMount() {
+                console.log("mounted");
                 this.drawCanvas();
               }
 
               drawCanvas(data) {
-                const { state } = this;
+                console.log("drawing");
+                const { state, props } = this;
                 const { radius, width, height } = state;
 
-                const topology = this.hexTopology(radius, width, height);
+                const topology = this.hexTopology(radius, width, height, props.hexagons);
                 const projection = this.hexProjection(radius);
                 const path = index$1().projection(projection);
-
                 let mousing = 0;
 
                 const mousedown = function(d) {
+                  console.log(d);
                   mousing = d.fill ? -1 : +1;
                   mousemove.apply(this, arguments);
                 };
 
                 const mousemove = function(d) {
                   if (mousing) {
+                    props.api.hexagons.paint(d.id, mousing > 0);
                     select(this).classed("fill", d.fill = mousing > 0);
                     border.call(redraw);
                   }
@@ -54705,6 +54708,11 @@
                   mousing = 0;
                 };
 
+                const changeColor = function(d){
+                  if(d.fill)console.log(d);
+                  return d.fill ? "fill" : null;
+                };
+
                 const redraw = (border) => {
                   border.attr("d",
                     path(mesh(topology, topology.objects.hexagons,
@@ -54713,20 +54721,34 @@
                   );
                 };
 
-                const svg = select(this.refs.canvas).append("svg")
-                    .attr("width", width)
-                    .attr("height", height);
+                // const svg = d3.select(this.refs.canvas).append("svg")
+                //     .attr("width", width)
+                //     .attr("height", height)
+                //     .append("g")
+                //       .attr("class", "hexagon")
 
-                svg.append("g")
-                    .attr("class", "hexagon")
-                  .selectAll("path")
-                    .data(topology.objects.hexagons.geometries)
+                const svg = select(".hexagon");
+
+                // update
+                const hexagons = svg
+                  .selectAll(".point")
+                  .data(topology.objects.hexagons.geometries)
+                  .attr("class", changeColor);
+
+                // enter
+                hexagons
                   .enter().append("path")
                     .attr("d", function(d) { return path(feature(topology, d)); })
-                    .attr("class", function(d) { return d.fill ? "fill" : null; })
+                    .attr("class", "point")
+                    .attr("class", changeColor)
                     .on("mousedown", mousedown)
                     .on("mousemove", mousemove)
                     .on("mouseup", mouseup);
+
+                //const mesh = d3.select(".mesh");
+                //  update
+
+                //  enter
 
                 svg.append("path")
                     .datum(mesh(topology, topology.objects.hexagons))
@@ -54739,13 +54761,15 @@
 
               }
 
-              hexTopology(radius, width, height) {
+              hexTopology(radius, width, height, hexagons) {
+                console.log(hexagons);
                 const dx = radius * 2 * Math.sin(Math.PI / 3),
                     dy = radius * 1.5,
                     m = Math.ceil((height + radius) / dy) + 1,
                     n = Math.ceil(width / dx) + 1,
                     geometries = [],
                     arcs = [];
+                let total = 0;
                 for (var j = -1; j <= m; ++j) {
                   for (var i = -1; i <= n; ++i) {
                     var y = j * 2, x = (i + (j & 1) / 2) * 2;
@@ -54756,12 +54780,16 @@
                 for (var j = 0, q = 3; j < m; ++j, q += 6) {
                   for (var i = 0; i < n; ++i, q += 3) {
                     geometries.push({
+                      id: total,
                       type: "Polygon",
                       arcs: [[q, q + 1, q + 2, ~(q + (n + 2 - (j & 1)) * 3), ~(q - 2), ~(q - (n + 2 + (j & 1)) * 3 + 2)]],
-                      fill: Math.random() > i / n * 2
+                      fill: (hexagons) ? hexagons.hasOwnProperty(total) : false
+                      // fill: Math.random() > i / n * 2
                     });
+                    ++total;
                   }
                 }
+                console.log(geometries, (hexagons ? Object.keys(hexagons).length : 0));
                 return {
                   transform: {translate: [0, 0], scale: [1, 1]},
                   objects: {hexagons: {type: "GeometryCollection", geometries: geometries}},
@@ -54770,7 +54798,6 @@
               }
 
               hexProjection(radius) {
-                console.log("test");
                 var dx = radius * 2 * Math.sin(Math.PI / 3),
                     dy = radius * 1.5;
                 return {
@@ -54786,90 +54813,26 @@
                 };
               }
 
-              render() { return react.createElement('div', { ref: "canvas", __self: this, __source: {fileName: _jsxFileName$3, lineNumber: 130}}) }
-            }
-
-            const _jsxFileName$4 = "/Users/jose/urbit/canvas/src/js/components/root.js";
-
-            class Root extends react_1 {
-              constructor(props) {
-                super(props);
-              }
-
               render() {
-
+                const { width, height } = this.state;
+                console.log(this.state, this.props);
+                if (this.props.hexagons) {
+                  this.drawCanvas();
+                }
                 return (
-                  react.createElement(BrowserRouter, {__self: this, __source: {fileName: _jsxFileName$4, lineNumber: 16}}
-                    , react.createElement('div', { className: "absolute h-100 w-100 bg-gray0-d ph4-m ph4-l ph4-xl pb4-m pb4-l pb4-xl"         , __self: this, __source: {fileName: _jsxFileName$4, lineNumber: 17}}
-                    , react.createElement(HeaderBar, {__self: this, __source: {fileName: _jsxFileName$4, lineNumber: 18}})
-                    , react.createElement(Route, { exact: true, path: "/~canvas", render:  () => {
-                      return (
-                        react.createElement('div', { className: "cf w-100 flex flex-column pa4 ba-m ba-l ba-xl b--gray2 br1 h-100 h-100-minus-40-m h-100-minus-40-l h-100-minus-40-xl f9 white-d"               , __self: this, __source: {fileName: _jsxFileName$4, lineNumber: 21}}
-                          , react.createElement('h1', { className: "mt0 f8 fw4"  , __self: this, __source: {fileName: _jsxFileName$4, lineNumber: 22}}, "canvas")
-                          , react.createElement('p', { className: "lh-copy measure pt3"  , __self: this, __source: {fileName: _jsxFileName$4, lineNumber: 23}}, "Welcome to your Landscape application."    )
-                          , react.createElement('p', { className: "lh-copy measure pt3"  , __self: this, __source: {fileName: _jsxFileName$4, lineNumber: 24}}, "To get started, edit "    , react.createElement('code', {__self: this, __source: {fileName: _jsxFileName$4, lineNumber: 24}}, "src/index.js"), " or "  , react.createElement('code', {__self: this, __source: {fileName: _jsxFileName$4, lineNumber: 24}}, "canvas.hoon"), " and "  , react.createElement('code', {__self: this, __source: {fileName: _jsxFileName$4, lineNumber: 24}}, "|commit %home" ), " on your Urbit ship to see your changes."        )
-                          , react.createElement('a', { className: "black no-underline db f8 pt3"    , href: "https://urbit.org/docs", __self: this, __source: {fileName: _jsxFileName$4, lineNumber: 25}}, "-> Read the docs"   )
-                          , react.createElement(Hexagons, {__self: this, __source: {fileName: _jsxFileName$4, lineNumber: 26}} )
-                        )
-                      )}, __self: this, __source: {fileName: _jsxFileName$4, lineNumber: 19}}
-                    )
-                    )
+                  react.createElement('div', { ref: "canvas", __self: this, __source: {fileName: _jsxFileName$3, lineNumber: 164}}
+                    , react.createElement('svg', { width: width, height: height, __self: this, __source: {fileName: _jsxFileName$3, lineNumber: 165}}, react.createElement('g', { className: "hexagon", __self: this, __source: {fileName: _jsxFileName$3, lineNumber: 165}} ))
                   )
                 )
               }
             }
 
-            class UrbitApi {
-              setAuthTokens(authTokens) {
-                this.authTokens = authTokens;
-                this.bindPaths = [];
-              }
-
-              bind(path, method, ship = this.authTokens.ship, appl = "canvas", success, fail) {
-                this.bindPaths = lodash.uniq([...this.bindPaths, path]);
-
-                window.subscriptionId = window.urb.subscribe(ship, appl, path, 
-                  (err) => {
-                    fail(err);
-                  },
-                  (event) => {
-                    success({
-                      data: event,
-                      from: {
-                        ship,
-                        path
-                      }
-                    });
-                  },
-                  (err) => {
-                    fail(err);
-                  });
-              }
-
-              canvas(data) {
-                this.action("canvas", "json", data);
-              }
-
-              action(appl, mark, data) {
-                return new Promise((resolve, reject) => {
-                  window.urb.poke(ship, appl, mark, data,
-                    (json) => {
-                      resolve(json);
-                    }, 
-                    (err) => {
-                      reject(err);
-                    });
-                });
-              }
-            }
-            let api = new UrbitApi();
-            window.api = api;
-
             class InitialReducer {
                 reduce(json, state) {
-                    let data = lodash.get(json, 'initial', false);
+                    let data = lodash.get(json, 'init', false);
                     if (data) {
-                        state.inbox = data.inbox;
+                      console.log(data);
+                        state.hexagons = data;
                     }
                 }
             }
@@ -54921,13 +54884,106 @@
                     this.initialReducer.reduce(json, this.state);
                     this.configReducer.reduce(json, this.state);
                     this.updateReducer.reduce(json, this.state);
-
+                    console.log(this.state);
                     this.setState(this.state);
                 }
             }
 
             let store = new Store();
             window.store = store;
+
+            class UrbitApi {
+              setAuthTokens(authTokens) {
+                this.authTokens = authTokens;
+                this.bindPaths = [];
+
+                this.hexagons = {
+                  paint: this.paint.bind(this),
+                };
+              }
+
+              bind(path, method, ship = this.authTokens.ship, appl = "canvas", success, fail) {
+                this.bindPaths = lodash.uniq([...this.bindPaths, path]);
+
+                window.subscriptionId = window.urb.subscribe(ship, appl, path,
+                  (err) => {
+                    fail(err);
+                  },
+                  (event) => {
+                    success({
+                      data: event,
+                      from: {
+                        ship,
+                        path
+                      }
+                    });
+                  },
+                  (err) => {
+                    fail(err);
+                  });
+              }
+
+              canvas(data) {
+                this.action("canvas", "json", data);
+              }
+
+              paint(id, filled) {
+                this.action("canvas", "canvas-action", {
+                  paint: {
+                    id: id,
+                    filled: filled
+                  }
+                });
+              }
+
+              action(appl, mark, data) {
+                return new Promise((resolve, reject) => {
+                  window.urb.poke(ship, appl, mark, data,
+                    (json) => {
+                      resolve(json);
+                    },
+                    (err) => {
+                      reject(err);
+                    });
+                });
+              }
+            }
+            let api = new UrbitApi();
+            window.api = api;
+
+            const _jsxFileName$4 = "/Users/jose/urbit/canvas/src/js/components/root.js";
+
+            class Root extends react_1 {
+              constructor(props) {
+                super(props);
+                this.state = store.state;
+                store.setStateHandler(this.setState.bind(this));
+              }
+
+              render() {
+                const { props, state } = this;
+                console.log(state);
+                console.log(state.hexagons);
+                return (
+                  react.createElement(BrowserRouter, {__self: this, __source: {fileName: _jsxFileName$4, lineNumber: 24}}
+                    , react.createElement('div', { className: "absolute h-100 w-100 bg-gray0-d ph4-m ph4-l ph4-xl pb4-m pb4-l pb4-xl"         , __self: this, __source: {fileName: _jsxFileName$4, lineNumber: 25}}
+                    , react.createElement(HeaderBar, {__self: this, __source: {fileName: _jsxFileName$4, lineNumber: 26}})
+                    , react.createElement(Route, { exact: true, path: "/~canvas", render:  () => {
+                      return (
+                        react.createElement('div', { className: "cf w-100 flex flex-column pa4 ba-m ba-l ba-xl b--gray2 br1 h-100 h-100-minus-40-m h-100-minus-40-l h-100-minus-40-xl f9 white-d"               , __self: this, __source: {fileName: _jsxFileName$4, lineNumber: 29}}
+                          , react.createElement('h1', { className: "mt0 f8 fw4"  , __self: this, __source: {fileName: _jsxFileName$4, lineNumber: 30}}, "canvas")
+                          , react.createElement('p', { className: "lh-copy measure pt3"  , __self: this, __source: {fileName: _jsxFileName$4, lineNumber: 31}}, "Welcome to your Landscape application."    )
+                          , react.createElement('p', { className: "lh-copy measure pt3"  , __self: this, __source: {fileName: _jsxFileName$4, lineNumber: 32}}, "To get started, edit "    , react.createElement('code', {__self: this, __source: {fileName: _jsxFileName$4, lineNumber: 32}}, "src/index.js"), " or "  , react.createElement('code', {__self: this, __source: {fileName: _jsxFileName$4, lineNumber: 32}}, "canvas.hoon"), " and "  , react.createElement('code', {__self: this, __source: {fileName: _jsxFileName$4, lineNumber: 32}}, "|commit %home" ), " on your Urbit ship to see your changes."        )
+                          , react.createElement('a', { className: "black no-underline db f8 pt3"    , href: "https://urbit.org/docs", __self: this, __source: {fileName: _jsxFileName$4, lineNumber: 33}}, "-> Read the docs"   )
+                          , react.createElement(Hexagons, { api: api, hexagons: state.hexagons, __self: this, __source: {fileName: _jsxFileName$4, lineNumber: 34}} )
+                        )
+                      )}, __self: this, __source: {fileName: _jsxFileName$4, lineNumber: 27}}
+                    )
+                    )
+                  )
+                )
+              }
+            }
 
             var lookup = [];
             var revLookup = [];
@@ -63422,16 +63478,18 @@ lyrtesmudnytbyrsenwegfyrmurtelreptegpecnelnevfes\
 
             class Subscription {
               start() {
-                if (api.authTokens) ; else {
+                if (api.authTokens) {
+                  this.initializecanvas();
+                } else {
                   console.error("~~~ ERROR: Must set api.authTokens before operation ~~~");
                 }
               }
 
-              // initializecanvas() {
-              //   api.bind('/primary', 'PUT', api.authTokens.ship, 'canvas',
-              //     this.handleEvent.bind(this),
-              //     this.handleError.bind(this));
-              // }
+              initializecanvas() {
+                api.bind('/primary', 'PUT', api.authTokens.ship, 'canvas',
+                  this.handleEvent.bind(this),
+                  this.handleError.bind(this));
+              }
 
               handleEvent(diff) {
                 store.handleEvent(diff);

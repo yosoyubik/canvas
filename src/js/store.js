@@ -26,7 +26,7 @@ class Store {
         this.initialReducer.reduce(json, this.state);
         this.configReducer.reduce(json, this.state);
         this.updateReducer.reduce(json, this.state);
-
+        console.log(this.state);
         this.setState(this.state);
     }
 }

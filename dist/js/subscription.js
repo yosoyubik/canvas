@@ -7,17 +7,17 @@ import urbitOb from 'urbit-ob';
 export class Subscription {
   start() {
     if (api.authTokens) {
-      // this.initializecanvas();
+      this.initializecanvas();
     } else {
       console.error("~~~ ERROR: Must set api.authTokens before operation ~~~");
     }
   }
 
-  // initializecanvas() {
-  //   api.bind('/primary', 'PUT', api.authTokens.ship, 'canvas',
-  //     this.handleEvent.bind(this),
-  //     this.handleError.bind(this));
-  // }
+  initializecanvas() {
+    api.bind('/primary', 'PUT', api.authTokens.ship, 'canvas',
+      this.handleEvent.bind(this),
+      this.handleError.bind(this));
+  }
 
   handleEvent(diff) {
     store.handleEvent(diff);

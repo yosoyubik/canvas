@@ -51,7 +51,8 @@
       ==
     ::
     +$  state-zero
-      $:  test=@t
+      $:  mesh=hexagons
+          test=?
       ==
     --
 ::
@@ -70,11 +71,12 @@
     ++  on-init
       ^-  (quip card _this)
       ~&  "innito"
-      :_  this(test 'test')
-      :~  ::  Connects to %launch app
+      ~&  launch-poke
+      :_  this
+      :~  ::  Attaches tile to %launch app
           ::
           launch-poke
-          ::  Connects %eyre to the frontend
+          ::  Connects %eyre to the app
           ::
           [%pass /bind/canvas %arvo %e %connect [~ /'~canvas'] %canvas]
       ==
@@ -83,23 +85,34 @@
       ^-  (quip card _this)
       ?>  (team:title our.bowl src.bowl)
       ?+    mark  (on-poke:def mark vase)
+          %json
+        ~&  "got poked"
+        =^  cards  state
+          (handle-json:cc !<(json vase))
+        [cards this]
+      ::
           %handle-http-request
         =+  !<([eyre-id=@ta =inbound-request:eyre] vase)
         :_  this
         %+  give-simple-payload:app  eyre-id
         %+  require-authorization:app  inbound-request
         poke-handle-http-request:cc
-      ::
+        ::
+          %canvas-action
+        =^  cards  state
+          (handle-canvas-action:cc !<(canvas-action vase))
+        [cards this]
       ==
     ::
     ++  on-watch
       |=  =path
-      ^-  (quip card:agent:gall _this)
-      ?:  ?=([%http-response *] path)
-        `this
-      ?.  =(/ path)
-        (on-watch:def path)
-      [[%give %fact ~ %json !>(*json)]~ this]
+      ^-  (quip card _this)
+      :_  this
+      ?+  path  ~|([%peer-canvas-strange path] !!)
+        [%canvastile ~]    [%give %fact ~ %json !>(*json)]~
+        [%primary *]       [%give %fact ~ %json !>(innit-load)]~
+        [%http-response *]  ~
+      ==
     ::
     ++  on-agent  on-agent:def
     ::
@@ -129,6 +142,37 @@
       %launch-action
       !>([%add %canvas /canvastile '/~canvas/js/tile.js'])
   ==
+::
+++  innit-load
+  ^-  json
+  (canvas-action-to-json %init mesh)
+::
+++  handle-json
+  |=  jon=json
+  ^-  (quip card _state)
+  ?>  (team:title our.bowl src.bowl)
+  (handle-canvas-action (json-to-canvas-action jon))
+::
+++  handle-canvas-action
+  |=  act=canvas-action
+  ^-  (quip card _state)
+  |^
+  ?-  -.act
+      %paint  (handle-paint +.act)
+      %init   (handle-init +.act)
+  ==
+  ::
+  ++  handle-paint
+    |=  =arc
+    ^-  (quip card _state)
+    `state(mesh (~(put by mesh) arc))
+  ::
+  ++  handle-init
+    |=  =hexagons
+    ^-  (quip card _state)
+    `state(mesh hexagons)
+  --
+::
 ++  poke-handle-http-request
   |=  =inbound-request:eyre
   ^-  simple-payload:http

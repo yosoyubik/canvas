@@ -1,12 +1,16 @@
 ::  Types
 ::
 |%
++$  arc       [id=@ud filled=?]
++$  hexagons  (map @ud ?)
+::
 +$  canvas-response
-  $%  [%test @t]
+  $%  [%paint arc]
   ==
 ::
 +$  canvas-action
-  $%  [%test @t]
+  $%  [%paint =arc]
+      [%init =hexagons]
   ==
 ::
 +$  canvas-update

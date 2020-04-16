@@ -3,9 +3,10 @@ import _ from 'lodash';
 
 export class InitialReducer {
     reduce(json, state) {
-        let data = _.get(json, 'initial', false);
+        let data = _.get(json, 'init', false);
         if (data) {
-            state.inbox = data.inbox;
+          console.log(data);
+            state.hexagons = data;
         }
     }
 }
