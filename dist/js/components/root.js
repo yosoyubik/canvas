@@ -26,12 +26,8 @@ export class Root extends Component {
         , React.createElement(HeaderBar, {__self: this, __source: {fileName: _jsxFileName, lineNumber: 26}})
         , React.createElement(Route, { exact: true, path: "/~canvas", render:  () => {
           return (
-            React.createElement('div', { className: "cf w-100 flex flex-column pa4 ba-m ba-l ba-xl b--gray2 br1 h-100 h-100-minus-40-m h-100-minus-40-l h-100-minus-40-xl f9 white-d"               , __self: this, __source: {fileName: _jsxFileName, lineNumber: 29}}
-              , React.createElement('h1', { className: "mt0 f8 fw4"  , __self: this, __source: {fileName: _jsxFileName, lineNumber: 30}}, "canvas")
-              , React.createElement('p', { className: "lh-copy measure pt3"  , __self: this, __source: {fileName: _jsxFileName, lineNumber: 31}}, "Welcome to your Landscape application."    )
-              , React.createElement('p', { className: "lh-copy measure pt3"  , __self: this, __source: {fileName: _jsxFileName, lineNumber: 32}}, "To get started, edit "    , React.createElement('code', {__self: this, __source: {fileName: _jsxFileName, lineNumber: 32}}, "src/index.js"), " or "  , React.createElement('code', {__self: this, __source: {fileName: _jsxFileName, lineNumber: 32}}, "canvas.hoon"), " and "  , React.createElement('code', {__self: this, __source: {fileName: _jsxFileName, lineNumber: 32}}, "|commit %home" ), " on your Urbit ship to see your changes."        )
-              , React.createElement('a', { className: "black no-underline db f8 pt3"    , href: "https://urbit.org/docs", __self: this, __source: {fileName: _jsxFileName, lineNumber: 33}}, "-> Read the docs"   )
-              , React.createElement(Hexagons, { api: api, hexagons: state.hexagons, __self: this, __source: {fileName: _jsxFileName, lineNumber: 34}} )
+            React.createElement('div', { className: "cf w-100 flex flex-column ba-m ba-l ba-xl b--gray2 br1 h-100 h-100-minus-40-m h-100-minus-40-l h-100-minus-40-xl f9 white-d"              , __self: this, __source: {fileName: _jsxFileName, lineNumber: 29}}
+              , React.createElement(Hexagons, { api: api, hexagons: state.hexagons, __self: this, __source: {fileName: _jsxFileName, lineNumber: 30}} )
             )
           )}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 27}}
         )

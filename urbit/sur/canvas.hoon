@@ -9,8 +9,9 @@
   ==
 ::
 +$  canvas-action
-  $%  [%paint =arc]
-      [%init =hexagons]
+  $%  [%paint id=@t =arc]
+      [%init id=@t =hexagons]
+      [%join =ship id=@t]
   ==
 ::
 +$  canvas-update

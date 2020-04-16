@@ -31,26 +31,28 @@ export class Hexagons extends Component {
     let mousing = 0;
 
     const mousedown = function(d) {
-      console.log(d);
+      // console.log("mousedown");
       mousing = d.fill ? -1 : +1;
       mousemove.apply(this, arguments);
     }
 
     const mousemove = function(d) {
+      // console.log("mousemove");
       if (mousing) {
-        props.api.hexagons.paint(d.id, mousing > 0);
+        if (d.fill !== mousing > 0)
+          props.api.hexagons.paint('0', d.id, mousing > 0);
         d3.select(this).classed("fill", d.fill = mousing > 0);
         border.call(redraw);
       }
     }
 
     const mouseup = function() {
+      // console.log("mouseup");
       mousemove.apply(this, arguments);
       mousing = 0;
     }
 
     const changeColor = function(d){
-      if(d.fill)console.log(d);
       return d.fill ? "fill" : null;
     }
 
@@ -161,8 +163,8 @@ export class Hexagons extends Component {
       this.drawCanvas();
     }
     return (
-      React.createElement('div', { ref: "canvas", __self: this, __source: {fileName: _jsxFileName, lineNumber: 164}}
-        , React.createElement('svg', { width: width, height: height, __self: this, __source: {fileName: _jsxFileName, lineNumber: 165}}, React.createElement('g', { className: "hexagon", __self: this, __source: {fileName: _jsxFileName, lineNumber: 165}} ))
+      React.createElement('div', { ref: "canvas", __self: this, __source: {fileName: _jsxFileName, lineNumber: 166}}
+        , React.createElement('svg', { width: width, height: height, __self: this, __source: {fileName: _jsxFileName, lineNumber: 167}}, React.createElement('g', { className: "hexagon", __self: this, __source: {fileName: _jsxFileName, lineNumber: 167}} ))
       )
     )
   }

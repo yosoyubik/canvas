@@ -37,11 +37,13 @@ class UrbitApi {
     this.action("canvas", "json", data);
   }
 
-  paint(id, filled) {
+  paint(canvasID, id, filled) {
+    console.log(canvasID, id, filled);
     this.action("canvas", "canvas-action", {
       paint: {
-        id: id,
-        filled: filled
+        'canvas-id': canvasID,
+        'id': id,
+        'filled': filled
       }
     });
   }

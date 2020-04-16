@@ -1,8 +1,8 @@
-::  canvas A Canvas app for Urbit
+::  canvas: A Canvas app for Urbit
 ::
 ::    data:            scry command:
 ::    ------------    ----------------------------------------------
-::    test           .^(canvas %gx /=canvas=/test/noun)
+::    mesh           .^(* %gx /=canvas=/mesh/id/noun)
 ::
 /-  *canvas
 /+  *server, default-agent, verb, *canvas
@@ -51,7 +51,7 @@
       ==
     ::
     +$  state-zero
-      $:  mesh=hexagons
+      $:  canvas=(map @t hexagons)
           test=?
       ==
     --
@@ -70,9 +70,10 @@
     ::
     ++  on-init
       ^-  (quip card _this)
+
       ~&  "innito"
       ~&  launch-poke
-      :_  this
+      :_  this(canvas (~(put by canvas) ['0' ~]))
       :~  ::  Attaches tile to %launch app
           ::
           launch-poke
@@ -86,7 +87,6 @@
       ?>  (team:title our.bowl src.bowl)
       ?+    mark  (on-poke:def mark vase)
           %json
-        ~&  "got poked"
         =^  cards  state
           (handle-json:cc !<(json vase))
         [cards this]
@@ -107,26 +107,65 @@
     ++  on-watch
       |=  =path
       ^-  (quip card _this)
+      ~&  path
       :_  this
-      ?+  path  ~|([%peer-canvas-strange path] !!)
-        [%canvastile ~]    [%give %fact ~ %json !>(*json)]~
-        [%primary *]       [%give %fact ~ %json !>(innit-load)]~
-        [%http-response *]  ~
+      ?+    path  ~|([%peer-canvas-strange path] !!)
+          [%canvastile ~]
+        [%give %fact ~ %json !>(*json)]~
+      ::
+          [%primary *]
+        [%give %fact ~ %json !>((canvas-action-to-json innit-load))]~
+      ::
+          [%http-response *]
+        ~
+      ::
+          [%canvas ^]
+        ~&  path
+        =^  cards  state
+           (send-init-canvas:cc i.t.path)
+         cards
       ==
     ::
-    ++  on-agent  on-agent:def
+    ++  on-agent
+      |=  [=wire =sign:agent:gall]
+      ^-  (quip card _this)
+      ~&  -.sign
+      ?-    -.sign
+          %poke-ack   (on-agent:def wire sign)
+          %watch-ack  (on-agent:def wire sign)
+          %kick       (on-agent:def wire sign)
+      ::
+          %fact
+        =^  cards  state
+          =*  vase  q.cage.sign
+          ^-  (quip card _state)
+          ?+    p.cage.sign  ~|([%canvas-bad-update-mark wire vase] !!)
+              %canvas-action
+            (handle-canvas-action:cc !<(canvas-action q.cage.sign))
+          ==
+        [cards this]
+      ==
     ::
     ++  on-arvo
       |=  [=wire =sign-arvo]
       ^-  (quip card _this)
-      ?.  ?=(%bound +<.sign-arvo)
-        (on-arvo:def wire sign-arvo)
-      [~ this]
+      ~&  [wire sign-arvo]
+      ?:  ?=(%bound +<.sign-arvo)
+        [~ this]
+      (on-arvo:def wire sign-arvo)
     ::
     ++  on-save  on-save:def
     ++  on-load  on-load:def
     ++  on-leave  on-leave:def
-    ++  on-peek   on-peek:def
+    ::  +on-peek: read from app state
+    ::
+    ++  on-peek
+      |=  =path
+      ^-  (unit (unit cage))
+      ?+  path  (on-peek:def path)
+          [%x %mesh @t ~]  ``noun+!>((~(get by canvas) i.t.t.path))
+      ==
+    ::
     ++  on-fail   on-fail:def
     --
 ::
@@ -143,9 +182,32 @@
       !>([%add %canvas /canvastile '/~canvas/js/tile.js'])
   ==
 ::
+++  subscribe
+  |=  [=ship canvas-id=@t]
+  ^-  card
+  :*  %pass
+      /subscribe/(scot %p ship)/(scot %da now.bowl)
+      %agent
+      [ship %canvas]
+      %watch
+      /canvas/(scot %tas canvas-id)
+  ==
+::
+++  send-update
+  |=  [canvas-id=@t =arc]
+  ^-  card
+  :*  %give
+      %fact
+      [/canvas/(scot %tas canvas-id)]~
+      %canvas-action
+      !>([%paint canvas-id arc])
+  ==
+::
 ++  innit-load
-  ^-  json
-  (canvas-action-to-json %init mesh)
+  ^-  canvas-action
+  =/  mesh=(unit hexagons)  (~(get by canvas) '0')
+  ~&  ["innit-load" mesh]
+  [%init ['0' ?~(mesh ~ u.mesh)]]
 ::
 ++  handle-json
   |=  jon=json
@@ -158,20 +220,58 @@
   ^-  (quip card _state)
   |^
   ?-  -.act
-      %paint  (handle-paint +.act)
-      %init   (handle-init +.act)
+    %init   (handle-init +.act)
+    %paint  (handle-paint +.act)
+    %join   (handle-join +.act)
   ==
   ::
   ++  handle-paint
-    |=  =arc
+    |=  [id=@t =arc]
     ^-  (quip card _state)
-    `state(mesh (~(put by mesh) arc))
+    ::  FIXME: remove
+    ::
+    =?  canvas  =(canvas ~)  (~(put by canvas) ['0' ~])
+    =/  mesh=(unit hexagons)  (~(get by canvas) id)
+    ?~  mesh  `state
+    =.  canvas  (~(put by canvas) [id (~(put by u.mesh) arc)])
+    :_  state
+    ?.  (team:title our.bowl src.bowl)
+      ::  foreign
+      ::
+      ~&  "foreign"
+      =/  data=json
+        (canvas-action-to-json [%init id (~(got by canvas) id)])
+      [%give %fact [/primary]~ %json !>(data)]~
+    ::  local
+    ::
+    ~&  'local'
+    [(send-update id arc)]~
   ::
   ++  handle-init
-    |=  =hexagons
+    |=  [id=@t mesh=hexagons]
     ^-  (quip card _state)
-    `state(mesh hexagons)
+    =/  data=json  (canvas-action-to-json [%init id mesh])
+    :-  [%give %fact [/primary]~ %json !>(data)]~
+    state(canvas (~(put by canvas) [id mesh]))
+  ::
+  ++  handle-join
+    |=  [=ship canvas-id=@t]
+    ^-  (quip card _state)
+    ~&  "subscribing..."
+    :-  [(subscribe ship canvas-id)]~
+    ::  TODO: do it after confirmation?
+    ::
+    state(canvas (~(put by canvas) [canvas-id ~]))
   --
+::
+++  send-init-canvas
+  |=  canvas-id=@t
+  ^-  (quip card _state)
+  ~&  "send-init-canvas"
+  ::   send canvas state
+  ::
+  :_  state
+  [%give %fact ~ %canvas-action !>(innit-load)]~
 ::
 ++  poke-handle-http-request
   |=  =inbound-request:eyre

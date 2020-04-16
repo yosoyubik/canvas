@@ -54690,26 +54690,28 @@
                 let mousing = 0;
 
                 const mousedown = function(d) {
-                  console.log(d);
+                  // console.log("mousedown");
                   mousing = d.fill ? -1 : +1;
                   mousemove.apply(this, arguments);
                 };
 
                 const mousemove = function(d) {
+                  // console.log("mousemove");
                   if (mousing) {
-                    props.api.hexagons.paint(d.id, mousing > 0);
+                    if (d.fill !== mousing > 0)
+                      props.api.hexagons.paint('0', d.id, mousing > 0);
                     select(this).classed("fill", d.fill = mousing > 0);
                     border.call(redraw);
                   }
                 };
 
                 const mouseup = function() {
+                  // console.log("mouseup");
                   mousemove.apply(this, arguments);
                   mousing = 0;
                 };
 
                 const changeColor = function(d){
-                  if(d.fill)console.log(d);
                   return d.fill ? "fill" : null;
                 };
 
@@ -54820,8 +54822,8 @@
                   this.drawCanvas();
                 }
                 return (
-                  react.createElement('div', { ref: "canvas", __self: this, __source: {fileName: _jsxFileName$3, lineNumber: 164}}
-                    , react.createElement('svg', { width: width, height: height, __self: this, __source: {fileName: _jsxFileName$3, lineNumber: 165}}, react.createElement('g', { className: "hexagon", __self: this, __source: {fileName: _jsxFileName$3, lineNumber: 165}} ))
+                  react.createElement('div', { ref: "canvas", __self: this, __source: {fileName: _jsxFileName$3, lineNumber: 166}}
+                    , react.createElement('svg', { width: width, height: height, __self: this, __source: {fileName: _jsxFileName$3, lineNumber: 167}}, react.createElement('g', { className: "hexagon", __self: this, __source: {fileName: _jsxFileName$3, lineNumber: 167}} ))
                   )
                 )
               }
@@ -54927,11 +54929,13 @@
                 this.action("canvas", "json", data);
               }
 
-              paint(id, filled) {
+              paint(canvasID, id, filled) {
+                console.log(canvasID, id, filled);
                 this.action("canvas", "canvas-action", {
                   paint: {
-                    id: id,
-                    filled: filled
+                    'canvas-id': canvasID,
+                    'id': id,
+                    'filled': filled
                   }
                 });
               }
@@ -54970,12 +54974,8 @@
                     , react.createElement(HeaderBar, {__self: this, __source: {fileName: _jsxFileName$4, lineNumber: 26}})
                     , react.createElement(Route, { exact: true, path: "/~canvas", render:  () => {
                       return (
-                        react.createElement('div', { className: "cf w-100 flex flex-column pa4 ba-m ba-l ba-xl b--gray2 br1 h-100 h-100-minus-40-m h-100-minus-40-l h-100-minus-40-xl f9 white-d"               , __self: this, __source: {fileName: _jsxFileName$4, lineNumber: 29}}
-                          , react.createElement('h1', { className: "mt0 f8 fw4"  , __self: this, __source: {fileName: _jsxFileName$4, lineNumber: 30}}, "canvas")
-                          , react.createElement('p', { className: "lh-copy measure pt3"  , __self: this, __source: {fileName: _jsxFileName$4, lineNumber: 31}}, "Welcome to your Landscape application."    )
-                          , react.createElement('p', { className: "lh-copy measure pt3"  , __self: this, __source: {fileName: _jsxFileName$4, lineNumber: 32}}, "To get started, edit "    , react.createElement('code', {__self: this, __source: {fileName: _jsxFileName$4, lineNumber: 32}}, "src/index.js"), " or "  , react.createElement('code', {__self: this, __source: {fileName: _jsxFileName$4, lineNumber: 32}}, "canvas.hoon"), " and "  , react.createElement('code', {__self: this, __source: {fileName: _jsxFileName$4, lineNumber: 32}}, "|commit %home" ), " on your Urbit ship to see your changes."        )
-                          , react.createElement('a', { className: "black no-underline db f8 pt3"    , href: "https://urbit.org/docs", __self: this, __source: {fileName: _jsxFileName$4, lineNumber: 33}}, "-> Read the docs"   )
-                          , react.createElement(Hexagons, { api: api, hexagons: state.hexagons, __self: this, __source: {fileName: _jsxFileName$4, lineNumber: 34}} )
+                        react.createElement('div', { className: "cf w-100 flex flex-column ba-m ba-l ba-xl b--gray2 br1 h-100 h-100-minus-40-m h-100-minus-40-l h-100-minus-40-xl f9 white-d"              , __self: this, __source: {fileName: _jsxFileName$4, lineNumber: 29}}
+                          , react.createElement(Hexagons, { api: api, hexagons: state.hexagons, __self: this, __source: {fileName: _jsxFileName$4, lineNumber: 30}} )
                         )
                       )}, __self: this, __source: {fileName: _jsxFileName$4, lineNumber: 27}}
                     )
