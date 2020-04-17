@@ -239,13 +239,13 @@
     ?.  (team:title our.bowl src.bowl)
       ::  foreign
       ::
-      ~&  "foreign"
-      =/  data=json
-        (canvas-action-to-json [%init id (~(got by canvas) id)])
+      ~&  "foreign, udpate my frontend"
+      =/  data=json  (canvas-action-to-json [%paint id arc])
+        :: (canvas-action-to-json [%init id (~(got by canvas) id)])
       [%give %fact [/primary]~ %json !>(data)]~
     ::  local
     ::
-    ~&  'local'
+    ~&  'local, send to subscribers'
     [(send-update id arc)]~
   ::
   ++  handle-init
