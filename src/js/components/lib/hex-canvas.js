@@ -25,9 +25,9 @@ const hexProjection = (radius) => {
 const projection = hexProjection(radius);
 const path = d3.geoPath().projection(projection);
 
-const initHexMesh = (svg) => {
+const initHexMesh = () => {
   const topology = hexTopology(radius, width, height);
-  d3.select(".hexagon").append("path")
+  d3.select(".mesh-group").append("path")
       .datum(topojson.mesh(topology, topology.objects.hexagons))
       .attr("class", "mesh")
       .attr("d", path);
@@ -47,12 +47,11 @@ const drawHexCanvas = (props) => {
   }
 
   const mousemove = function(d) {
-    // console.log("mousemove");
     if (mousing) {
       if (d.fill !== mousing > 0)
         props.api.hexagons.paint('0', d.id, mousing > 0);
       d3.select(this).classed("point fill", d.fill = mousing > 0);
-      border.call(redraw);
+      // border.call(redraw);
     }
   }
 
@@ -66,27 +65,19 @@ const drawHexCanvas = (props) => {
     return d.fill ? "fill point" : "point";
   }
 
-  const redraw = (border) => {
-    console.log("redrawing");
-    border.attr("d",
-      path(topojson.mesh(topology, topology.objects.hexagons,
-        function(a, b) { return a.fill ^ b.fill; })
-      )
-    );
-  }
-
-  // const svg = d3.select(this.refs.canvas).append("svg")
-  //     .attr("width", width)
-  //     .attr("height", height)
-  //     .append("g")
-  //       .attr("class", "hexagon")
-
-  const svg = d3.select(".hexagon");
-  // const mesh = d3.select(".mesh");
-  const border = d3.select(".border");
+  // const redraw = (border) => {
+  //   console.log("redrawing", border);
+  //   border.attr("d",
+  //     path(topojson.mesh(topology, topology.objects.hexagons,
+  //       function(a, b) { return a.fill ^ b.fill; })
+  //     )
+  //   );
+  // }
+  const svg = d3.select("svg");
+  const g = d3.select(".hexagon");
 
   // update
-  const hexagons = svg
+  const hexagons = g
     .selectAll("path")
     .data(topology.objects.hexagons.geometries)
     .attr("class", changeColor);
@@ -100,12 +91,10 @@ const drawHexCanvas = (props) => {
       .on("mousemove", mousemove)
       .on("mouseup", mouseup);
 
-  // update
-  border.call(redraw);
-  // enter
-  border.enter().append("path")
-      .attr("class", "border")
-      .call(redraw);
+  // const border = d3.select(".border-group")
+  //   .append("path")
+  //     .attr("class", "border")
+  //     .call(redraw);
 }
 
 const hexTopology = (radius, width, height, hexagons) => {
@@ -147,7 +136,7 @@ const hexTopology = (radius, width, height, hexagons) => {
 const updateCanvas = (arc) => {
   d3.selectAll(".point").attr("class", function (d) {
     if (arc.hasOwnProperty(d.id)) {
-      d.fill = arc.hasOwnProperty(d.id) ? true : d.fill;
+      d.fill = arc.hasOwnProperty(d.id) ? arc[d.id] : d.fill;
     }
     return d.fill ? "fill point" : "point"
    });

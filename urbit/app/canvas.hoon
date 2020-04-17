@@ -234,8 +234,15 @@
     :: =?  canvas  =(canvas ~)  (~(put by canvas) ['0' ~])
     =/  mesh=(unit hexagons)  (~(get by canvas) id)
     ?~  mesh  `state
-    =.  canvas  (~(put by canvas) [id (~(put by u.mesh) arc)])
-    :_  state
+    :: =.  canvas  (~(put by canvas) [id (~(put by u.mesh) arc)])
+    :_  %_  state
+            canvas
+          %+  ~(put by canvas)  id
+          ?.  filled.arc
+            (~(del by u.mesh) id.arc)
+          (~(put by u.mesh) arc)
+        ==
+    :: :_  state
     ?.  (team:title our.bowl src.bowl)
       ::  foreign
       ::
