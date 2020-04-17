@@ -49628,6 +49628,12 @@
                   : new Selection([[selector]], root);
             }
 
+            function selectAll(selector) {
+              return typeof selector === "string"
+                  ? new Selection([document.querySelectorAll(selector)], [document.documentElement])
+                  : new Selection([selector == null ? [] : selector], root);
+            }
+
             function define(constructor, factory, prototype) {
               constructor.prototype = factory.prototype = prototype;
               prototype.constructor = constructor;
@@ -54665,12 +54671,38 @@
                   height = 500,
                   radius = 20;
 
+            const hexProjection = (radius) => {
+              var dx = radius * 2 * Math.sin(Math.PI / 3),
+                  dy = radius * 1.5;
+              return {
+                stream: function(stream) {
+                  return {
+                    point: function(x, y) { stream.point(x * dx / 2, (y - (2 - (y & 1)) / 3) * dy / 2); },
+                    lineStart: function() { stream.lineStart(); },
+                    lineEnd: function() { stream.lineEnd(); },
+                    polygonStart: function() { stream.polygonStart(); },
+                    polygonEnd: function() { stream.polygonEnd(); }
+                  };
+                }
+              };
+            };
+
+            const projection = hexProjection(radius);
+            const path = index$1().projection(projection);
+
+            const initHexMesh = (svg) => {
+              const topology = hexTopology(radius, width, height);
+              select(".hexagon").append("path")
+                  .datum(mesh(topology, topology.objects.hexagons))
+                  .attr("class", "mesh")
+                  .attr("d", path);
+            };
+
             const drawHexCanvas = (props) => {
               console.log("drawing", props);
 
               const topology = hexTopology(radius, width, height, props.hexagons);
-              const projection = hexProjection(radius);
-              const path = index$1().projection(projection);
+
               let mousing = 0;
 
               const mousedown = function(d) {
@@ -54700,6 +54732,7 @@
               };
 
               const redraw = (border) => {
+                console.log("redrawing");
                 border.attr("d",
                   path(mesh(topology, topology.objects.hexagons,
                     function(a, b) { return a.fill ^ b.fill; })
@@ -54714,6 +54747,8 @@
               //       .attr("class", "hexagon")
 
               const svg = select(".hexagon");
+              // const mesh = d3.select(".mesh");
+              const border = select(".border");
 
               // update
               const hexagons = svg
@@ -54730,18 +54765,10 @@
                   .on("mousemove", mousemove)
                   .on("mouseup", mouseup);
 
-              //const mesh = d3.select(".mesh");
-              //  update
-
-              //  enter
-
-              svg.append("path")
-                  .datum(mesh(topology, topology.objects.hexagons))
-                  .attr("class", "mesh")
-                  .attr("d", path);
-
-
-              const border = svg.append("path")
+              // update
+              border.call(redraw);
+              // enter
+              border.enter().append("path")
                   .attr("class", "border")
                   .call(redraw);
             };
@@ -54782,31 +54809,13 @@
               };
             };
 
-            const hexProjection = (radius) => {
-              var dx = radius * 2 * Math.sin(Math.PI / 3),
-                  dy = radius * 1.5;
-              return {
-                stream: function(stream) {
-                  return {
-                    point: function(x, y) { stream.point(x * dx / 2, (y - (2 - (y & 1)) / 3) * dy / 2); },
-                    lineStart: function() { stream.lineStart(); },
-                    lineEnd: function() { stream.lineEnd(); },
-                    polygonStart: function() { stream.polygonStart(); },
-                    polygonEnd: function() { stream.polygonEnd(); }
-                  };
-                }
-              };
-            };
-
             const updateCanvas = (arc) => {
-              const paths = select(".hexagon").selectAll(".point");
-                paths
-                .attr("class", function (d) {
-                  if (arc.hasOwnProperty(d.id)) {
-                    d.fill = arc.hasOwnProperty(d.id) ? true : d.fill;
-                  }
-                  return d.fill ? "fill point" : "point"
-                 });
+              selectAll(".point").attr("class", function (d) {
+                if (arc.hasOwnProperty(d.id)) {
+                  d.fill = arc.hasOwnProperty(d.id) ? true : d.fill;
+                }
+                return d.fill ? "fill point" : "point"
+               });
             };
 
             const _jsxFileName$3 = "/Users/jose/urbit/canvas/src/js/components/hexagons.js";
@@ -54825,6 +54834,7 @@
               componentDidMount() {
                 console.log("mounted");
                 drawHexCanvas(this.props);
+                initHexMesh();
               }
 
               // drawCanvas() {
@@ -54969,8 +54979,8 @@
                   drawHexCanvas(this.props);
                 }
                 return (
-                  react.createElement('div', { ref: "canvas", __self: this, __source: {fileName: _jsxFileName$3, lineNumber: 164}}
-                    , react.createElement('svg', { width: width, height: height, __self: this, __source: {fileName: _jsxFileName$3, lineNumber: 165}}, react.createElement('g', { className: "hexagon", __self: this, __source: {fileName: _jsxFileName$3, lineNumber: 165}} ))
+                  react.createElement('div', { ref: "canvas", __self: this, __source: {fileName: _jsxFileName$3, lineNumber: 170}}
+                    , react.createElement('svg', { width: width, height: height, __self: this, __source: {fileName: _jsxFileName$3, lineNumber: 171}}, react.createElement('g', { className: "hexagon", __self: this, __source: {fileName: _jsxFileName$3, lineNumber: 171}} ))
                   )
                 )
               }

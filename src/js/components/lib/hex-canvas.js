@@ -6,12 +6,38 @@ const width = 960,
       height = 500,
       radius = 20;
 
+const hexProjection = (radius) => {
+  var dx = radius * 2 * Math.sin(Math.PI / 3),
+      dy = radius * 1.5;
+  return {
+    stream: function(stream) {
+      return {
+        point: function(x, y) { stream.point(x * dx / 2, (y - (2 - (y & 1)) / 3) * dy / 2); },
+        lineStart: function() { stream.lineStart(); },
+        lineEnd: function() { stream.lineEnd(); },
+        polygonStart: function() { stream.polygonStart(); },
+        polygonEnd: function() { stream.polygonEnd(); }
+      };
+    }
+  };
+}
+
+const projection = hexProjection(radius);
+const path = d3.geoPath().projection(projection);
+
+const initHexMesh = (svg) => {
+  const topology = hexTopology(radius, width, height);
+  d3.select(".hexagon").append("path")
+      .datum(topojson.mesh(topology, topology.objects.hexagons))
+      .attr("class", "mesh")
+      .attr("d", path);
+}
+
 const drawHexCanvas = (props) => {
   console.log("drawing", props);
 
   const topology = hexTopology(radius, width, height, props.hexagons);
-  const projection = hexProjection(radius);
-  const path = d3.geoPath().projection(projection);
+
   let mousing = 0;
 
   const mousedown = function(d) {
@@ -41,6 +67,7 @@ const drawHexCanvas = (props) => {
   }
 
   const redraw = (border) => {
+    console.log("redrawing");
     border.attr("d",
       path(topojson.mesh(topology, topology.objects.hexagons,
         function(a, b) { return a.fill ^ b.fill; })
@@ -55,6 +82,8 @@ const drawHexCanvas = (props) => {
   //       .attr("class", "hexagon")
 
   const svg = d3.select(".hexagon");
+  // const mesh = d3.select(".mesh");
+  const border = d3.select(".border");
 
   // update
   const hexagons = svg
@@ -71,17 +100,10 @@ const drawHexCanvas = (props) => {
       .on("mousemove", mousemove)
       .on("mouseup", mouseup);
 
-  //const mesh = d3.select(".mesh");
-  //  update
-
-  //  enter
-
-  svg.append("path")
-      .datum(topojson.mesh(topology, topology.objects.hexagons))
-      .attr("class", "mesh")
-      .attr("d", path);
-
-  const border = svg.append("path")
+  // update
+  border.call(redraw);
+  // enter
+  border.enter().append("path")
       .attr("class", "border")
       .call(redraw);
 }
@@ -122,31 +144,13 @@ const hexTopology = (radius, width, height, hexagons) => {
   };
 }
 
-const hexProjection = (radius) => {
-  var dx = radius * 2 * Math.sin(Math.PI / 3),
-      dy = radius * 1.5;
-  return {
-    stream: function(stream) {
-      return {
-        point: function(x, y) { stream.point(x * dx / 2, (y - (2 - (y & 1)) / 3) * dy / 2); },
-        lineStart: function() { stream.lineStart(); },
-        lineEnd: function() { stream.lineEnd(); },
-        polygonStart: function() { stream.polygonStart(); },
-        polygonEnd: function() { stream.polygonEnd(); }
-      };
-    }
-  };
-}
-
 const updateCanvas = (arc) => {
-  const paths = d3.select(".hexagon").selectAll(".point");
-    paths
-    .attr("class", function (d) {
-      if (arc.hasOwnProperty(d.id)) {
-        d.fill = arc.hasOwnProperty(d.id) ? true : d.fill;
-      }
-      return d.fill ? "fill point" : "point"
-     });
+  d3.selectAll(".point").attr("class", function (d) {
+    if (arc.hasOwnProperty(d.id)) {
+      d.fill = arc.hasOwnProperty(d.id) ? true : d.fill;
+    }
+    return d.fill ? "fill point" : "point"
+   });
 }
 
-export { drawHexCanvas, updateCanvas, width, height, radius };
+export { initHexMesh, drawHexCanvas, updateCanvas, width, height, radius };

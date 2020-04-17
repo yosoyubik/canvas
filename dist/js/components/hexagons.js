@@ -1,6 +1,11 @@
 const _jsxFileName = "/Users/jose/urbit/canvas/src/js/components/hexagons.js";import React, { Component } from 'react';
 
-import { drawHexCanvas, width, height, radius } from "./lib/hex-canvas";
+import { initHexMesh,
+         drawHexCanvas,
+         width,
+         height,
+         radius }
+from "./lib/hex-canvas";
 
 
 export class Hexagons extends Component {
@@ -17,6 +22,7 @@ export class Hexagons extends Component {
   componentDidMount() {
     console.log("mounted");
     drawHexCanvas(this.props);
+    initHexMesh();
   }
 
   // drawCanvas() {
@@ -161,8 +167,8 @@ export class Hexagons extends Component {
       drawHexCanvas(this.props);
     }
     return (
-      React.createElement('div', { ref: "canvas", __self: this, __source: {fileName: _jsxFileName, lineNumber: 164}}
-        , React.createElement('svg', { width: width, height: height, __self: this, __source: {fileName: _jsxFileName, lineNumber: 165}}, React.createElement('g', { className: "hexagon", __self: this, __source: {fileName: _jsxFileName, lineNumber: 165}} ))
+      React.createElement('div', { ref: "canvas", __self: this, __source: {fileName: _jsxFileName, lineNumber: 170}}
+        , React.createElement('svg', { width: width, height: height, __self: this, __source: {fileName: _jsxFileName, lineNumber: 171}}, React.createElement('g', { className: "hexagon", __self: this, __source: {fileName: _jsxFileName, lineNumber: 171}} ))
       )
     )
   }

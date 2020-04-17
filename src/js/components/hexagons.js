@@ -1,6 +1,11 @@
 import React, { Component } from 'react';
 
-import { drawHexCanvas, width, height, radius } from "./lib/hex-canvas";
+import { initHexMesh,
+         drawHexCanvas,
+         width,
+         height,
+         radius }
+from "./lib/hex-canvas";
 
 
 export class Hexagons extends Component {
@@ -17,6 +22,7 @@ export class Hexagons extends Component {
   componentDidMount() {
     console.log("mounted");
     drawHexCanvas(this.props);
+    initHexMesh();
   }
 
   // drawCanvas() {
