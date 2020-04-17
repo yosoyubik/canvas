@@ -1,7 +1,8 @@
+import _ from 'lodash';
 import { api } from '/api';
 import { store } from '/store';
-
 import urbitOb from 'urbit-ob';
+import { updateCanvas } from "./components/lib/hex-canvas";
 
 
 export class Subscription {
@@ -20,7 +21,16 @@ export class Subscription {
   }
 
   handleEvent(diff) {
-    store.handleEvent(diff);
+    let data = _.get(diff.data, 'paint', false);
+    if (data) {
+      //  TODO: account for if canvas-id exists
+      //  data = {canvas-id: {arc-id: : fill}
+      //
+      updateCanvas(data['0']);
+    }
+    else{
+      store.handleEvent(diff);
+    }
   }
 
   handleError(err) {

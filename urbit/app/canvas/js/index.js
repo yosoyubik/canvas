@@ -54684,7 +54684,7 @@
                 if (mousing) {
                   if (d.fill !== mousing > 0)
                     props.api.hexagons.paint('0', d.id, mousing > 0);
-                  select(this).classed("fill", d.fill = mousing > 0);
+                  select(this).classed("point fill", d.fill = mousing > 0);
                   border.call(redraw);
                 }
               };
@@ -54696,7 +54696,7 @@
               };
 
               const changeColor = function(d){
-                return d.fill ? "fill" : null;
+                return d.fill ? "fill point" : "point";
               };
 
               const redraw = (border) => {
@@ -54717,7 +54717,7 @@
 
               // update
               const hexagons = svg
-                .selectAll(".point")
+                .selectAll("path")
                 .data(topology.objects.hexagons.geometries)
                 .attr("class", changeColor);
 
@@ -54725,7 +54725,6 @@
               hexagons
                 .enter().append("path")
                   .attr("d", function(d) { return path(feature(topology, d)); })
-                  .attr("class", "point")
                   .attr("class", changeColor)
                   .on("mousedown", mousedown)
                   .on("mousemove", mousemove)
@@ -54741,10 +54740,10 @@
                   .attr("class", "mesh")
                   .attr("d", path);
 
+
               const border = svg.append("path")
                   .attr("class", "border")
                   .call(redraw);
-
             };
 
             const hexTopology = (radius, width, height, hexagons) => {
@@ -54797,6 +54796,17 @@
                   };
                 }
               };
+            };
+
+            const updateCanvas = (arc) => {
+              const paths = select(".hexagon").selectAll(".point");
+                paths
+                .attr("class", function (d) {
+                  if (arc.hasOwnProperty(d.id)) {
+                    d.fill = arc.hasOwnProperty(d.id) ? true : d.fill;
+                  }
+                  return d.fill ? "fill point" : "point"
+                 });
             };
 
             const _jsxFileName$3 = "/Users/jose/urbit/canvas/src/js/components/hexagons.js";
@@ -63629,7 +63639,16 @@ lyrtesmudnytbyrsenwegfyrmurtelreptegpecnelnevfes\
               }
 
               handleEvent(diff) {
-                store.handleEvent(diff);
+                let data = lodash.get(diff.data, 'paint', false);
+                if (data) {
+                  //  TODO: account for if canvas-id exists
+                  //  data = {canvas-id: {arc-id: : fill}
+                  //
+                  updateCanvas(data['0']);
+                }
+                else{
+                  store.handleEvent(diff);
+                }
               }
 
               handleError(err) {

@@ -25,7 +25,7 @@ const drawHexCanvas = (props) => {
     if (mousing) {
       if (d.fill !== mousing > 0)
         props.api.hexagons.paint('0', d.id, mousing > 0);
-      d3.select(this).classed("fill", d.fill = mousing > 0);
+      d3.select(this).classed("point fill", d.fill = mousing > 0);
       border.call(redraw);
     }
   }
@@ -37,7 +37,7 @@ const drawHexCanvas = (props) => {
   }
 
   const changeColor = function(d){
-    return d.fill ? "fill" : null;
+    return d.fill ? "fill point" : "point";
   }
 
   const redraw = (border) => {
@@ -58,7 +58,7 @@ const drawHexCanvas = (props) => {
 
   // update
   const hexagons = svg
-    .selectAll(".point")
+    .selectAll("path")
     .data(topology.objects.hexagons.geometries)
     .attr("class", changeColor);
 
@@ -66,7 +66,6 @@ const drawHexCanvas = (props) => {
   hexagons
     .enter().append("path")
       .attr("d", function(d) { return path(topojson.feature(topology, d)); })
-      .attr("class", "point")
       .attr("class", changeColor)
       .on("mousedown", mousedown)
       .on("mousemove", mousemove)
@@ -85,7 +84,6 @@ const drawHexCanvas = (props) => {
   const border = svg.append("path")
       .attr("class", "border")
       .call(redraw);
-
 }
 
 const hexTopology = (radius, width, height, hexagons) => {
@@ -140,4 +138,15 @@ const hexProjection = (radius) => {
   };
 }
 
-export { drawHexCanvas, width, height, radius };
+const updateCanvas = (arc) => {
+  const paths = d3.select(".hexagon").selectAll(".point");
+    paths
+    .attr("class", function (d) {
+      if (arc.hasOwnProperty(d.id)) {
+        d.fill = arc.hasOwnProperty(d.id) ? true : d.fill;
+      }
+      return d.fill ? "fill point" : "point"
+     });
+}
+
+export { drawHexCanvas, updateCanvas, width, height, radius };
