@@ -12,6 +12,7 @@
   $%  [%paint id=@t =arc]
       [%init id=@t =hexagons]
       [%join =ship id=@t]
+      [%create id=@t]
   ==
 ::
 +$  canvas-update

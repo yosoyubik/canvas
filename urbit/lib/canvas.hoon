@@ -11,6 +11,7 @@
     %-  of
     :~  [%paint paint]
         [%join join]
+        [%create so]
     ==
   ::
   ++  paint

@@ -220,9 +220,10 @@
   ^-  (quip card _state)
   |^
   ?-  -.act
-    %init   (handle-init +.act)
-    %paint  (handle-paint +.act)
-    %join   (handle-join +.act)
+    %init    (handle-init +.act)
+    %paint   (handle-paint +.act)
+    %join    (handle-join +.act)
+    %create  (handle-create +.act)
   ==
   ::
   ++  handle-paint
@@ -230,7 +231,7 @@
     ^-  (quip card _state)
     ::  FIXME: remove
     ::
-    =?  canvas  =(canvas ~)  (~(put by canvas) ['0' ~])
+    :: =?  canvas  =(canvas ~)  (~(put by canvas) ['0' ~])
     =/  mesh=(unit hexagons)  (~(get by canvas) id)
     ?~  mesh  `state
     =.  canvas  (~(put by canvas) [id (~(put by u.mesh) arc)])
@@ -262,6 +263,12 @@
     ::  TODO: do it after confirmation?
     ::
     state(canvas (~(put by canvas) [canvas-id ~]))
+  ::
+  ++  handle-create
+   |=  id=@t
+   ^-  (quip card _state)
+   :-  ~
+   state(canvas (~(put by canvas) [id ~]))
   --
 ::
 ++  send-init-canvas
