@@ -54446,6 +54446,76 @@
               bezierCurveTo: function(x1, y1, x2, y2, x, y) { this._context.bezierCurveTo(y1, x1, y2, x2, y, x); }
             };
 
+            // Adapted from: http://bl.ocks.org/Rokotyan/0556f8facbaf344507cdc45dc3622177
+
+            const hexClasses = [".hexagon",
+                                ".hexagon path",
+                                ".hexagon :hover",
+                                ".hexagon .fill",
+                                ".border, .mesh",
+                                ".mesh",
+                                ".border"];
+
+            const contains = (str, arr) => {
+              return arr.indexOf( str ) === -1 ? false : true;
+            };
+
+            const getCSSStyles = ( parentElement ) => {
+              let extractedCSSText = '';
+              const s = document.styleSheets[0];
+              console.log(s);
+              var cssRules = s.cssRules;
+              for (let r = 0; r < cssRules.length; r++) {
+                if ( contains( cssRules[r].selectorText, hexClasses ) )
+                  extractedCSSText += cssRules[r].cssText;
+                }
+
+              return extractedCSSText;
+            };
+
+            const appendCSS = ( element, css ) => {
+              const styleElement = document.createElement("style");
+              styleElement.setAttribute("type","text/css");
+              styleElement.innerHTML = css;
+              const refNode = element.hasChildNodes() ? element.children[0] : null;
+              element.insertBefore( styleElement, refNode );
+              return element;
+            };
+
+            const simpleParseSVG = (svgNode) => {
+
+              // const svgString =
+              // `<svg viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg">
+              //   <style>
+              //     circle {
+              //       fill: gold;
+              //       stroke: maroon;
+              //       stroke-width: 2px;
+              //     }
+              //   </style>
+              //
+              //   <circle cx="5" cy="5" r="4" />
+              // </svg>`;
+
+              // const svgString = sigil({
+              //   patp: "~norsyr-torryn",
+              //   renderer: stringRenderer,
+              //   size: 30,
+              //   colors: ['white', 'black'],
+              // });
+              // const svgDocument = new DOMParser().parseFromString(svgString, 'image/svg+xml')
+              // svgDocument.documentElement.width.baseVal.valueAsString = `40px`
+              // svgDocument.documentElement.height.baseVal.valueAsString = `40px`
+              const svgNodePlusCSS = appendCSS(svgNode, getCSSStyles());
+              let serializedXML = new XMLSerializer().serializeToString(svgNode);
+              // Fix root xlink without namespace
+              serializedXML = serializedXML.replace(/(\w+)?:?xlink=/g, 'xmlns:xlink=');
+              // Safari NS namespace fix
+              serializedXML = serializedXML.replace(/NS\d+:href/g, 'xlink:href');
+              console.log(serializedXML);
+              return serializedXML;
+            };
+
             function identity$3(x) {
               return x;
             }
@@ -54820,17 +54890,28 @@
                 initHexMesh();
               }
 
+              onClickSave () {
+                const svgString = simpleParseSVG(select("#canvas").node());
+                console.log(svgString);
+                this.props.api.svg.save('0', svgString);
+              }
+
               render() {
                 console.log(this.state, this.props);
                 if (this.props.hexagons) {
                   drawHexCanvas(this.props);
                 }
                 return (
-                  react.createElement('div', { ref: "canvas", __self: this, __source: {fileName: _jsxFileName$3, lineNumber: 28}}
-                    , react.createElement('svg', { width: width, height: height, __self: this, __source: {fileName: _jsxFileName$3, lineNumber: 29}}
-                      , react.createElement('g', { className: "hexagon", __self: this, __source: {fileName: _jsxFileName$3, lineNumber: 30}} )
-                      , react.createElement('g', { className: "mesh-group", __self: this, __source: {fileName: _jsxFileName$3, lineNumber: 31}} )
-                      , react.createElement('g', { className: "border-group", __self: this, __source: {fileName: _jsxFileName$3, lineNumber: 32}} )
+                  react.createElement('div', { ref: "canvas", __self: this, __source: {fileName: _jsxFileName$3, lineNumber: 36}}
+                    , react.createElement('button', {
+                      onClick: this.onClickSave.bind(this),
+                      className: "pointer db f9 green2 bg-gray0-d ba pv3 ph4 b--green2"        , __self: this, __source: {fileName: _jsxFileName$3, lineNumber: 37}}, "Save Image"
+
+                    )
+                    , react.createElement('svg', { id: "canvas", width: width, height: height, __self: this, __source: {fileName: _jsxFileName$3, lineNumber: 42}}
+                      , react.createElement('g', { className: "hexagon", __self: this, __source: {fileName: _jsxFileName$3, lineNumber: 43}} )
+                      , react.createElement('g', { className: "mesh-group", __self: this, __source: {fileName: _jsxFileName$3, lineNumber: 44}} )
+                      , react.createElement('g', { className: "border-group", __self: this, __source: {fileName: _jsxFileName$3, lineNumber: 45}} )
                     )
                   )
                 )
@@ -54910,6 +54991,10 @@
                 this.hexagons = {
                   paint: this.paint.bind(this),
                 };
+
+                this.svg = {
+                  save: this.saveSVG.bind(this),
+                };
               }
 
               bind(path, method, ship = this.authTokens.ship, appl = "canvas", success, fail) {
@@ -54935,6 +55020,15 @@
 
               canvas(data) {
                 this.action("canvas", "json", data);
+              }
+
+              saveSVG(canvasID, svgData) {
+                this.action("canvas", "canvas-action", {
+                  save: {
+                    'canvas-id': canvasID,
+                    'svg': svgData,
+                  }
+                });
               }
 
               paint(canvasID, id, filled) {

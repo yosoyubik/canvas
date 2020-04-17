@@ -93,11 +93,11 @@
       ::
           %handle-http-request
         =+  !<([eyre-id=@ta =inbound-request:eyre] vase)
+        =+  url=(parse-request-line url.request.inbound-request)
         :_  this
         %+  give-simple-payload:app  eyre-id
-        %+  require-authorization:app  inbound-request
-        poke-handle-http-request:cc
-        ::
+        (poke-handle-http-request:cc inbound-request site.url)
+      ::
           %canvas-action
         =^  cards  state
           (handle-canvas-action:cc !<(canvas-action vase))
@@ -224,6 +224,7 @@
     %paint   (handle-paint +.act)
     %join    (handle-join +.act)
     %create  (handle-create +.act)
+    %save    (handle-save +.act)
   ==
   ::
   ++  handle-paint
@@ -276,6 +277,19 @@
    ^-  (quip card _state)
    :-  ~
    state(canvas (~(put by canvas) [id ~]))
+  ::
+  ++  handle-save
+    |=  [file=@t svg=@t]
+    ^-  (quip card _state)
+    =/  =path
+      ~[(scot %p our.bowl) %home (scot %da now.bowl) %app %canvas %svg file %svg]
+    :: ~&  path
+    :: ~&  (as-octs:mimes:html svg)
+    :: ~&  (de-xml:html svg)
+    =/  contents=cage  [%svg !>(svg)]
+    :: =/  contents=cage  [%xml !>(~['text file line 1' 'line 2'])]
+    :_  state
+    [%pass /write-file %arvo %c %info (foal:space:userlib path contents)]~
   --
 ::
 ++  send-init-canvas
@@ -288,21 +302,42 @@
   [%give %fact ~ %canvas-action !>(innit-load)]~
 ::
 ++  poke-handle-http-request
-  |=  =inbound-request:eyre
+  |=  [=inbound-request:eyre url=(list @t)]
   ^-  simple-payload:http
-  =+  url=(parse-request-line url.request.inbound-request)
-  ?+  site.url  not-found:gen
+  |^
+  ?:  ?=([%'~canvas' %svg ^] url)
+    (handle-svg-call i.t.t.url)
+  %+  require-authorization:app  inbound-request
+  handle-auth-call
+  ::
+  ++  handle-svg-call
+    |=  file=@t
+    ^-  simple-payload:http
+    ~&  file
+    =/  svg  (~(get by canvas-svg) file)
+    ?~  svg
+      not-found:gen
+    (svg-response:gen (as-octs:mimes:html u.svg))
+  ::
+  ++  handle-auth-call
+    |=  =inbound-request:eyre
+    ^-  simple-payload:http
+    =/  url=request-line
+      (parse-request-line url.request.inbound-request)
+    ?+  site.url  not-found:gen
       [%'~canvas' %css %index ~]  (css-response:gen style)
       [%'~canvas' %js %tile ~]    (js-response:gen tile-js)
       [%'~canvas' %js %index ~]   (js-response:gen script)
+      [%'~canvas' %img @t *]      (handle-img-call i.t.t.site.url)
+      [%'~canvas' *]              (html-response:gen index)
+    ==
   ::
-      [%'~canvas' %img @t *]
-    =/  name=@t  i.t.t.site.url
+  ++  handle-img-call
+    |=  name=@t
+    ^-  simple-payload:http
     =/  img  (~(get by canvas-png) name)
     ?~  img
       not-found:gen
     (png-response:gen (as-octs:mimes:html u.img))
-  ::
-      [%'~canvas' *]  (html-response:gen index)
-  ==
+  --
 --

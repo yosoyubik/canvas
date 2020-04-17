@@ -10,6 +10,10 @@ class UrbitApi {
     this.hexagons = {
       paint: this.paint.bind(this),
     };
+
+    this.svg = {
+      save: this.saveSVG.bind(this),
+    };
   }
 
   bind(path, method, ship = this.authTokens.ship, appl = "canvas", success, fail) {
@@ -35,6 +39,15 @@ class UrbitApi {
 
   canvas(data) {
     this.action("canvas", "json", data);
+  }
+
+  saveSVG(canvasID, svgData) {
+    this.action("canvas", "canvas-action", {
+      save: {
+        'canvas-id': canvasID,
+        'svg': svgData,
+      }
+    });
   }
 
   paint(canvasID, id, filled) {

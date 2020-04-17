@@ -12,6 +12,7 @@
     :~  [%paint paint]
         [%join join]
         [%create so]
+        [%save save]
     ==
   ::
   ++  paint
@@ -19,6 +20,9 @@
   ::
   ++  join
     (ot ~[['ship' (su fed:ag)] ['canvas-id' so]])
+  ::
+  ++  save
+    (ot ~[['canvas-id' so] ['svg' so]])
   --
 ::
 ++  canvas-action-to-json
