@@ -2,14 +2,15 @@
 
 import { sigil, stringRenderer } from 'urbit-sigil-js'
 
-const hexClasses = [".hexagon",
-                    ".hexagon path",
-                    ".hexagon :hover",
-                    ".hexagon .fill",
-                    ".border, .mesh",
-                    ".mesh",
-                    ".border"];
-
+const hexClasses = [
+  ".hexagon",
+  ".hexagon path",
+  ".hexagon :hover",
+  ".hexagon .fill",
+  ".border, .mesh",
+  ".mesh",
+  ".border"
+];
 
 const parseSVG = ( svgNode ) => {
 	const compiledSVG = appendCSS( cssStyleText, svgNode );

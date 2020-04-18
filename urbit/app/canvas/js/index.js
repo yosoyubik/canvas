@@ -54448,13 +54448,15 @@
 
             // Adapted from: http://bl.ocks.org/Rokotyan/0556f8facbaf344507cdc45dc3622177
 
-            const hexClasses = [".hexagon",
-                                ".hexagon path",
-                                ".hexagon :hover",
-                                ".hexagon .fill",
-                                ".border, .mesh",
-                                ".mesh",
-                                ".border"];
+            const hexClasses = [
+              ".hexagon",
+              ".hexagon path",
+              ".hexagon :hover",
+              ".hexagon .fill",
+              ".border, .mesh",
+              ".mesh",
+              ".border"
+            ];
 
             const contains = (str, arr) => {
               return arr.indexOf( str ) === -1 ? false : true;
@@ -54892,8 +54894,11 @@
 
               onClickSave () {
                 const svgString = simpleParseSVG(select("#canvas").node());
-                console.log(svgString);
                 this.props.api.svg.save('0', svgString);
+              }
+
+              onClickShare () {
+                this.props.api.svg.share('0');
               }
 
               render() {
@@ -54902,16 +54907,21 @@
                   drawHexCanvas(this.props);
                 }
                 return (
-                  react.createElement('div', { ref: "canvas", __self: this, __source: {fileName: _jsxFileName$3, lineNumber: 36}}
+                  react.createElement('div', { ref: "canvas", __self: this, __source: {fileName: _jsxFileName$3, lineNumber: 39}}
                     , react.createElement('button', {
                       onClick: this.onClickSave.bind(this),
-                      className: "pointer db f9 green2 bg-gray0-d ba pv3 ph4 b--green2"        , __self: this, __source: {fileName: _jsxFileName$3, lineNumber: 37}}, "Save Image"
+                      className: "pointer db f9 green2 bg-gray0-d ba pv3 ph4 b--green2"        , __self: this, __source: {fileName: _jsxFileName$3, lineNumber: 40}}, "Save Image"
 
                     )
-                    , react.createElement('svg', { id: "canvas", width: width, height: height, __self: this, __source: {fileName: _jsxFileName$3, lineNumber: 42}}
-                      , react.createElement('g', { className: "hexagon", __self: this, __source: {fileName: _jsxFileName$3, lineNumber: 43}} )
-                      , react.createElement('g', { className: "mesh-group", __self: this, __source: {fileName: _jsxFileName$3, lineNumber: 44}} )
-                      , react.createElement('g', { className: "border-group", __self: this, __source: {fileName: _jsxFileName$3, lineNumber: 45}} )
+                    , react.createElement('button', {
+                      onClick: this.onClickShare.bind(this),
+                      className: "pointer db f9 green2 bg-gray0-d ba pv3 ph4 b--green2"        , __self: this, __source: {fileName: _jsxFileName$3, lineNumber: 45}}, "Share Image"
+
+                    )
+                    , react.createElement('svg', { id: "canvas", width: width, height: height, __self: this, __source: {fileName: _jsxFileName$3, lineNumber: 50}}
+                      , react.createElement('g', { className: "hexagon", __self: this, __source: {fileName: _jsxFileName$3, lineNumber: 51}} )
+                      , react.createElement('g', { className: "mesh-group", __self: this, __source: {fileName: _jsxFileName$3, lineNumber: 52}} )
+                      , react.createElement('g', { className: "border-group", __self: this, __source: {fileName: _jsxFileName$3, lineNumber: 53}} )
                     )
                   )
                 )
@@ -54994,6 +55004,7 @@
 
                 this.svg = {
                   save: this.saveSVG.bind(this),
+                  share: this.shareSVG.bind(this)
                 };
               }
 
@@ -55027,6 +55038,14 @@
                   save: {
                     'canvas-id': canvasID,
                     'svg': svgData,
+                  }
+                });
+              }
+
+              shareSVG(canvasID) {
+                this.action("canvas", "canvas-action", {
+                  share: {
+                    'canvas-id': canvasID
                   }
                 });
               }

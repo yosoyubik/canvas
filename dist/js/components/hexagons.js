@@ -23,8 +23,11 @@ export class Hexagons extends Component {
 
   onClickSave () {
     const svgString = simpleParseSVG(d3.select("#canvas").node());
-    console.log(svgString);
     this.props.api.svg.save('0', svgString);
+  }
+
+  onClickShare () {
+    this.props.api.svg.share('0');
   }
 
   render() {
@@ -33,16 +36,21 @@ export class Hexagons extends Component {
       drawHexCanvas(this.props);
     }
     return (
-      React.createElement('div', { ref: "canvas", __self: this, __source: {fileName: _jsxFileName, lineNumber: 36}}
+      React.createElement('div', { ref: "canvas", __self: this, __source: {fileName: _jsxFileName, lineNumber: 39}}
         , React.createElement('button', {
           onClick: this.onClickSave.bind(this),
-          className: "pointer db f9 green2 bg-gray0-d ba pv3 ph4 b--green2"        , __self: this, __source: {fileName: _jsxFileName, lineNumber: 37}}, "Save Image"
+          className: "pointer db f9 green2 bg-gray0-d ba pv3 ph4 b--green2"        , __self: this, __source: {fileName: _jsxFileName, lineNumber: 40}}, "Save Image"
 
         )
-        , React.createElement('svg', { id: "canvas", width: width, height: height, __self: this, __source: {fileName: _jsxFileName, lineNumber: 42}}
-          , React.createElement('g', { className: "hexagon", __self: this, __source: {fileName: _jsxFileName, lineNumber: 43}} )
-          , React.createElement('g', { className: "mesh-group", __self: this, __source: {fileName: _jsxFileName, lineNumber: 44}} )
-          , React.createElement('g', { className: "border-group", __self: this, __source: {fileName: _jsxFileName, lineNumber: 45}} )
+        , React.createElement('button', {
+          onClick: this.onClickShare.bind(this),
+          className: "pointer db f9 green2 bg-gray0-d ba pv3 ph4 b--green2"        , __self: this, __source: {fileName: _jsxFileName, lineNumber: 45}}, "Share Image"
+
+        )
+        , React.createElement('svg', { id: "canvas", width: width, height: height, __self: this, __source: {fileName: _jsxFileName, lineNumber: 50}}
+          , React.createElement('g', { className: "hexagon", __self: this, __source: {fileName: _jsxFileName, lineNumber: 51}} )
+          , React.createElement('g', { className: "mesh-group", __self: this, __source: {fileName: _jsxFileName, lineNumber: 52}} )
+          , React.createElement('g', { className: "border-group", __self: this, __source: {fileName: _jsxFileName, lineNumber: 53}} )
         )
       )
     )

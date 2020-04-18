@@ -4,7 +4,7 @@
 ::    ------------    ----------------------------------------------
 ::    mesh           .^(* %gx /=canvas=/mesh/id/noun)
 ::
-/-  *canvas
+/-  *canvas, *chat-store
 /+  *server, default-agent, verb, *canvas
 ::
 /=  index
@@ -182,6 +182,12 @@
       !>([%add %canvas /canvastile '/~canvas/js/tile.js'])
   ==
 ::
+++  innit-load
+  ^-  canvas-action
+  =/  mesh=(unit hexagons)  (~(get by canvas) '0')
+  ~&  ["innit-load" mesh]
+  [%init ['0' ?~(mesh ~ u.mesh)]]
+::
 ++  subscribe
   |=  [=ship canvas-id=@t]
   ^-  card
@@ -203,11 +209,27 @@
       !>([%paint canvas-id arc])
   ==
 ::
-++  innit-load
-  ^-  canvas-action
-  =/  mesh=(unit hexagons)  (~(get by canvas) '0')
-  ~&  ["innit-load" mesh]
-  [%init ['0' ?~(mesh ~ u.mesh)]]
+++  share-canvas
+  |=  id=@t
+  ^-  card
+  ::  TODO: support group chats
+  ::
+  =/  =path  (weld /~ [(scot %p our.bowl) /test])
+  =/  serial=@uvH  (shaf %msg-uid eny.bowl)
+  =/  port=@ud  ?:(=(our.bowl ~fyr) 8.081 8.080)
+  =/  =letter
+    :-  %url
+    %-  crip
+    "http://localhost:{(trip (rsh 3 2 (scot %ui port)))}/~canvas/svg/{(trip id)}.png"
+  =/  =envelope  [serial *@ our.bowl now.bowl letter]
+  :*  %pass
+      ~[%chat %share id]
+      %agent
+      [our.bowl %chat-hook]
+      %poke
+      %chat-action
+      !>([%message path envelope])
+  ==
 ::
 ++  handle-json
   |=  jon=json
@@ -224,6 +246,7 @@
     %paint   (handle-paint +.act)
     %join    (handle-join +.act)
     %create  (handle-create +.act)
+    %share   (handle-share +.act)
     %save    (handle-save +.act)
   ==
   ::
@@ -277,6 +300,12 @@
    ^-  (quip card _state)
    :-  ~
    state(canvas (~(put by canvas) [id ~]))
+  ::
+  ++  handle-share
+   |=  id=@t
+   ^-  (quip card _state)
+   [[(share-canvas id)]~ state]
+
   ::
   ++  handle-save
     |=  [file=@t svg=@t]

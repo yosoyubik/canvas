@@ -12,6 +12,7 @@
     :~  [%paint paint]
         [%join join]
         [%create so]
+        [%share share]
         [%save save]
     ==
   ::
@@ -23,6 +24,9 @@
   ::
   ++  save
     (ot ~[['canvas-id' so] ['svg' so]])
+  ::
+  ++  share
+    (ot ['canvas-id' so]~)
   --
 ::
 ++  canvas-action-to-json

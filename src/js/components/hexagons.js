@@ -23,8 +23,11 @@ export class Hexagons extends Component {
 
   onClickSave () {
     const svgString = simpleParseSVG(d3.select("#canvas").node());
-    console.log(svgString);
     this.props.api.svg.save('0', svgString);
+  }
+
+  onClickShare () {
+    this.props.api.svg.share('0');
   }
 
   render() {
@@ -38,6 +41,11 @@ export class Hexagons extends Component {
           onClick={this.onClickSave.bind(this)}
           className="pointer db f9 green2 bg-gray0-d ba pv3 ph4 b--green2">
           Save Image
+        </button>
+        <button
+          onClick={this.onClickShare.bind(this)}
+          className="pointer db f9 green2 bg-gray0-d ba pv3 ph4 b--green2">
+          Share Image
         </button>
         <svg id="canvas" width={width} height={height}>
           <g className="hexagon" />

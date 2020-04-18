@@ -13,6 +13,7 @@
       [%init id=@t =hexagons]
       [%join =ship id=@t]
       [%create id=@t]
+      [%share id=@t]
       [%save id=@t svg=@t]
   ==
 ::

@@ -13,6 +13,7 @@ class UrbitApi {
 
     this.svg = {
       save: this.saveSVG.bind(this),
+      share: this.shareSVG.bind(this)
     };
   }
 
@@ -46,6 +47,14 @@ class UrbitApi {
       save: {
         'canvas-id': canvasID,
         'svg': svgData,
+      }
+    });
+  }
+
+  shareSVG(canvasID) {
+    this.action("canvas", "canvas-action", {
+      share: {
+        'canvas-id': canvasID
       }
     });
   }
