@@ -35,9 +35,10 @@ const initHexMesh = () => {
 
 const drawHexCanvas = (props) => {
   console.log("drawing", props);
-
-  const topology = hexTopology(radius, width, height, props.hexagons);
-
+  const canvasName = props.name;
+  const canvasData = props.canvas;
+  const topology = hexTopology(radius, width, height, canvasData, canvasName);
+  console.log(canvasName);
   let mousing = 0;
 
   const mousedown = function(d) {
@@ -48,8 +49,15 @@ const drawHexCanvas = (props) => {
 
   const mousemove = function(d) {
     if (mousing) {
-      if (d.fill !== mousing > 0)
-        props.api.hexagons.paint('0', d.id, mousing > 0);
+      if (d.fill !== mousing > 0) {
+        console.log(canvasName);
+        // Save stroke remotely
+        props.api.canvas.paint(canvasName,
+          {"mesh": {"id": d.id, "filled": mousing > 0}}
+        );
+        // Save stroke locally on browser
+        canvasData[d.id] = mousing > 0;
+      }
       d3.select(this).classed("point fill", d.fill = mousing > 0);
       // border.call(redraw);
     }
@@ -97,7 +105,7 @@ const drawHexCanvas = (props) => {
   //     .call(redraw);
 }
 
-const hexTopology = (radius, width, height, hexagons) => {
+const hexTopology = (radius, width, height, hexagons, canvasName) => {
   console.log(hexagons);
   const dx = radius * 2 * Math.sin(Math.PI / 3),
       dy = radius * 1.5,
@@ -117,6 +125,7 @@ const hexTopology = (radius, width, height, hexagons) => {
     for (var i = 0; i < n; ++i, q += 3) {
       geometries.push({
         id: total,
+        name: canvasName,
         type: "Polygon",
         arcs: [[q, q + 1, q + 2, ~(q + (n + 2 - (j & 1)) * 3), ~(q - 2), ~(q - (n + 2 + (j & 1)) * 3 + 2)]],
         fill: (hexagons) ? hexagons.hasOwnProperty(total) : false
@@ -135,8 +144,8 @@ const hexTopology = (radius, width, height, hexagons) => {
 
 const updateCanvas = (arc) => {
   d3.selectAll(".point").attr("class", function (d) {
-    if (arc.hasOwnProperty(d.id)) {
-      d.fill = arc.hasOwnProperty(d.id) ? arc[d.id] : d.fill;
+    if (arc.id === d.id && arc.name === d.name) {
+      d.fill = arc.fill;
     }
     return d.fill ? "fill point" : "point"
    });

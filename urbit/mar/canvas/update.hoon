@@ -1,9 +1,9 @@
 /+  *canvas
 =,  dejs:format
-|_  act=canvas-action
+|_  act=canvas-update
 ++  grab
   |%
-  ++  noun  canvas-action
+  ++  noun  canvas-update
   :: ++  json
   ::   |=  jon=^json
   ::   (json-to-canvas-action jon)

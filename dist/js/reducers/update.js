@@ -3,15 +3,13 @@ import _ from 'lodash';
 
 export class UpdateReducer {
     reduce(json, state) {
-        let data = _.get(json, 'update', false);
+        let data = _.get(json, 'load', false);
         if (data) {
-            this.reduceInbox(_.get(data, 'inbox', false), state);
-        }
-    }
-
-    reduceInbox(inbox, state) {
-        if (inbox) {
-            state.inbox = inbox;
+            state.canvasList[data.name] = {
+              "type": data.type,
+              "metadata": data.metadata,
+              "data": data.data
+            };
         }
     }
 }

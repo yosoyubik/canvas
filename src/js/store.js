@@ -6,7 +6,7 @@ import { UpdateReducer } from '/reducers/update';
 class Store {
     constructor() {
         this.state = {
-            inbox: {}
+            canvasList: {}
         };
 
         this.initialReducer = new InitialReducer();

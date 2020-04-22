@@ -2,7 +2,8 @@
 ::
 ::    data:            scry command:
 ::    ------------    ----------------------------------------------
-::    mesh           .^(* %gx /=canvas=/mesh/id/noun)
+::    canvas           .^(* %gx /=canvas=/canvas/<name>/noun)
+::    gallery          .^(* %gx /=canvas=/gallery/noun)
 ::
 /-  *canvas, *chat-store
 /+  *server, default-agent, verb, *canvas
@@ -51,7 +52,7 @@
       ==
     ::
     +$  state-zero
-      $:  canvas=(map @t hexagons)
+      $:  gallery=(map @t canvas)
           test=?
       ==
     --
@@ -68,36 +69,12 @@
         cc         ~(. canvas-core bowl)
         def        ~(. (default-agent this %|) bowl)
     ::
-    ++  on-init
-      ^-  (quip card _this)
-
-      ~&  "innito"
-      ~&  launch-poke
-      :_  this(canvas (~(put by canvas) ['0' ~]))
-      :~  ::  Attaches tile to %launch app
-          ::
-          launch-poke
-          ::  Connects %eyre to the app
-          ::
-          [%pass /bind/canvas %arvo %e %connect [~ /'~canvas'] %canvas]
-      ==
+    ++  on-init  on-init:def
     ++  on-poke
       |=  [=mark =vase]
       ^-  (quip card _this)
       ?>  (team:title our.bowl src.bowl)
       ?+    mark  (on-poke:def mark vase)
-          %json
-        =^  cards  state
-          (handle-json:cc !<(json vase))
-        [cards this]
-      ::
-          %handle-http-request
-        =+  !<([eyre-id=@ta =inbound-request:eyre] vase)
-        =+  url=(parse-request-line url.request.inbound-request)
-        :_  this
-        %+  give-simple-payload:app  eyre-id
-        (poke-handle-http-request:cc inbound-request site.url)
-      ::
           %canvas-action
         =^  cards  state
           (handle-canvas-action:cc !<(canvas-action vase))
@@ -110,17 +87,18 @@
       ~&  path
       :_  this
       ?+    path  ~|([%peer-canvas-strange path] !!)
-          [%canvastile ~]
-        [%give %fact ~ %json !>(*json)]~
-      ::
-          [%primary *]
-        [%give %fact ~ %json !>((canvas-action-to-json innit-load))]~
-      ::
-          [%http-response *]
-        ~
+      ::     [%canvastile ~]
+      ::   [%give %fact ~ %json !>(*json)]~
+      :: ::
+      ::     [%primary *]
+      ::   [%give %fact ~ %json !>((canvas-action-to-json innit-load))]~
+      :: ::
+      ::     [%http-response *]
+      ::   ~
+          [%updates ~]  ~
       ::
           [%canvas ^]
-        ~&  path
+        ~&  [src.bowl path %canvas]
         =^  cards  state
            (send-init-canvas:cc i.t.path)
          cards
@@ -139,9 +117,10 @@
         =^  cards  state
           =*  vase  q.cage.sign
           ^-  (quip card _state)
+          ~&  p.cage.sign
           ?+    p.cage.sign  ~|([%canvas-bad-update-mark wire vase] !!)
-              %canvas-action
-            (handle-canvas-action:cc !<(canvas-action q.cage.sign))
+              %canvas-update
+            (handle-canvas-update:cc !<(canvas-update vase))
           ==
         [cards this]
       ==
@@ -162,87 +141,72 @@
     ++  on-peek
       |=  =path
       ^-  (unit (unit cage))
+      ~&  scry+path
       ?+  path  (on-peek:def path)
-          [%x %mesh @t ~]  ``noun+!>((~(get by canvas) i.t.t.path))
+          [%x %canvas @t ~]  ``noun+!>((~(got by gallery) i.t.t.path))
+          [%x %gallery ~]    ``noun+!>(~(val by gallery))
       ==
     ::
     ++  on-fail   on-fail:def
     --
 ::
-::
 |_  bowl=bowl:gall
-++  launch-poke
-  ^-  card
-  :*  %pass
-      /launch/canvas
-      %agent
-      [our.bowl %launch]
-      %poke
-      %launch-action
-      !>([%add %canvas /canvastile '/~canvas/js/tile.js'])
-  ==
+:: ++  launch-poke
+::   ^-  card
+::   :*  %pass
+::       /launch/canvas
+::       %agent
+::       [our.bowl %launch]
+::       %poke
+::       %launch-action
+::       !>([%add %canvas /canvastile '/~canvas/js/tile.js'])
+::   ==
 ::
-++  innit-load
-  ^-  canvas-action
-  =/  mesh=(unit hexagons)  (~(get by canvas) '0')
-  ~&  ["innit-load" mesh]
-  [%init ['0' ?~(mesh ~ u.mesh)]]
+:: ++  innit-load
+::   ^-  canvas-action
+::   =/  mesh=(unit hexagons)  (~(get by canvas) '0')
+::   ~&  ["innit-load" mesh]
+::   [%init ['0' ?~(mesh ~ u.mesh)]]
 ::
 ++  subscribe
-  |=  [=ship canvas-id=@t]
+  |=  [=ship canvas-name=@t]
   ^-  card
   :*  %pass
       /subscribe/(scot %p ship)/(scot %da now.bowl)
       %agent
       [ship %canvas]
       %watch
-      /canvas/(scot %tas canvas-id)
+      /canvas/(scot %tas canvas-name)
   ==
 ::
-++  send-update
-  |=  [canvas-id=@t =arc]
+++  send-init-canvas
+  |=  name=@t
+  ^-  (quip card _state)
+  ~&  "send-init-canvas"
+  ::   send canvas state
+  ::
+  =/  canvas=(unit canvas)  (~(get by gallery) name)
+  ?~  canvas  `state
+  :_  state
+  [%give %fact ~ %canvas-update !>([%load name u.canvas])]~
+::
+++  send-canvas-stroke
+  |=  [name=@t =stroke]
   ^-  card
   :*  %give
       %fact
-      [/canvas/(scot %tas canvas-id)]~
-      %canvas-action
-      !>([%paint canvas-id arc])
+      [/canvas/(scot %tas name)]~
+      %canvas-update
+      !>([%paint name stroke])
   ==
-::
-++  share-canvas
-  |=  id=@t
-  ^-  card
-  ::  TODO: support group chats
-  ::
-  =/  =path  (weld /~ [(scot %p our.bowl) /test])
-  =/  serial=@uvH  (shaf %msg-uid eny.bowl)
-  =/  port=@ud  ?:(=(our.bowl ~fyr) 8.081 8.080)
-  =/  =letter
-    :-  %url
-    %-  crip
-    "http://localhost:{(trip (rsh 3 2 (scot %ui port)))}/~canvas/svg/{(trip id)}.png"
-  =/  =envelope  [serial *@ our.bowl now.bowl letter]
-  :*  %pass
-      ~[%chat %share id]
-      %agent
-      [our.bowl %chat-hook]
-      %poke
-      %chat-action
-      !>([%message path envelope])
-  ==
-::
-++  handle-json
-  |=  jon=json
-  ^-  (quip card _state)
-  ?>  (team:title our.bowl src.bowl)
-  (handle-canvas-action (json-to-canvas-action jon))
 ::
 ++  handle-canvas-action
   |=  act=canvas-action
   ^-  (quip card _state)
   |^
-  ?-  -.act
-    %init    (handle-init +.act)
+  ?+  -.act  !!
+    :: %init    (handle-init +.act)
+    :: %load    (handle-load +.act)
     %paint   (handle-paint +.act)
     %join    (handle-join +.act)
     %create  (handle-create +.act)
@@ -250,123 +214,185 @@
     %save    (handle-save +.act)
   ==
   ::
-  ++  handle-paint
-    |=  [id=@t =arc]
-    ^-  (quip card _state)
-    ::  FIXME: remove
-    ::
-    :: =?  canvas  =(canvas ~)  (~(put by canvas) ['0' ~])
-    =/  mesh=(unit hexagons)  (~(get by canvas) id)
-    ?~  mesh  `state
-    :: =.  canvas  (~(put by canvas) [id (~(put by u.mesh) arc)])
-    :_  %_  state
-            canvas
-          %+  ~(put by canvas)  id
-          ?.  filled.arc
-            (~(del by u.mesh) id.arc)
-          (~(put by u.mesh) arc)
-        ==
-    :: :_  state
-    ?.  (team:title our.bowl src.bowl)
-      ::  foreign
-      ::
-      ~&  "foreign, udpate my frontend"
-      =/  data=json  (canvas-action-to-json [%paint id arc])
-        :: (canvas-action-to-json [%init id (~(got by canvas) id)])
-      [%give %fact [/primary]~ %json !>(data)]~
-    ::  local
-    ::
-    ~&  'local, send to subscribers'
-    [(send-update id arc)]~
+  :: ++  handle-init
+  ::   |=  canvas-list=(list metadata)
+  ::   ^-  (quip card _state)
+  ::   :: =/  data=json  (canvas-action-to-json [%init id mesh])
+  ::   =/  data=json  (canvas-action-to-json [%init canvas-list])
+  ::   :_  state
+  ::   [%give %fact [/primary]~ %json !>(data)]~
+  ::   :: :-  [%give %fact [/primary]~ %json !>(data)]~
+  ::   :: state(canvas (~(put by canvas) [id mesh]))
   ::
-  ++  handle-init
-    |=  [id=@t mesh=hexagons]
+  :: ++  handle-load
+  ::   |=  [name=@t =canvas]
+  ::   ^-  (quip card _state)
+  ::   :_  state(gallery (~(put by gallery) [name canvas]))
+  ::   [%give %fact [/updates]~ %canvas-update !>([%load name canvas])]~
+  ::
+  ++  handle-paint
+    |=  [name=@t =stroke]
     ^-  (quip card _state)
-    =/  data=json  (canvas-action-to-json [%init id mesh])
-    :-  [%give %fact [/primary]~ %json !>(data)]~
-    state(canvas (~(put by canvas) [id mesh]))
+    (process-remote-paint name stroke)
+  ::
+  :: ++  handle-frontend-load
+  ::   |=  [id=@t mesh=hexagons]
+  ::   ^-  (quip card _state)
+  ::   =/  data=json  (canvas-action-to-json [%init id mesh])
+  ::   :-  [%give %fact [/primary]~ %json !>(data)]~
+  ::   state(canvas (~(put by canvas) [id mesh]))
   ::
   ++  handle-join
-    |=  [=ship canvas-id=@t]
+    |=  [=ship name=@t]
     ^-  (quip card _state)
     ~&  "subscribing..."
-    :-  [(subscribe ship canvas-id)]~
-    ::  TODO: do it after confirmation?
+    :_  state
+    [(subscribe ship name)]~
+    ::  TODO: do it after confirmation is subs failed?
     ::
-    state(canvas (~(put by canvas) [canvas-id ~]))
+    :: state(gallery (~(put by gallery) [name []]))
+  ::
   ::
   ++  handle-create
-   |=  id=@t
+   |=  =canvas
    ^-  (quip card _state)
    :-  ~
-   state(canvas (~(put by canvas) [id ~]))
+   state(gallery (~(put by gallery) [name.metadata.canvas canvas]))
   ::
   ++  handle-share
-   |=  id=@t
+   |=  name=@t
    ^-  (quip card _state)
-   [[(share-canvas id)]~ state]
-
+   :_  state
+   ::  TODO: check if file has been created already?
+   ::  disable share on browser if not
+   ::
+   =/  =path  (weld /~ [(scot %p our.bowl) name ~])
+   =/  serial=@uvH  (shaf %msg-uid eny.bowl)
+   ::  TODO: request hostname and port to %eyre
+   ::
+   =/  port=@ud  ?:(=(our.bowl ~fyr) 8.080 8.081)
+   =/  =letter
+     :-  %url
+     %-  crip
+     "http://localhost:{(trip (rsh 3 2 (scot %ui port)))}/~canvas/svg/{(trip name)}.png"
+   =/  =envelope  [serial *@ our.bowl now.bowl letter]
+   :_  ~
+   :*  %pass
+       ~[%chat %share name]
+       %agent
+       [our.bowl %chat-hook]
+       %poke
+       %chat-action
+       !>([%message path envelope])
+   ==
   ::
   ++  handle-save
     |=  [file=@t svg=@t]
     ^-  (quip card _state)
     =/  =path
       ~[(scot %p our.bowl) %home (scot %da now.bowl) %app %canvas %svg file %svg]
-    :: ~&  path
-    :: ~&  (as-octs:mimes:html svg)
-    :: ~&  (de-xml:html svg)
     =/  contents=cage  [%svg !>(svg)]
-    :: =/  contents=cage  [%xml !>(~['text file line 1' 'line 2'])]
     :_  state
     [%pass /write-file %arvo %c %info (foal:space:userlib path contents)]~
   --
 ::
-++  send-init-canvas
-  |=  canvas-id=@t
+++  handle-canvas-update
+  |=  act=canvas-update
   ^-  (quip card _state)
-  ~&  "send-init-canvas"
-  ::   send canvas state
-  ::
-  :_  state
-  [%give %fact ~ %canvas-action !>(innit-load)]~
-::
-++  poke-handle-http-request
-  |=  [=inbound-request:eyre url=(list @t)]
-  ^-  simple-payload:http
   |^
-  ?:  ?=([%'~canvas' %svg ^] url)
-    (handle-svg-call i.t.t.url)
-  %+  require-authorization:app  inbound-request
-  handle-auth-call
+  ?-  -.act
+    :: %init    (handle-init +.act)
+    %load    (handle-load +.act)
+    %paint   (handle-paint +.act)
+  ==
   ::
-  ++  handle-svg-call
-    |=  file=@t
-    ^-  simple-payload:http
-    ~&  file
-    =/  svg  (~(get by canvas-svg) file)
-    ?~  svg
-      not-found:gen
-    (svg-response:gen (as-octs:mimes:html u.svg))
+  ++  handle-load
+    |=  [name=@t =canvas]
+    ^-  (quip card _state)
+    :_  state(gallery (~(put by gallery) [name canvas]))
+    [%give %fact [/updates]~ %canvas-view !>([%load name canvas])]~
   ::
-  ++  handle-auth-call
-    |=  =inbound-request:eyre
-    ^-  simple-payload:http
-    =/  url=request-line
-      (parse-request-line url.request.inbound-request)
-    ?+  site.url  not-found:gen
-      [%'~canvas' %css %index ~]  (css-response:gen style)
-      [%'~canvas' %js %tile ~]    (js-response:gen tile-js)
-      [%'~canvas' %js %index ~]   (js-response:gen script)
-      [%'~canvas' %img @t *]      (handle-img-call i.t.t.site.url)
-      [%'~canvas' *]              (html-response:gen index)
-    ==
-  ::
-  ++  handle-img-call
-    |=  name=@t
-    ^-  simple-payload:http
-    =/  img  (~(get by canvas-png) name)
-    ?~  img
-      not-found:gen
-    (png-response:gen (as-octs:mimes:html u.img))
+  ++  handle-paint
+    |=  [name=@t =stroke]
+    ^-  (quip card _state)
+    (process-remote-paint name stroke)
   --
+::
+++  process-remote-paint
+  |=  [name=@t edit=stroke]
+  ^-  (quip card _state)
+  =/  target-canvas=(unit canvas)  (~(get by gallery) name)
+  ?~  target-canvas  `state
+  ?.  =(-.edit -.u.target-canvas)  `state
+  |^
+  ?-  -.u.target-canvas
+    %mesh  (handle-mesh name +.u.target-canvas edit)
+  ==
+  ::
+  ++  handle-mesh
+    |=  [name=@t [=mesh =metadata] =stroke]
+    ^-  (quip card _state)
+    :_  %_  state
+            gallery
+          %+  ~(put by gallery)  name
+          ^-  canvas
+          :*  %mesh
+            ::
+              ?.  filled.arc.stroke
+                (~(del by mesh) id.arc.stroke)
+              (~(put by mesh) arc.stroke)
+            ::
+              metadata
+          ==
+        ==
+    ?.  (team:title our.bowl src.bowl)
+      ::  foreign
+      ::
+      ~&  "foreign, udpate my frontend"
+      [%give %fact [/updates]~ %canvas-view !>([%paint name stroke])]~
+    ::  local
+    ::
+    ~&  'local, send to subscribers'
+    [(send-canvas-stroke name stroke)]~
+  --
+::
+:: ++  poke-handle-http-request
+::   |=  [=inbound-request:eyre url=(list @t)]
+::   ^-  simple-payload:http
+::   |^
+::   ?:  ?=([%'~canvas' %svg ^] url)
+::     (handle-svg-call i.t.t.url)
+::   %+  require-authorization:app  inbound-request
+::   handle-auth-call
+::   ::
+::   ++  handle-svg-call
+::     |=  file=@t
+::     ^-  simple-payload:http
+::     ~&  file
+::     =/  svg  (~(get by canvas-svg) file)
+::     ?~  svg
+::       not-found:gen
+::     (svg-response:gen (as-octs:mimes:html u.svg))
+::   ::
+::   ++  handle-auth-call
+::     |=  =inbound-request:eyre
+::     ^-  simple-payload:http
+::     =/  url=request-line
+::       (parse-request-line url.request.inbound-request)
+::     ?+  site.url  not-found:gen
+::       [%'~canvas' %css %index ~]  (css-response:gen style)
+::       [%'~canvas' %js %tile ~]    (js-response:gen tile-js)
+::       [%'~canvas' %js %index ~]   (js-response:gen script)
+::       [%'~canvas' %img @t *]      (handle-img-call i.t.t.site.url)
+::       [%'~canvas' *]              (html-response:gen index)
+::     ==
+::   ::
+::   ++  handle-img-call
+::     |=  name=@t
+::     ^-  simple-payload:http
+::     =/  img  (~(get by canvas-png) name)
+::     ?~  img
+::       not-found:gen
+::     (png-response:gen (as-octs:mimes:html u.img))
+::   --
 --

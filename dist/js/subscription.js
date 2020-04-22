@@ -15,7 +15,7 @@ export class Subscription {
   }
 
   initializecanvas() {
-    api.bind('/primary', 'PUT', api.authTokens.ship, 'canvas',
+    api.bind('/primary', 'PUT', api.authTokens.ship, 'canvas-view',
       this.handleEvent.bind(this),
       this.handleError.bind(this));
   }
@@ -24,9 +24,12 @@ export class Subscription {
     let data = _.get(diff.data, 'paint', false);
     if (data) {
       //  TODO: account for if canvas-id exists
-      //  data = {canvas-id: {arc-id: : fill}
+      //  data = {name: 'name', arc-id: : filled?}
       //
-      updateCanvas(data['0']);
+      if (data.name in store.state.canvasList) {
+        store.state.canvasList[data.name].data[data.id] = data.fill;
+        updateCanvas(data);
+      }
     }
     else{
       store.handleEvent(diff);
@@ -35,7 +38,7 @@ export class Subscription {
 
   handleError(err) {
     console.error(err);
-    api.bind('/primary', 'PUT', api.authTokens.ship, 'canvas',
+    api.bind('/primary', 'PUT', api.authTokens.ship, 'canvas-view',
       this.handleEvent.bind(this),
       this.handleError.bind(this));
   }

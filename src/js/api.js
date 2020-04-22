@@ -7,8 +7,10 @@ class UrbitApi {
     this.authTokens = authTokens;
     this.bindPaths = [];
 
-    this.hexagons = {
+    this.canvas = {
       paint: this.paint.bind(this),
+      create: this.create.bind(this),
+      load: this.loadCanvas.bind(this)
     };
 
     this.svg = {
@@ -39,33 +41,50 @@ class UrbitApi {
   }
 
   canvas(data) {
-    this.action("canvas", "json", data);
+    this.action("canvas-view", "json", data);
   }
 
-  saveSVG(canvasID, svgData) {
-    this.action("canvas", "canvas-action", {
+  saveSVG(name, svgData) {
+    this.action("canvas-view", "canvas-view", {
       save: {
-        'canvas-id': canvasID,
+        'canvas-name': name,
         'svg': svgData,
       }
     });
   }
 
-  shareSVG(canvasID) {
-    this.action("canvas", "canvas-action", {
+  shareSVG(name) {
+    this.action("canvas-view", "canvas-view", {
       share: {
-        'canvas-id': canvasID
+        'canvas-name': name
       }
     });
   }
 
-  paint(canvasID, id, filled) {
-    console.log(canvasID, id, filled);
-    this.action("canvas", "canvas-action", {
+  loadCanvas(name) {
+    this.action("canvas-view", "canvas-view", {
+      load: {
+        'name': name
+      }
+    });
+  }
+
+  create(name, type) {
+    console.log("creating");
+    return this.action("canvas-view", "canvas-view", {
+      create: {
+        'name': name,
+        'type': type
+      }
+    });
+  }
+
+  paint(name, stroke) {
+    console.log(name, stroke);
+    this.action("canvas-view", "canvas-view", {
       paint: {
-        'canvas-id': canvasID,
-        'id': id,
-        'filled': filled
+        'canvas-name': name,
+        'stroke': stroke
       }
     });
   }
