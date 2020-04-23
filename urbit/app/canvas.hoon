@@ -172,7 +172,7 @@
   |=  [=ship canvas-name=@t]
   ^-  card
   :*  %pass
-      /subscribe/(scot %p ship)/(scot %da now.bowl)
+      /subscribe/(scot %p ship)
       %agent
       [ship %canvas]
       %watch
