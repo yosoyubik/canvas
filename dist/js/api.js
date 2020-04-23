@@ -69,22 +69,24 @@ class UrbitApi {
     });
   }
 
-  create(name, type) {
+  create(name, type, location) {
     console.log("creating");
     return this.action("canvas-view", "canvas-view", {
       create: {
         'name': name,
-        'type': type
+        'type': type,
+        'location': location
       }
     });
   }
 
-  paint(name, stroke) {
+  paint(name, location, stroke) {
     console.log(name, stroke);
     this.action("canvas-view", "canvas-view", {
       paint: {
         'canvas-name': name,
-        'stroke': stroke
+        'stroke': stroke,
+        'location': location
       }
     });
   }

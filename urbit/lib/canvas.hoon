@@ -10,7 +10,6 @@
   ++  parse-json
     %-  of
     :~  [%init ul]
-        :: [%load so]
         [%paint paint]
         [%join join]
         [%create create]
@@ -22,11 +21,13 @@
     %-  ot
     :~  ['name' so]
         ['type' (cu canvas-type so)]
+        ['location' (su ;~(pfix sig fed:ag))]
     ==
   ::
   ++  paint
     %-  ot
     :~  ['canvas-name' so]
+        ['location' (su ;~(pfix sig fed:ag))]
         :-  'stroke'
         %-  of
         [%mesh (ot ~[['id' ni] ['filled' bo]])]~
@@ -64,19 +65,23 @@
     %-  pairs
     %+  weld
       (canvas-to-json canvas)
-    (metadata-to-json metadata.canvas)
+    ['metadata' (pairs (metadata-to-json metadata.canvas))]~
   ::
       %load
     %-  pairs
     %+  weld
-      ['name' s+name.act]~
-    (canvas-to-json canvas.act)
+      (canvas-to-json canvas.act)
+    (metadata-to-json metadata.canvas.act)
+
   ::
       %paint
     %-  pairs
     %+  weld
-      ['name' s+name.act]~
-    (stroke-to-json stroke.act)
+      (stroke-to-json stroke.act)
+    ^-  (list [@t json])
+    :~  ['name' s+name.act]
+        ['location' s+(scot %p location.act)]
+    ==
   ==
 ::
 ++  canvas-to-json
@@ -85,20 +90,21 @@
   =,  enjs:format
   ?-    -.canvas
       %mesh
-    :~  ['type' s+'mesh']
-        :-  'data'
-        %-  pairs
-        %-  zing
-        (turn ~(tap by mesh.canvas) arc-to-json)
-    ==
+    :_  ~
+    :-  'data'
+    %-  pairs
+    %-  zing
+    (turn ~(tap by mesh.canvas) arc-to-json)
   ::
   ==
 ::
 ++  metadata-to-json
-  |=  meta=metadata
+  |=  =metadata
   ^-  (list [@t json])
-  =,  enjs:format
-  ['metadata' (pairs ~[['name' s+name.meta] ['type' s+type.meta]])]~
+  :~  ['name' s+name.metadata]
+      ['location' s+(scot %p location.metadata)]
+      ['type' s+type.metadata]
+  ==
 ::
 ++  arc-to-json
   |=  arc

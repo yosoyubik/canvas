@@ -50,11 +50,13 @@ export class Root extends Component {
                 const name =  props.match.params.name;
                 if (canvasList) {
                   let canvas;
-                  let data = !!canvasList[name] ? canvasList[name].data : {};
-                  let canvasType = !!canvasList[name] ? canvasList[name].type : "";
+                  console.log(canvasList);
+                  const data = !!canvasList[name] ? canvasList[name].data : {};
+                  const canvasType = !!canvasList[name] ? canvasList[name].metadata.type : "";
+                  const location = !!canvasList[name] ? canvasList[name].metadata.location : "";
                   switch (canvasType) {
                     case 'mesh':
-                      canvas = <Hexagons api={api} canvas={data} name={name} />;
+                      canvas = <Hexagons api={api} canvas={data} name={name} location={location} />;
                       break;
                     case 'map': canvas = null; break;
                     default: canvas = null;

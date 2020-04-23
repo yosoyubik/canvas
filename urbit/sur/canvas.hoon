@@ -2,7 +2,8 @@
 +$  arc          [id=@ud filled=?]
 +$  mesh         (map @ud ?)
 +$  canvas-type  ?(%mesh)
-+$  metadata     [name=@t type=canvas-type]
++$  metadata     [name=@t type=canvas-type location=ship]
++$  location     [host=ship canvas=@t]
 +$  canvas
   $%  [%mesh =mesh =metadata]
       :: [%free id=@t name=@t data=*]
@@ -17,7 +18,7 @@
   ==
 ::
 +$  canvas-action
-  $%  [%paint name=@t =stroke]
+  $%  [%paint location=@p name=@t =stroke]
       [%init gallery=(list canvas)]
       :: [%init gallery=(list [@tas mesh metadata])]
       [%load name=@t =canvas]
@@ -30,14 +31,14 @@
   ==
 ::
 +$  canvas-update
-  $%  [%paint name=@t =stroke]
+  $%  [%paint location=@p name=@t =stroke]
       [%load name=@t =canvas]
   ==
 ::
 +$  canvas-view
   $%  [%init ~]
       [%load name=@t =canvas]
-      [%paint name=@t =stroke]
+      [%paint name=@t local=@p =stroke]
       [%join =ship name=@t]
       [%create =metadata]
       ::  TODO: add chat name

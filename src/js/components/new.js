@@ -44,21 +44,27 @@ export class NewScreen extends Component {
       success: true,
       awaiting: true
     }, () => {
-      let submit = props.api.canvas.create(state.canvasName, state.canvasType);
-      submit.then(() => {
+      props.api.canvas.create(
+        state.canvasName,
+        state.canvasType,
+        '~' + ship
+      ).then(() => {
         this.setState({
           awaiting: false
         });
-        store.setState(prevState => ({
-          canvasList: {
-            ...prevState.canvasList,
-            [state.canvasName]: {
-              "type": state.canvasType,
-              "data": {},
-              "metadata": {"name": state.canvasName, "type": "mesh"}
-            }
-          }
-        }));
+        // store.setState(prevState => ({
+        //   canvasList: {
+        //     ...prevState.canvasList,
+        //     [state.canvasName]: {
+        //       "data": {},
+        //       "metadata": {
+        //         "name": state.canvasName,
+        //         "type": "mesh",
+        //         "location": '~' + ship
+        //       }
+        //     }
+        //   }
+        // }));
         props.history.push(`/~canvas/item/${state.canvasName}`);
       })
     });

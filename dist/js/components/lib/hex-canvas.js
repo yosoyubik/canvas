@@ -37,6 +37,7 @@ const drawHexCanvas = (props) => {
   console.log("drawing", props);
   const canvasName = props.name;
   const canvasData = props.canvas;
+  const location = props.location;
   const topology = hexTopology(radius, width, height, canvasData, canvasName);
   console.log(canvasName);
   let mousing = 0;
@@ -52,7 +53,7 @@ const drawHexCanvas = (props) => {
       if (d.fill !== mousing > 0) {
         console.log(canvasName);
         // Save stroke remotely
-        props.api.canvas.paint(canvasName,
+        props.api.canvas.paint(canvasName, location,
           {"mesh": {"id": d.id, "filled": mousing > 0}}
         );
         // Save stroke locally on browser
@@ -144,6 +145,9 @@ const hexTopology = (radius, width, height, hexagons, canvasName) => {
 
 const updateCanvas = (arc) => {
   d3.selectAll(".point").attr("class", function (d) {
+    if (arc.id === d.id) {
+      console.log(d, arc);
+    }
     if (arc.id === d.id && arc.name === d.name) {
       d.fill = arc.fill;
     }

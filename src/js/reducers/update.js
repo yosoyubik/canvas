@@ -7,7 +7,11 @@ export class UpdateReducer {
         if (data) {
             state.canvasList[data.name] = {
               "type": data.type,
-              "metadata": data.metadata,
+              "metadata": {
+                "name": data.name,
+                "type": data.type,
+                "location": data.location
+              },
               "data": data.data
             };
         }

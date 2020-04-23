@@ -50,11 +50,13 @@ export class Root extends Component {
                 const name =  props.match.params.name;
                 if (canvasList) {
                   let canvas;
-                  let data = !!canvasList[name] ? canvasList[name].data : {};
-                  let canvasType = !!canvasList[name] ? canvasList[name].type : "";
+                  console.log(canvasList);
+                  const data = !!canvasList[name] ? canvasList[name].data : {};
+                  const canvasType = !!canvasList[name] ? canvasList[name].metadata.type : "";
+                  const location = !!canvasList[name] ? canvasList[name].metadata.location : "";
                   switch (canvasType) {
                     case 'mesh':
-                      canvas = React.createElement(Hexagons, { api: api, canvas: data, name: name, __self: this, __source: {fileName: _jsxFileName, lineNumber: 57}} );
+                      canvas = React.createElement(Hexagons, { api: api, canvas: data, name: name, location: location, __self: this, __source: {fileName: _jsxFileName, lineNumber: 59}} );
                       break;
                     case 'map': canvas = null; break;
                     default: canvas = null;
@@ -64,7 +66,7 @@ export class Root extends Component {
                     React.createElement(Skeleton, {
                       history: props.history,
                       canvasList: canvasList,
-                      activeDrawer: "rightPanel", __self: this, __source: {fileName: _jsxFileName, lineNumber: 64}}
+                      activeDrawer: "rightPanel", __self: this, __source: {fileName: _jsxFileName, lineNumber: 66}}
                       , canvas
                     )
                   );

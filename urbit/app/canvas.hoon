@@ -52,7 +52,7 @@
       ==
     ::
     +$  state-zero
-      $:  gallery=(map @t canvas)
+      $:  gallery=(map location canvas)
           test=?
       ==
     --
@@ -73,7 +73,6 @@
     ++  on-poke
       |=  [=mark =vase]
       ^-  (quip card _this)
-      ?>  (team:title our.bowl src.bowl)
       ?+    mark  (on-poke:def mark vase)
           %canvas-action
         =^  cards  state
@@ -84,7 +83,7 @@
     ++  on-watch
       |=  =path
       ^-  (quip card _this)
-      ~&  path
+      ~&  [src.bowl path]
       :_  this
       ?+    path  ~|([%peer-canvas-strange path] !!)
       ::     [%canvastile ~]
@@ -142,15 +141,25 @@
       |=  =path
       ^-  (unit (unit cage))
       ~&  scry+path
-      ?+  path  (on-peek:def path)
-          [%x %canvas @t ~]  ``noun+!>((~(got by gallery) i.t.t.path))
-          [%x %gallery ~]    ``noun+!>(~(val by gallery))
+      ?+    path  (on-peek:def path)
+          [%x %canvas @t @t ~]
+        ``noun+!>((~(got by gallery) (extract-location t.t.path)))
+      ::
+          [%x %gallery ~]
+        ``noun+!>(~(val by gallery))
       ==
     ::
     ++  on-fail   on-fail:def
     --
 ::
 |_  bowl=bowl:gall
+++  extract-location
+  |=  =path
+  ^-  [ship @t]
+  ?>  ?=([@t @t ~] path)
+  :_  i.t.path
+  (rash i.path ;~(pfix sig fed:ag))
+::
 :: ++  launch-poke
 ::   ^-  card
 ::   :*  %pass
@@ -169,14 +178,14 @@
 ::   [%init ['0' ?~(mesh ~ u.mesh)]]
 ::
 ++  subscribe
-  |=  [=ship canvas-name=@t]
+  |=  [=ship name=@t]
   ^-  card
   :*  %pass
-      /subscribe/(scot %p ship)
+      /subscribe/(scot %p ship)/(scot %tas name)
       %agent
       [ship %canvas]
       %watch
-      /canvas/(scot %tas canvas-name)
+      /canvas/(scot %tas name)
   ==
 ::
 ++  send-init-canvas
@@ -185,19 +194,31 @@
   ~&  "send-init-canvas"
   ::   send canvas state
   ::
-  =/  canvas=(unit canvas)  (~(get by gallery) name)
+  =/  canvas=(unit canvas)  (~(get by gallery) [our.bowl name])
   ?~  canvas  `state
   :_  state
   [%give %fact ~ %canvas-update !>([%load name u.canvas])]~
 ::
-++  send-canvas-stroke
+++  send-canvas-update
   |=  [name=@t =stroke]
   ^-  card
   :*  %give
       %fact
       [/canvas/(scot %tas name)]~
       %canvas-update
-      !>([%paint name stroke])
+      !>([%paint our.bowl name stroke])
+  ==
+::
+++  update-remote-canvas
+  |=  [name=@t =stroke location=@p]
+  ^-  card
+  :*  %pass
+      [%paint name ~]
+      %agent
+      [location %canvas]
+      %poke
+      %canvas-action
+      !>([%paint location name stroke])
   ==
 ::
 ++  handle-canvas-action
@@ -231,9 +252,10 @@
   ::   [%give %fact [/updates]~ %canvas-update !>([%load name canvas])]~
   ::
   ++  handle-paint
-    |=  [name=@t =stroke]
+    |=  [location=@p name=@t =stroke]
     ^-  (quip card _state)
-    (process-remote-paint name stroke)
+    ~&  "processing remote paint"
+    (process-remote-paint location name stroke)
   ::
   :: ++  handle-frontend-load
   ::   |=  [id=@t mesh=hexagons]
@@ -245,7 +267,8 @@
   ++  handle-join
     |=  [=ship name=@t]
     ^-  (quip card _state)
-    ~&  "subscribing..."
+    ?>  (team:title our.bowl src.bowl)
+    ~&  ["subscribing..." ship name]
     :_  state
     [(subscribe ship name)]~
     ::  TODO: do it after confirmation is subs failed?
@@ -253,15 +276,19 @@
     :: state(gallery (~(put by gallery) [name []]))
   ::
   ::
+  ::
   ++  handle-create
    |=  =canvas
    ^-  (quip card _state)
-   :-  ~
-   state(gallery (~(put by gallery) [name.metadata.canvas canvas]))
+   ?>  (team:title our.bowl src.bowl)
+   =/  load=canvas-view  [%load name.metadata.canvas canvas]
+   :-  [%give %fact [/updates]~ %canvas-view !>(load)]~
+   state(gallery (~(put by gallery) [[our.bowl name.metadata.canvas] canvas]))
   ::
   ++  handle-share
    |=  name=@t
    ^-  (quip card _state)
+   ?>  (team:title our.bowl src.bowl)
    :_  state
    ::  TODO: check if file has been created already?
    ::  disable share on browser if not
@@ -289,6 +316,7 @@
   ++  handle-save
     |=  [file=@t svg=@t]
     ^-  (quip card _state)
+    ?>  (team:title our.bowl src.bowl)
     =/  =path
       ~[(scot %p our.bowl) %home (scot %da now.bowl) %app %canvas %svg file %svg]
     =/  contents=cage  [%svg !>(svg)]
@@ -309,32 +337,32 @@
   ++  handle-load
     |=  [name=@t =canvas]
     ^-  (quip card _state)
-    :_  state(gallery (~(put by gallery) [name canvas]))
+    :_  state(gallery (~(put by gallery) [[src.bowl name] canvas]))
     [%give %fact [/updates]~ %canvas-view !>([%load name canvas])]~
   ::
   ++  handle-paint
-    |=  [name=@t =stroke]
+    |=  [location=@p name=@t =stroke]
     ^-  (quip card _state)
-    (process-remote-paint name stroke)
+    (process-remote-paint location name stroke)
   --
 ::
 ++  process-remote-paint
-  |=  [name=@t edit=stroke]
+  |=  [location=@p name=@t edit=stroke]
   ^-  (quip card _state)
-  =/  target-canvas=(unit canvas)  (~(get by gallery) name)
+  =/  target-canvas=(unit canvas)  (~(get by gallery) [location name])
   ?~  target-canvas  `state
   ?.  =(-.edit -.u.target-canvas)  `state
   |^
   ?-  -.u.target-canvas
-    %mesh  (handle-mesh name +.u.target-canvas edit)
+    %mesh  (handle-mesh name +.u.target-canvas edit location)
   ==
   ::
   ++  handle-mesh
-    |=  [name=@t [=mesh =metadata] =stroke]
+    |=  [name=@t [=mesh =metadata] =stroke location=@p]
     ^-  (quip card _state)
     :_  %_  state
             gallery
-          %+  ~(put by gallery)  name
+          %+  ~(put by gallery)  [location name]
           ^-  canvas
           :*  %mesh
             ::
@@ -346,14 +374,17 @@
           ==
         ==
     ?.  (team:title our.bowl src.bowl)
-      ::  foreign
+      ::  stroke from a remote ship
       ::
       ~&  "foreign, udpate my frontend"
-      [%give %fact [/updates]~ %canvas-view !>([%paint name stroke])]~
-    ::  local
+      [%give %fact [/updates]~ %canvas-view !>([%paint name location stroke])]~
+    ::  stroke from frontend
     ::
-    ~&  'local, send to subscribers'
-    [(send-canvas-stroke name stroke)]~
+    ?:  =(location our.bowl)
+      ~&  'local canvas, send to subscribers'
+      [(send-canvas-update name stroke)]~
+    ~&  'remote canvas, poke owner'
+    [(update-remote-canvas name stroke location)]~
   --
 ::
 :: ++  poke-handle-http-request
