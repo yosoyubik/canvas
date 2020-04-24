@@ -261,7 +261,7 @@
   ++  handle-paint
     |=  [name=@t location=@p =stroke]
     ^-  (quip card _state)
-    [[(paint-poke name stroke)]~ state]
+    [[(paint-poke name location stroke)]~ state]
   ::
   :: ++  handle-join
   ::   |=  [=ship canvas-id=@t]

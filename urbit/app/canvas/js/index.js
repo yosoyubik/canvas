@@ -54950,6 +54950,8 @@
                 }
               }
 
+              
+
               for (var j = 0, q = 3; j < m; ++j, q += 6) {
                 for (var i = 0; i < n; ++i, q += 3) {
                   geometries.push({
@@ -54957,7 +54959,7 @@
                     name: canvasName,
                     type: "Polygon",
                     arcs: [[q, q + 1, q + 2, ~(q + (n + 2 - (j & 1)) * 3), ~(q - 2), ~(q - (n + 2 + (j & 1)) * 3 + 2)]],
-                    fill: (hexagons) ? hexagons.hasOwnProperty(total) : false
+                    fill: (hexagons) ? hexagons[total] : false
                     // fill: Math.random() > i / n * 2
                   });
                   ++total;
@@ -63545,15 +63547,6 @@ lyrtesmudnytbyrsenwegfyrmurtelreptegpecnelnevfes\
                 }
             }
 
-            class ConfigReducer {
-                reduce(json, state) {
-                    let data = lodash.get(json, 'canvas', false);
-                    if (data) {
-                        state.inbox = data.inbox;
-                    }
-                }
-            }
-
             class UpdateReducer {
                 reduce(json, state) {
                     let data = lodash.get(json, 'load', false);
@@ -63596,7 +63589,6 @@ lyrtesmudnytbyrsenwegfyrmurtelreptegpecnelnevfes\
                     };
 
                     this.initialReducer = new InitialReducer();
-                    this.configReducer = new ConfigReducer();
                     this.updateReducer = new UpdateReducer();
                     this.paintReducer = new PaintReducer();
                     this.setState = () => { };
@@ -63611,11 +63603,13 @@ lyrtesmudnytbyrsenwegfyrmurtelreptegpecnelnevfes\
 
                     console.log(json);
                     this.initialReducer.reduce(json, this.state);
-                    this.configReducer.reduce(json, this.state);
                     this.updateReducer.reduce(json, this.state);
                     this.paintReducer.reduce(json, this.state);
                     console.log(this.state);
-                    this.setState(this.state);
+                    if (!('paint' in json)) {
+                      console.log("painting!!!!!!!!!!!");
+                      this.setState(this.state);
+                    }
                 }
             }
 

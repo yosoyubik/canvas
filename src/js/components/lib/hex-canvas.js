@@ -122,6 +122,8 @@ const hexTopology = (radius, width, height, hexagons, canvasName) => {
     }
   }
 
+  
+
   for (var j = 0, q = 3; j < m; ++j, q += 6) {
     for (var i = 0; i < n; ++i, q += 3) {
       geometries.push({
@@ -129,7 +131,7 @@ const hexTopology = (radius, width, height, hexagons, canvasName) => {
         name: canvasName,
         type: "Polygon",
         arcs: [[q, q + 1, q + 2, ~(q + (n + 2 - (j & 1)) * 3), ~(q - 2), ~(q - (n + 2 + (j & 1)) * 3 + 2)]],
-        fill: (hexagons) ? hexagons.hasOwnProperty(total) : false
+        fill: (hexagons) ? hexagons[total] : false
         // fill: Math.random() > i / n * 2
       });
       ++total;
