@@ -257,13 +257,6 @@
     ~&  "processing remote paint"
     (process-remote-paint location name stroke)
   ::
-  :: ++  handle-frontend-load
-  ::   |=  [id=@t mesh=hexagons]
-  ::   ^-  (quip card _state)
-  ::   =/  data=json  (canvas-action-to-json [%init id mesh])
-  ::   :-  [%give %fact [/primary]~ %json !>(data)]~
-  ::   state(canvas (~(put by canvas) [id mesh]))
-  ::
   ++  handle-join
     |=  [=ship name=@t]
     ^-  (quip card _state)
@@ -274,6 +267,7 @@
     ::  TODO: do it after confirmation is subs failed?
     ::
     :: state(gallery (~(put by gallery) [name []]))
+  ::
   ::
   ::
   ::
@@ -295,13 +289,19 @@
    ::
    =/  =path  (weld /~ [(scot %p our.bowl) name ~])
    =/  serial=@uvH  (shaf %msg-uid eny.bowl)
-   ::  TODO: request hostname and port to %eyre
-   ::
-   =/  port=@ud  ?:(=(our.bowl ~fyr) 8.080 8.081)
+   =/  =hart:eyre  .^(hart:eyre %e /(scot %p our.bowl)/host/real)
+   =/  port=@ud  (need q.hart)
+   =/  domain=tape
+     %+  weld
+       ?:(p.hart "https://" "http://")
+    ?-  -.r.hart
+      %.y  (trip (en-turf:html p.r.hart))
+      %.n  (slag 1 (scow %if p.r.hart))
+    ==
    =/  =letter
      :-  %url
      %-  crip
-     "http://localhost:{(trip (rsh 3 2 (scot %ui port)))}/~canvas/svg/{(trip name)}.png"
+     "{domain}:{((d-co:co 1) port)}/~canvas/svg/{(trip name)}.png"
    =/  =envelope  [serial *@ our.bowl now.bowl letter]
    :_  ~
    :*  %pass
