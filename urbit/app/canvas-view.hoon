@@ -220,6 +220,18 @@
       !>([%join ship canvas-name])
   ==
 ::
+++  leave-poke
+  |=  [ship=@p canvas-name=@t]
+  ^-  card
+  :*  %pass
+      [%leave (scot %p ship) canvas-name ~]
+      %agent
+      [our.bowl %canvas]
+      %poke
+      %canvas-action
+      !>([%leave ship canvas-name])
+  ==
+::
 ++  share-poke
   |=  name=@t
   ^-  card
@@ -260,6 +272,7 @@
     %init    handle-init
     %paint   (handle-paint +.act)
     %join    (handle-join +.act)
+    %leave   (handle-leave +.act)
     %create  (handle-create +.act)
     %share   (handle-share +.act)
     %save    (handle-save +.act)
@@ -281,6 +294,12 @@
     ^-  (quip card _state)
     ~&  "subscribing..."
     [[(join-poke ship canvas-name)]~ state]
+  ::
+  ++  handle-leave
+    |=  [=ship canvas-name=@t]
+    ^-  (quip card _state)
+    ~&  "leaving..."
+    [[(leave-poke ship canvas-name)]~ state]
   ::
   ++  handle-create
    |=  =metadata

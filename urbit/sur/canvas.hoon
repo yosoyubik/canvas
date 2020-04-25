@@ -23,6 +23,7 @@
       :: [%init gallery=(list [@tas mesh metadata])]
       [%load name=@t =canvas]
       [%join =ship name=@t]
+      [%leave =ship name=@t]
       [%create =canvas]
       ::  TODO: add chat name
       ::
@@ -40,6 +41,7 @@
       [%load name=@t =canvas]
       [%paint name=@t local=@p =stroke]
       [%join =ship name=@t]
+      [%leave =ship name=@t]
       [%create =metadata]
       ::  TODO: add chat name
       ::

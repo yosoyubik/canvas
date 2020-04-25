@@ -11,7 +11,8 @@
     %-  of
     :~  [%init ul]
         [%paint paint]
-        [%join join]
+        [%join subscription]
+        [%leave subscription]
         [%create create]
         [%share share]
         [%save save]
@@ -32,8 +33,9 @@
         %-  of
         [%mesh (ot ~[['id' ni] ['filled' bo]])]~
     ==
+  ::  TODO: combine join & leave
   ::
-  ++  join
+  ++  subscription
     (ot ~[['ship' (su ;~(pfix sig fed:ag))] ['canvas-name' so]])
   ::
   ++  save

@@ -1,12 +1,18 @@
 import React, { Component } from 'react';
 
+import { api } from '/api';
+
 import { Route, Link } from 'react-router-dom';
 import { Sigil } from '/components/lib/icons/sigil';
 import { cite } from '/lib/util';
+import { CanvasTitle } from '/components/lib/canvas-title'
+
 
 export class CanvasSidebar extends Component {
   // drawer to the left
-
+  onClickLeave() {
+    api.canvas.leave(each[1].metadata.location, each[0])
+  }
   render() {
     const { props, state } = this;
     console.log(props, state);
@@ -38,11 +44,7 @@ export class CanvasSidebar extends Component {
       canvasItems = Object.entries(props.canvasList).map((each, i) => {
         console.log(each, i);
         return (
-          <Link to={`/~canvas/item/${each[0]}`} key={each[0]}>
-            <div className="w-100 v-mid f9 ph4 z1 pv1">
-              <p className="f9 dib">{each[0]}</p>
-            </div>
-          </Link>
+          <CanvasTitle id={each[0]} location={each[1].metadata.location} />
         )
       });
     }

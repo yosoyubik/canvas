@@ -53,7 +53,6 @@
     ::
     +$  state-zero
       $:  gallery=(map location canvas)
-          test=?
       ==
     --
 ::
@@ -86,14 +85,6 @@
       ~&  [src.bowl path]
       :_  this
       ?+    path  ~|([%peer-canvas-strange path] !!)
-      ::     [%canvastile ~]
-      ::   [%give %fact ~ %json !>(*json)]~
-      :: ::
-      ::     [%primary *]
-      ::   [%give %fact ~ %json !>((canvas-action-to-json innit-load))]~
-      :: ::
-      ::     [%http-response *]
-      ::   ~
           [%updates ~]  ~
       ::
           [%canvas ^]
@@ -188,6 +179,17 @@
       /canvas/(scot %tas name)
   ==
 ::
+++  leave
+  |=  [=ship name=@t]
+  ^-  card
+  :*  %pass
+      /subscribe/(scot %p ship)/(scot %tas name)
+      %agent
+      [ship %canvas]
+      %leave
+      ~
+  ==
+::
 ++  send-init-canvas
   |=  name=@t
   ^-  (quip card _state)
@@ -199,7 +201,7 @@
   :_  state
   [%give %fact ~ %canvas-update !>([%load name u.canvas])]~
 ::
-++  send-canvas-update
+++  send-paint-update
   |=  [name=@t =stroke]
   ^-  card
   :*  %give
@@ -230,6 +232,7 @@
     :: %load    (handle-load +.act)
     %paint   (handle-paint +.act)
     %join    (handle-join +.act)
+    %leave   (handle-leave +.act)
     %create  (handle-create +.act)
     %share   (handle-share +.act)
     %save    (handle-save +.act)
@@ -263,6 +266,20 @@
     ?>  (team:title our.bowl src.bowl)
     ~&  ["subscribing..." ship name]
     [[(subscribe ship name)]~ state]
+  ::
+  ++  handle-leave
+    |=  [=ship name=@t]
+    ^-  (quip card _state)
+    ?>  (team:title our.bowl src.bowl)
+    ~&  ["leaving" ship name]
+    =/  =canvas  (~(got by gallery) [ship name])
+    ::  the canvas becomes local
+    ::
+    =.  location.metadata.canvas  our.bowl
+    :_  state(gallery (~(put by gallery) [ship name] canvas))
+    :~  (leave ship name)
+        [%give %fact [/updates]~ %canvas-view !>([%load name canvas])]
+    ==  
   ::
   ++  handle-create
    |=  =canvas
@@ -375,7 +392,7 @@
     ::
     ?:  =(location our.bowl)
       ~&  'local canvas, send to subscribers'
-      [(send-canvas-update name stroke)]~
+      [(send-paint-update name stroke)]~
     ~&  'remote canvas, poke owner'
     [(update-remote-canvas name stroke location)]~
   --
