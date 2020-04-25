@@ -238,22 +238,6 @@
     %save    (handle-save +.act)
   ==
   ::
-  :: ++  handle-init
-  ::   |=  canvas-list=(list metadata)
-  ::   ^-  (quip card _state)
-  ::   :: =/  data=json  (canvas-action-to-json [%init id mesh])
-  ::   =/  data=json  (canvas-action-to-json [%init canvas-list])
-  ::   :_  state
-  ::   [%give %fact [/primary]~ %json !>(data)]~
-  ::   :: :-  [%give %fact [/primary]~ %json !>(data)]~
-  ::   :: state(canvas (~(put by canvas) [id mesh]))
-  ::
-  :: ++  handle-load
-  ::   |=  [name=@t =canvas]
-  ::   ^-  (quip card _state)
-  ::   :_  state(gallery (~(put by gallery) [name canvas]))
-  ::   [%give %fact [/updates]~ %canvas-update !>([%load name canvas])]~
-  ::
   ++  handle-paint
     |=  [location=@p name=@t =stroke]
     ^-  (quip card _state)
@@ -279,7 +263,7 @@
     :_  state(gallery (~(put by gallery) [ship name] canvas))
     :~  (leave ship name)
         [%give %fact [/updates]~ %canvas-view !>([%load name canvas])]
-    ==  
+    ==
   ::
   ++  handle-create
    |=  =canvas

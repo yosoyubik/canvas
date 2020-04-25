@@ -9,6 +9,7 @@ import { initHexMesh,
          height,
          radius }
 from "./lib/hex-canvas";
+import { createColorPicker } from "./lib/color";
 
 
 export class Hexagons extends Component {
@@ -24,6 +25,7 @@ export class Hexagons extends Component {
     console.log("mounting");
     drawHexCanvas(this.props);
     initHexMesh();
+    createColorPicker(width);
   }
 
   onClickSave () {
@@ -36,7 +38,6 @@ export class Hexagons extends Component {
   }
 
   render() {
-    // const svgClass = "cf w-100 flex flex-column ba-m ba-l ba-xl b--gray2 br1 h-100 h-100-minus-40-m h-100-minus-40-l h-100-minus-40-xl f9 white-d";
     d3.select(".hexagon").selectAll("path").remove();
     if (this.props.canvas) {
       console.log("rendering", this.props.name);
@@ -63,6 +64,7 @@ export class Hexagons extends Component {
             <g className="hexagon" />
             <g className="mesh-group" />
             <g className="border-group" />
+            <g className="legend" />
           </svg>
         </div>
       </div>

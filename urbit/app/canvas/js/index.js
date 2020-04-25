@@ -48931,6 +48931,20 @@
 
             var ascendingBisect = bisector(ascending);
 
+            function sequence(start, stop, step) {
+              start = +start, stop = +stop, step = (n = arguments.length) < 2 ? (stop = start, start = 0, 1) : n < 3 ? 1 : +step;
+
+              var i = -1,
+                  n = Math.max(0, Math.ceil((stop - start) / step)) | 0,
+                  range = new Array(n);
+
+              while (++i < n) {
+                range[i] = start + i * step;
+              }
+
+              return range;
+            }
+
             var noop$1 = {value: function() {}};
 
             function dispatch() {
@@ -53223,6 +53237,60 @@
               return path.projection(projection).context(context);
             }
 
+            function initRange(domain, range) {
+              switch (arguments.length) {
+                case 0: break;
+                case 1: this.range(domain); break;
+                default: this.range(range).domain(domain); break;
+              }
+              return this;
+            }
+
+            var array = Array.prototype;
+            var slice = array.slice;
+
+            var implicit = {name: "implicit"};
+
+            function ordinal() {
+              var index = map(),
+                  domain = [],
+                  range = [],
+                  unknown = implicit;
+
+              function scale(d) {
+                var key = d + "", i = index.get(key);
+                if (!i) {
+                  if (unknown !== implicit) return unknown;
+                  index.set(key, i = domain.push(d));
+                }
+                return range[(i - 1) % range.length];
+              }
+
+              scale.domain = function(_) {
+                if (!arguments.length) return domain.slice();
+                domain = [], index = map();
+                var i = -1, n = _.length, d, key;
+                while (++i < n) if (!index.has(key = (d = _[i]) + "")) index.set(key, domain.push(d));
+                return scale;
+              };
+
+              scale.range = function(_) {
+                return arguments.length ? (range = slice.call(_), scale) : range.slice();
+              };
+
+              scale.unknown = function(_) {
+                return arguments.length ? (unknown = _, scale) : unknown;
+              };
+
+              scale.copy = function() {
+                return ordinal(domain, range).unknown(unknown);
+              };
+
+              initRange.apply(scale, arguments);
+
+              return scale;
+            }
+
             var t0$1 = new Date,
                 t1$1 = new Date;
 
@@ -54983,6 +55051,9 @@
 
             var pi$6 = Math.PI;
 
+            // Adapted from: https://bl.ocks.org/mbostock/5249328
+
+
             const width = 960,
                   height = 500,
                   radius = 20;
@@ -55005,6 +55076,19 @@
 
             const projection = hexProjection(radius);
             const path = index$1().projection(projection);
+
+
+            const selectedColor = (colors) => {
+              // console.log(colors);
+              let test= colors.find(color => {
+                if (color.style.stroke) {
+                  return true;
+                }
+              });
+              console.log(test);
+              return test;
+            };
+
 
             const initHexMesh = () => {
               const topology = hexTopology(radius, width, height);
@@ -55031,6 +55115,7 @@
 
               const mousemove = function(d) {
                 if (mousing) {
+                  const colors = select(".legend").selectAll("rect").nodes();
                   if (d.fill !== mousing > 0) {
                     console.log(canvasName);
                     // Save stroke remotely
@@ -55040,7 +55125,17 @@
                     // Save stroke locally on browser
                     canvasData[d.id] = mousing > 0;
                   }
-                  select(this).classed("point fill", d.fill = mousing > 0);
+                  // d3.select(this).classed("point fill", d.fill = mousing > 0);
+                  select(this).style('fill', () => {
+                    d.fill = mousing > 0;
+                    console.log(selectedColor(colors));
+                    console.log(color(selectedColor(colors).style.fill).toString());
+                    if (d.fill) {
+                      return color(selectedColor(colors).style.fill).toString();
+                    } else {
+                      return 'white'
+                    }
+                  });
                   // border.call(redraw);
                 }
               };
@@ -55103,7 +55198,7 @@
                 }
               }
 
-              
+
 
               for (var j = 0, q = 3; j < m; ++j, q += 6) {
                 for (var i = 0; i < n; ++i, q += 3) {
@@ -55138,6 +55233,92 @@
                });
             };
 
+            // From: https://bl.ocks.org/mbostock/debaad4fcce9bcee14cf
+
+
+            function createColorPicker(width) {
+
+              var color = ordinal().domain(sequence(9)).range(["#d53e4f","#f46d43","#fdae61","#fee08b","#ffffbf","#e6f598","#abdda4","#66c2a5","#3288bd"]),
+                  selectedColor = 0;
+
+              var components = color.domain().map(function() { return []; });
+
+              var legend = select(".legend")
+                  .attr("transform", "translate(" + ((width - color.domain().length * 24) / 2) + ",10)")
+                  .style("cursor", "pointer")
+                .selectAll("rect")
+                  .data(color.domain())
+                .enter().append("rect")
+                  .attr("x", function(d) { return d * 24; })
+                  .attr("width", 24 - 3)
+                  .attr("height", 24 - 3)
+                  .style("stroke", function(d) { return d ? null : "#000"; })
+                  .style("fill", color)
+                  .on("click", clicklegend);
+
+                function clicklegend(d) {
+                  var legend = select(".legend").selectAll("rect");
+                  var colors = legend.nodes();
+                  colors[selectedColor].style.stroke = null;
+                  colors[selectedColor = d].style.stroke = "#000";
+                }
+
+                return legend;
+
+              // var white = d3.rgb("white"),
+              //     black = d3.rgb("black"),
+              //     width = d3.select("canvas").property("width");
+              //
+              // var channels = {
+              //   h: {scale: d3.scaleLinear().domain([0, 360]).range([0, width]), x: width / 2},
+              //   c: {scale: d3.scaleLinear().domain([0, 100]).range([0, width]), x: width / 2},
+              //   l: {scale: d3.scaleLinear().domain([0, 150]).range([0, width]), x: width / 2}
+              // };
+              //
+              // function dragged(d) {
+              //   d.value.x = Math.max(0, Math.min(this.width - 1, d3.mouse(this)[0]));
+              //   canvas.each(render);
+              // }
+              //
+              // var channel = d3.selectAll(".channel")
+              //     .data(d3.entries(channels));
+              //
+              // var canvas = channel.select("canvas")
+              //     .call(d3.drag().on("drag", dragged))
+              //     .each(render);
+              //
+              // function render(d) {
+              //   var width = this.width,
+              //         context = this.getContext("2d"),
+              //         image = context.createImageData(width, 1),
+              //         i = -1;
+              //
+              //   var current = d3.hsl(
+              //     channels.h.scale.invert(channels.h.x),
+              //     channels.c.scale.invert(channels.c.x),
+              //     channels.l.scale.invert(channels.l.x)
+              //   );
+              //
+              //   for (var x = 0, v, c; x < width; ++x) {
+              //     if (x === d.value.x) {
+              //       c = white;
+              //     } else if (x === d.value.x - 1) {
+              //       c = black;
+              //     } else {
+              //       current[d.key] = d.value.scale.invert(x);
+              //       c = d3.rgb(current);
+              //     }
+              //     image.data[++i] = c.r;
+              //     image.data[++i] = c.g;
+              //     image.data[++i] = c.b;
+              //     image.data[++i] = 255;
+              //   }
+              //
+              //   context.putImageData(image, 0, 0);
+              // }
+
+            }
+
             const _jsxFileName$6 = "/Users/jose/urbit/canvas/src/js/components/hexagons.js";
 
             class Hexagons extends react_1 {
@@ -55153,6 +55334,7 @@
                 console.log("mounting");
                 drawHexCanvas(this.props);
                 initHexMesh();
+                createColorPicker(width);
               }
 
               onClickSave () {
@@ -55165,7 +55347,6 @@
               }
 
               render() {
-                // const svgClass = "cf w-100 flex flex-column ba-m ba-l ba-xl b--gray2 br1 h-100 h-100-minus-40-m h-100-minus-40-l h-100-minus-40-xl f9 white-d";
                 select(".hexagon").selectAll("path").remove();
                 if (this.props.canvas) {
                   console.log("rendering", this.props.name);
@@ -55173,25 +55354,26 @@
                 }
 
                 return (
-                  react.createElement('div', { className: "h-100 w-100 pa3 pt4 bg-gray0-d white-d flex flex-column"       , __self: this, __source: {fileName: _jsxFileName$6, lineNumber: 47}}
-                    , react.createElement('div', { className: "w-100 dn-m dn-l dn-xl inter pt1 pb6 f8"       , __self: this, __source: {fileName: _jsxFileName$6, lineNumber: 48}}
-                      , react.createElement(Link, { to: "/~canvas/", __self: this, __source: {fileName: _jsxFileName$6, lineNumber: 49}}, "⟵ Canvas")
+                  react.createElement('div', { className: "h-100 w-100 pa3 pt4 bg-gray0-d white-d flex flex-column"       , __self: this, __source: {fileName: _jsxFileName$6, lineNumber: 48}}
+                    , react.createElement('div', { className: "w-100 dn-m dn-l dn-xl inter pt1 pb6 f8"       , __self: this, __source: {fileName: _jsxFileName$6, lineNumber: 49}}
+                      , react.createElement(Link, { to: "/~canvas/", __self: this, __source: {fileName: _jsxFileName$6, lineNumber: 50}}, "⟵ Canvas")
                     )
                     , react.createElement('button', {
                       onClick: this.onClickSave.bind(this),
-                      className: "pointer f9 green2 bg-gray0-d ba pv3 ph4 b--green2"       , __self: this, __source: {fileName: _jsxFileName$6, lineNumber: 51}}, "Save Image"
+                      className: "pointer f9 green2 bg-gray0-d ba pv3 ph4 b--green2"       , __self: this, __source: {fileName: _jsxFileName$6, lineNumber: 52}}, "Save Image"
 
                     )
                     , react.createElement('button', {
                       onClick: this.onClickShare.bind(this),
-                      className: "pointer f9 green2 bg-gray0-d ba pv3 ph4 b--green2"       , __self: this, __source: {fileName: _jsxFileName$6, lineNumber: 56}}, "Share Image"
+                      className: "pointer f9 green2 bg-gray0-d ba pv3 ph4 b--green2"       , __self: this, __source: {fileName: _jsxFileName$6, lineNumber: 57}}, "Share Image"
 
                     )
-                    , react.createElement('div', { ref: "canvas", className: "w-100 mb4 pr6 pr0-l pr0-xl"    , __self: this, __source: {fileName: _jsxFileName$6, lineNumber: 61}}
-                      , react.createElement('svg', { className: "db", id: "canvas", width: width, height: height, __self: this, __source: {fileName: _jsxFileName$6, lineNumber: 62}}
-                        , react.createElement('g', { className: "hexagon", __self: this, __source: {fileName: _jsxFileName$6, lineNumber: 63}} )
-                        , react.createElement('g', { className: "mesh-group", __self: this, __source: {fileName: _jsxFileName$6, lineNumber: 64}} )
-                        , react.createElement('g', { className: "border-group", __self: this, __source: {fileName: _jsxFileName$6, lineNumber: 65}} )
+                    , react.createElement('div', { ref: "canvas", className: "w-100 mb4 pr6 pr0-l pr0-xl"    , __self: this, __source: {fileName: _jsxFileName$6, lineNumber: 62}}
+                      , react.createElement('svg', { className: "db", id: "canvas", width: width, height: height, __self: this, __source: {fileName: _jsxFileName$6, lineNumber: 63}}
+                        , react.createElement('g', { className: "hexagon", __self: this, __source: {fileName: _jsxFileName$6, lineNumber: 64}} )
+                        , react.createElement('g', { className: "mesh-group", __self: this, __source: {fileName: _jsxFileName$6, lineNumber: 65}} )
+                        , react.createElement('g', { className: "border-group", __self: this, __source: {fileName: _jsxFileName$6, lineNumber: 66}} )
+                        , react.createElement('g', { className: "legend", __self: this, __source: {fileName: _jsxFileName$6, lineNumber: 67}} )
                       )
                     )
                   )
