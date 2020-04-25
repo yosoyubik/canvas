@@ -208,6 +208,18 @@
       !>([%paint location name stroke])
   ==
 ::
+++  join-poke
+  |=  [ship=@p canvas-name=@t]
+  ^-  card
+  :*  %pass
+      [%join (scot %p ship) canvas-name ~]
+      %agent
+      [our.bowl %canvas]
+      %poke
+      %canvas-action
+      !>([%join ship canvas-name])
+  ==
+::
 ++  share-poke
   |=  name=@t
   ^-  card
@@ -247,6 +259,7 @@
   ?+  -.act  !!
     %init    handle-init
     %paint   (handle-paint +.act)
+    %join    (handle-join +.act)
     %create  (handle-create +.act)
     %share   (handle-share +.act)
     %save    (handle-save +.act)
@@ -263,14 +276,11 @@
     ^-  (quip card _state)
     [[(paint-poke name location stroke)]~ state]
   ::
-  :: ++  handle-join
-  ::   |=  [=ship canvas-id=@t]
-  ::   ^-  (quip card _state)
-  ::   ~&  "subscribing..."
-  ::   :-  [(subscribe ship canvas-id)]~
-  ::   ::  TODO: do it after confirmation is subs failed?
-  ::   ::
-  ::   state(canvas (~(put by canvas) [canvas-id ~]))
+  ++  handle-join
+    |=  [=ship canvas-name=@t]
+    ^-  (quip card _state)
+    ~&  "subscribing..."
+    [[(join-poke ship canvas-name)]~ state]
   ::
   ++  handle-create
    |=  =metadata

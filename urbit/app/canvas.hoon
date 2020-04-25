@@ -262,14 +262,7 @@
     ^-  (quip card _state)
     ?>  (team:title our.bowl src.bowl)
     ~&  ["subscribing..." ship name]
-    :_  state
-    [(subscribe ship name)]~
-    ::  TODO: do it after confirmation is subs failed?
-    ::
-    :: state(gallery (~(put by gallery) [name []]))
-  ::
-  ::
-  ::
+    [[(subscribe ship name)]~ state]
   ::
   ++  handle-create
    |=  =canvas

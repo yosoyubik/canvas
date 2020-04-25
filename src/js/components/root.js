@@ -5,6 +5,7 @@ import _ from 'lodash';
 import { Skeleton } from '/components/skeleton';
 import { Hexagons } from "/components/hexagons"
 import { NewScreen } from "/components/new"
+import { JoinScreen } from "/components/join"
 
 import { store } from '/store';
 import { api } from '/api';
@@ -72,6 +73,29 @@ export class Root extends Component {
                   );
                 }
             }} />
+          <Route exact path="/~canvas/join/(~)?/:ship?/:canvas?"
+            render={props => {
+              let canvas =
+                `/${props.match.params.ship}/${props.match.params.canvas}`;
+              let sig = props.match.url.includes("/~/");
+              if (sig) {
+                canvas = '/~' + canvas;
+              }
+
+              return (
+                <Skeleton
+                  history={props.history}
+                  canvasList={canvasList}
+                  activeDrawer="rightPanel">
+                  <JoinScreen
+                    api={api}
+                    canvasList={canvasList}
+                    autoJoin={canvas}
+                    {...props} />
+                </Skeleton>
+              );
+            }}
+          />
         </div>
       </BrowserRouter>
     )

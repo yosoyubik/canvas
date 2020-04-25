@@ -10,7 +10,8 @@ class UrbitApi {
     this.canvas = {
       paint: this.paint.bind(this),
       create: this.create.bind(this),
-      load: this.loadCanvas.bind(this)
+      load: this.loadCanvas.bind(this),
+      join: this.joinCanvas.bind(this)
     };
 
     this.svg = {
@@ -65,6 +66,15 @@ class UrbitApi {
     this.action("canvas-view", "canvas-view", {
       load: {
         'name': name
+      }
+    });
+  }
+
+  joinCanvas(ship, name) {
+    this.action("canvas-view", "canvas-view", {
+      join: {
+        'ship': ship,
+        'canvas-name': name
       }
     });
   }

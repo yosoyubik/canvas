@@ -34,7 +34,7 @@
     ==
   ::
   ++  join
-    (ot ~[['ship' (su fed:ag)] ['canvas-name' so]])
+    (ot ~[['ship' (su ;~(pfix sig fed:ag))] ['canvas-name' so]])
   ::
   ++  save
     (ot ~[['canvas-name' so] ['svg' so]])

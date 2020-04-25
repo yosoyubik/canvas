@@ -56,6 +56,9 @@ export class CanvasSidebar extends Component {
           <Link to="/~canvas/new" className="dib">
             <p className="f9 pt4 pl4 green2 bn">Create Canvas</p>
           </Link>
+          <Link to="/~canvas/join" className="dib">
+            <p className="f9 pt4 pl4 green2 bn">Join Canvas</p>
+          </Link>
           <div className="pt1">
             <h2 className="f9 pt4 pr4 pb2 pl4 gray2 c-default">My Canvas</h2>
             { canvasItems }
