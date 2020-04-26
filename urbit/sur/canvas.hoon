@@ -1,6 +1,6 @@
 |%
-+$  arc          [id=@ud filled=?]
-+$  mesh         (map @ud ?)
++$  arc          [filled=? color=@t]
++$  mesh         (map @ud arc)
 +$  canvas-type  ?(%mesh)
 +$  metadata     [name=@t type=canvas-type location=ship]
 +$  location     [host=ship canvas=@t]
@@ -10,7 +10,7 @@
   ==
 ::
 +$  stroke
-  $%  [%mesh =arc]
+  $%  [%mesh id=@ud =arc]
   ==
 ::
 +$  canvas-response

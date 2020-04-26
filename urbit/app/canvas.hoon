@@ -364,8 +364,8 @@
     ::
         mesh
       ?.  filled.arc.i.strokes
-        (~(del by mesh) id.arc.i.strokes)
-      (~(put by mesh) arc.i.strokes)
+        (~(del by mesh) id.i.strokes)
+      (~(put by mesh) [id.i.strokes arc.i.strokes])
     ==
   --
 --

@@ -33,7 +33,7 @@
         :-  'strokes'
         %-  ar
         %-  of
-        [%mesh (ot ~[['id' ni] ['filled' bo]])]~
+        [%mesh (ot ~[['id' ni] ['filled' bo] ['color' so]])]~
     ==
   ::
   ++  subscription
@@ -110,19 +110,22 @@
   ==
 ::
 ++  arc-to-json
-  |=  arc
+  |=  [id=@u =arc]
   ^-  (list [@t json])
-  =,  format
-  [(no:dejs (numb:enjs id)) b+filled]~
+  :_  ~
+  :-  (crip ((d-co:co 1) id))
+  %-  pairs:enjs:format
+  ^-  (list [@t json])
+  ~[['fill' b+filled.arc] ['color' s+color.arc]]
 ::
 ++  stroke-to-json
   |=  =stroke
   ^-  (list [@t json])
-  =,  format
   ?-    -.stroke
       %mesh
-    :~  ['id' (numb:enjs id.arc.stroke)]
+    :~  ['id' (numb:enjs:format id.stroke)]
         ['fill' b+filled.arc.stroke]
+        ['color' s+color.arc.stroke]
     ==
   ==
 --

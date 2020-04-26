@@ -27,18 +27,14 @@ const hexProjection = (radius) => {
 const projection = hexProjection(radius);
 const path = d3.geoPath().projection(projection);
 
-
 const selectedColor = (colors) => {
-  // console.log(colors);
   let test= colors.find(color => {
     if (color.style.stroke) {
       return true;
     }
   });
-  // console.log(test);
   return test;
 }
-
 
 const initHexMesh = () => {
   const topology = hexTopology(radius, width, height);
@@ -54,33 +50,36 @@ const drawHexCanvas = (props) => {
   const canvasData = props.canvas;
   const location = props.location;
   const topology = hexTopology(radius, width, height, canvasData, canvasName);
-  console.log(canvasName);
+
   let mousing = 0;
   let apiCalls = [];
 
   const mousedown = function(d) {
-    // console.log("mousedown");
-    mousing = d.fill ? -1 : +1;
+    const colors = d3.select(".legend").selectAll("rect").nodes();
+    const color = d3.color(selectedColor(colors).style.fill).toString();
+    mousing = (d.attr.fill && d.attr.color === color) ? -1 : +1;
     mousemove.apply(this, arguments);
   }
 
   const mousemove = function(d) {
     if (mousing) {
       const colors = d3.select(".legend").selectAll("rect").nodes();
-      if (d.fill !== mousing > 0) {
-        // console.log(canvasName);
+      const color = d3.color(selectedColor(colors).style.fill).toString();
+      if ((d.attr.fill && d.attr.color === color) !== mousing > 0) {
         // Save stroke remotely
-        apiCalls.push({"mesh": {"id": d.id, "filled": mousing > 0}});
+        apiCalls.push({mesh: {id: d.id, filled: mousing > 0, color: color}});
         // Save stroke locally on browser
-        canvasData[d.id] = mousing > 0;
+        canvasData[d.id] = {fill: mousing > 0, color: color};
       }
       // d3.select(this).classed("point fill", d.fill = mousing > 0);
       d3.select(this).style('fill', () => {
-        d.fill = mousing > 0;
-        if (d.fill) {
-          return d3.color(selectedColor(colors).style.fill).toString();
+        d.attr.fill = mousing > 0;
+        if (d.attr.fill) {
+          var color = d3.color(selectedColor(colors).style.fill).toString();
+          d.attr.color = color;
+          return color;
         } else {
-          return 'white'
+          return 'white';
         }
       });
       // border.call(redraw);
@@ -100,8 +99,12 @@ const drawHexCanvas = (props) => {
     mousing = 0;
   }
 
-  const changeColor = function(d){
-    return d.fill ? "fill point" : "point";
+  // const changeColor = function(d){
+  //   return d.fill ? "fill point" : "point";
+  // }
+
+  const addStyle = function(d) {
+    return d.attr ? d.attr.color : undefined;
   }
 
   // const redraw = (border) => {
@@ -119,13 +122,15 @@ const drawHexCanvas = (props) => {
   const hexagons = g
     .selectAll("path")
     .data(topology.objects.hexagons.geometries)
-    .attr("class", changeColor);
+    // .attr("class", changeColor)
+    .style('fill', addStyle);
 
   // enter
   hexagons
     .enter().append("path")
       .attr("d", function(d) { return path(topojson.feature(topology, d)); })
-      .attr("class", changeColor)
+      .attr("class", "point")
+      .style('fill', addStyle)
       .on("mousedown", mousedown)
       .on("mousemove", mousemove)
       .on("mouseup", mouseup);
@@ -137,7 +142,7 @@ const drawHexCanvas = (props) => {
 }
 
 const hexTopology = (radius, width, height, hexagons, canvasName) => {
-  console.log(hexagons);
+  // console.log(hexagons);
   const dx = radius * 2 * Math.sin(Math.PI / 3),
       dy = radius * 1.5,
       m = Math.ceil((height + radius) / dy) + 1,
@@ -152,8 +157,6 @@ const hexTopology = (radius, width, height, hexagons, canvasName) => {
     }
   }
 
-
-
   for (var j = 0, q = 3; j < m; ++j, q += 6) {
     for (var i = 0; i < n; ++i, q += 3) {
       geometries.push({
@@ -161,13 +164,12 @@ const hexTopology = (radius, width, height, hexagons, canvasName) => {
         name: canvasName,
         type: "Polygon",
         arcs: [[q, q + 1, q + 2, ~(q + (n + 2 - (j & 1)) * 3), ~(q - 2), ~(q - (n + 2 + (j & 1)) * 3 + 2)]],
-        fill: (hexagons) ? hexagons[total] : false
-        // fill: Math.random() > i / n * 2
+        attr: (hexagons && hexagons[total]) ? hexagons[total] : {}
       });
       ++total;
     }
   }
-  console.log(geometries, (hexagons ? Object.keys(hexagons).length : 0));
+  // console.log(geometries, (hexagons ? Object.keys(hexagons).length : 0));
   return {
     transform: {translate: [0, 0], scale: [1, 1]},
     objects: {hexagons: {type: "GeometryCollection", geometries: geometries}},
@@ -176,53 +178,14 @@ const hexTopology = (radius, width, height, hexagons, canvasName) => {
 }
 
 const updateCanvas = (arc, canvas) => {
-  d3.selectAll(".point").attr("class", function (d) {
-    if (arc.id === d.id) {
-      console.log(d, arc);
-    }
+  d3.selectAll(".point")
+    .style('fill', function (d) {
     if (arc.id === d.id && canvas === d.name) {
-      d.fill = arc.fill;
+      d.attr.fill = arc.fill;
+      d.attr.color = arc.color;
     }
-    return d.fill ? "fill point" : "point"
+    return d.attr.color;
    });
 }
-
-// function createColorPicker(width) {
-//
-//   var color = d3.scaleOrdinal()
-//                 .domain(d3.range(9))
-//                 .range([
-//                   "#d53e4f",
-//                   "#f46d43",
-//                   "#fdae61",
-//                   "#fee08b",
-//                   "#ffffbf",
-//                   "#e6f598",
-//                   "#abdda4",
-//                   "#66c2a5",
-//                   "#3288bd"]),
-//       dragColor;
-//
-//   var components = color.domain().map(function() { return []; });
-//
-//   var legend = d3.select(".legend")
-//       .attr("transform", "translate(" + ((width - color.domain().length * 24) / 2) + ",10)")
-//       .style("cursor", "pointer")
-//     .selectAll("rect")
-//       .data(color.domain())
-//     .enter().append("rect")
-//       .attr("x", function(d) { return d * 24; })
-//       .attr("width", 24 - 3)
-//       .attr("height", 24 - 3)
-//       .style("stroke", function(d) { return d ? null : "#000"; })
-//       .style("fill", color)
-//       .on("click", clicklegend);
-//
-//     function clicklegend(d) {
-//       var legend = d3.select(".legend");
-//       legend[0][selectedColor].style.stroke = null;
-//       legend[0][selectedColor = d].style.stroke = "#000";
-//     }
-// }
 
 export { initHexMesh, drawHexCanvas, updateCanvas, width, height, radius };
