@@ -151,23 +151,6 @@
   :_  i.t.path
   (rash i.path ;~(pfix sig fed:ag))
 ::
-:: ++  launch-poke
-::   ^-  card
-::   :*  %pass
-::       /launch/canvas
-::       %agent
-::       [our.bowl %launch]
-::       %poke
-::       %launch-action
-::       !>([%add %canvas /canvastile '/~canvas/js/tile.js'])
-::   ==
-::
-:: ++  innit-load
-::   ^-  canvas-action
-::   =/  mesh=(unit hexagons)  (~(get by canvas) '0')
-::   ~&  ["innit-load" mesh]
-::   [%init ['0' ?~(mesh ~ u.mesh)]]
-::
 ++  subscribe
   |=  [=ship name=@t]
   ^-  card
@@ -194,8 +177,6 @@
   |=  name=@t
   ^-  (quip card _state)
   ~&  "send-init-canvas"
-  ::   send canvas state
-  ::
   =/  canvas=(unit canvas)  (~(get by gallery) [our.bowl name])
   ?~  canvas  `state
   :_  state
@@ -229,8 +210,6 @@
   ^-  (quip card _state)
   |^
   ?+  -.act  !!
-    :: %init    (handle-init +.act)
-    :: %load    (handle-load +.act)
     %paint   (handle-paint +.act)
     %join    (handle-join +.act)
     %leave   (handle-leave +.act)
@@ -344,11 +323,8 @@
   |=  [location=@p name=@t strokes=(list stroke)]
   ^-  (quip card _state)
   ?>  ?=(^ strokes)
-  ~&  [location name]
   =/  target-canvas=(unit canvas)  (~(get by gallery) [location name])
-  ~&  target-canvas
   ?~  target-canvas  `state
-  ~&  [-.i.strokes -.u.target-canvas]
   ?.  =(-.i.strokes -.u.target-canvas)  `state
   |^
   ?-  -.u.target-canvas
