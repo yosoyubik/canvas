@@ -1,5 +1,5 @@
-// Adapted from: https://bl.ocks.org/mbostock/5249328
-
+//  Adapted from: https://bl.ocks.org/mbostock/5249328
+//
 import * as d3 from "d3";
 import * as topojson from "topojson";
 

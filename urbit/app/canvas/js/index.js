@@ -55058,7 +55058,7 @@
 
             var pi$6 = Math.PI;
 
-            // Adapted from: https://bl.ocks.org/mbostock/5249328
+            //  Adapted from: https://bl.ocks.org/mbostock/5249328
 
 
             const width = 960,
@@ -55245,7 +55245,7 @@
                });
             };
 
-            // From: https://bl.ocks.org/mbostock/debaad4fcce9bcee14cf
+            //  Adapted from: https://bl.ocks.org/mbostock/debaad4fcce9bcee14cf
 
 
             function createColorPicker(width) {
@@ -55261,22 +55261,35 @@
                                     "#abdda4",
                                     "#66c2a5",
                                     "#3288bd"]),
-                  grays = ordinal(scheme$n[9]),
+                  grays = ordinal()
+                            .domain(sequence(9))
+                            .range((scheme$n[9])),
                   selectedColor = 0;
-              // console.log(grays);
-              var components = color.domain().map(function() { return []; });
 
               var legend = select(".legend")
-                  .attr("transform", "translate(" + ((width - color.domain().length * 24) / 2) + ",10)")
-                  .style("cursor", "pointer")
-                .selectAll("rect")
-                  .data(color.domain())
+                  .attr("transform", "translate(" + ((width - 18 * 24) / 2) + ",10)")
+                  .style("cursor", "pointer");
+
+                legend.selectAll("rect")
+                  .data(sequence(18))
                 .enter().append("rect")
                   .attr("x", function(d) { return d * 24; })
                   .attr("width", 24 - 3)
                   .attr("height", 24 - 3)
                   .style("stroke", function(d) { return d ? null : "#000"; })
-                  .style("fill", color)
+                  .style("fill", function (d) {
+                    if (d < 9) {
+                      return color(d);
+                    }
+                    else {
+                      if (d === 9) {
+                        grays(d);
+                        return "#ff000000";
+                      } else {
+                        return grays(d);
+                      }
+                    }
+                  })
                   .on("click", clicklegend);
 
                 function clicklegend(d) {
@@ -55285,7 +55298,6 @@
                   colors[selectedColor].style.stroke = null;
                   colors[selectedColor = d].style.stroke = "#000";
                 }
-
             }
 
             const _jsxFileName$6 = "/Users/jose/urbit/canvas/src/js/components/hexagons.js";
@@ -64223,7 +64235,9 @@ lyrtesmudnytbyrsenwegfyrmurtelreptegpecnelnevfes\
                             react.createElement(Skeleton, {
                               activeDrawer: "canvas",
                               history: props.history,
-                              canvasList: canvasList, __self: this, __source: {fileName: _jsxFileName$9, lineNumber: 30}})
+                              canvasList: canvasList, __self: this, __source: {fileName: _jsxFileName$9, lineNumber: 30}} 
+                              , react.createElement(Hexagons, { api: api, canvas: {}, name: 'test', location: 'test', __self: this, __source: {fileName: _jsxFileName$9, lineNumber: 34}} )
+                              )
                           )}, __self: this, __source: {fileName: _jsxFileName$9, lineNumber: 27}} )
                       , react.createElement(Route, { exact: true, path: "/~canvas/new",
                           render:  (props) => {
@@ -64231,14 +64245,14 @@ lyrtesmudnytbyrsenwegfyrmurtelreptegpecnelnevfes\
                               react.createElement(Skeleton, {
                                 history: props.history,
                                 canvasList: canvasList,
-                                activeDrawer: "rightPanel", __self: this, __source: {fileName: _jsxFileName$9, lineNumber: 38}}
+                                activeDrawer: "rightPanel", __self: this, __source: {fileName: _jsxFileName$9, lineNumber: 40}}
                                 , react.createElement(NewScreen, {
                                   history: props.history,
-                                  api: api, __self: this, __source: {fileName: _jsxFileName$9, lineNumber: 42}}
+                                  api: api, __self: this, __source: {fileName: _jsxFileName$9, lineNumber: 44}}
                                 )
                               )
                             );
-                        }, __self: this, __source: {fileName: _jsxFileName$9, lineNumber: 35}} )
+                        }, __self: this, __source: {fileName: _jsxFileName$9, lineNumber: 37}} )
                       , react.createElement(Route, { exact: true, path: "/~canvas/item/:name",
                           render:  (props) => {
                             const name =  props.match.params.name;
@@ -64250,7 +64264,7 @@ lyrtesmudnytbyrsenwegfyrmurtelreptegpecnelnevfes\
                               const location = !!canvasList[name] ? canvasList[name].metadata.location : "";
                               switch (canvasType) {
                                 case 'mesh':
-                                  canvas = react.createElement(Hexagons, { api: api, canvas: data, name: name, location: location, __self: this, __source: {fileName: _jsxFileName$9, lineNumber: 60}} );
+                                  canvas = react.createElement(Hexagons, { api: api, canvas: data, name: name, location: location, __self: this, __source: {fileName: _jsxFileName$9, lineNumber: 62}} );
                                   break;
                                 case 'map': canvas = null; break;
                                 default: canvas = null;
@@ -64260,12 +64274,12 @@ lyrtesmudnytbyrsenwegfyrmurtelreptegpecnelnevfes\
                                 react.createElement(Skeleton, {
                                   history: props.history,
                                   canvasList: canvasList,
-                                  activeDrawer: "rightPanel", __self: this, __source: {fileName: _jsxFileName$9, lineNumber: 67}}
+                                  activeDrawer: "rightPanel", __self: this, __source: {fileName: _jsxFileName$9, lineNumber: 69}}
                                   , canvas
                                 )
                               );
                             }
-                        }, __self: this, __source: {fileName: _jsxFileName$9, lineNumber: 49}} )
+                        }, __self: this, __source: {fileName: _jsxFileName$9, lineNumber: 51}} )
                       , react.createElement(Route, { exact: true, path: "/~canvas/join/(~)?/:ship?/:canvas?",
                         render: props => {
                           let canvas =
@@ -64279,15 +64293,15 @@ lyrtesmudnytbyrsenwegfyrmurtelreptegpecnelnevfes\
                             react.createElement(Skeleton, {
                               history: props.history,
                               canvasList: canvasList,
-                              activeDrawer: "rightPanel", __self: this, __source: {fileName: _jsxFileName$9, lineNumber: 86}}
+                              activeDrawer: "rightPanel", __self: this, __source: {fileName: _jsxFileName$9, lineNumber: 88}}
                               , react.createElement(JoinScreen, {
                                 api: api,
                                 canvasList: canvasList,
                                 autoJoin: canvas,
-                                ...props, __self: this, __source: {fileName: _jsxFileName$9, lineNumber: 90}} )
+                                ...props, __self: this, __source: {fileName: _jsxFileName$9, lineNumber: 92}} )
                             )
                           );
-                        }, __self: this, __source: {fileName: _jsxFileName$9, lineNumber: 76}}
+                        }, __self: this, __source: {fileName: _jsxFileName$9, lineNumber: 78}}
                       )
                     )
                   )
