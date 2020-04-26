@@ -111,13 +111,9 @@
         [%give %fact ~ %json !>(*json)]~
       ::
           [%primary *]
-        :_  ~
-        :*  %give
-            %fact
-            ~
-            %json
-            !>((canvas-view-response-to-json gallery-scry:cv))
-        ==
+        =^  cards  state
+          (handle-canvas-view:cv [%init ~])
+        cards
       ::
           [%http-response *]
         ~
@@ -184,77 +180,15 @@
     ~[%canvas name %noun]
   ==
 ::
-++  create-poke
-  |=  =metadata
+++  send-canvas-action
+  |=  [=wire act=canvas-action]
   ^-  card
-  :*  %pass
-      [%create name.metadata ~]
-      %agent
-      [our.bowl %canvas]
-      %poke
-      %canvas-action
-      !>([%create [%mesh ~ metadata]])
-  ==
+  [%pass wire %agent [our.bowl %canvas] %poke %canvas-action !>(act)]
 ::
-++  paint-poke
-  |=  [location=@p name=@t strokes=(list stroke)]
-  ^-  card
-  :*  %pass
-      [%paint name ~]
-      %agent
-      [our.bowl %canvas]
-      %poke
-      %canvas-action
-      !>([%paint location name strokes])
-  ==
-::
-++  join-poke
-  |=  [ship=@p canvas-name=@t]
-  ^-  card
-  :*  %pass
-      [%join (scot %p ship) canvas-name ~]
-      %agent
-      [our.bowl %canvas]
-      %poke
-      %canvas-action
-      !>([%join ship canvas-name])
-  ==
-::
-++  leave-poke
-  |=  [ship=@p canvas-name=@t]
-  ^-  card
-  :*  %pass
-      [%leave (scot %p ship) canvas-name ~]
-      %agent
-      [our.bowl %canvas]
-      %poke
-      %canvas-action
-      !>([%leave ship canvas-name])
-  ==
-::
-++  share-poke
-  |=  name=@t
-  ^-  card
-  :*  %pass
-      [%share name ~]
-      %agent
-      [our.bowl %canvas]
-      %poke
-      %canvas-action
-      !>([%share name])
-  ==
-::
-++  save-poke
-  |=  [name=@t svg=@t]
-  ^-  card
-  :*  %pass
-      [%save name ~]
-      %agent
-      [our.bowl %canvas]
-      %poke
-      %canvas-action
-      !>([%save name svg])
-  ==
+++  send-frontend
+  |=  =json
+  ^-  (list card)
+  [%give %fact [/primary]~ %json !>(json)]~
 ::
 ++  handle-json
   |=  jon=json
@@ -267,6 +201,7 @@
 ++  handle-canvas-view
   |=  act=canvas-view
   ^-  (quip card _state)
+  :_  state
   |^
   ?+  -.act  !!
     %init    handle-init
@@ -279,47 +214,55 @@
   ==
   ::
   ++  handle-init
-    ^-  (quip card _state)
-    =/  data=json  (canvas-view-response-to-json gallery-scry)
-    :_  state
-    [%give %fact [/primary]~ %json !>(data)]~
+    ^-  (list card)
+    (send-frontend (canvas-view-response-to-json gallery-scry))
   ::
   ++  handle-paint
     |=  [location=@p name=@t strokes=(list stroke)]
-    ^-  (quip card _state)
-    [[(paint-poke location name strokes)]~ state]
+    ^-  (list card)
+    [(send-canvas-action [%paint name ~] [%paint location name strokes])]~
   ::
   ++  handle-join
     |=  [=ship canvas-name=@t]
-    ^-  (quip card _state)
+    ^-  (list card)
     ~&  "subscribing..."
-    [[(join-poke ship canvas-name)]~ state]
+    :_  ~
+    %+  send-canvas-action
+      [%join (scot %p ship) canvas-name ~]
+    [%join ship canvas-name]
   ::
   ++  handle-leave
     |=  [=ship canvas-name=@t]
-    ^-  (quip card _state)
+    ^-  (list card)
     ~&  "leaving..."
-    [[(leave-poke ship canvas-name)]~ state]
+    :_  ~
+    %+  send-canvas-action
+      [%leave (scot %p ship) canvas-name ~]
+    [%leave ship canvas-name]
   ::
   ++  handle-create
    |=  =metadata
-   ^-  (quip card _state)
-   [[(create-poke metadata)]~ state]
+   ^-  (list card)
+   :_  ~
+   %+  send-canvas-action
+     [%create name.metadata ~]
+   [%create [%mesh ~ metadata]]
   ::
   ++  handle-share
    |=  name=@t
-   ^-  (quip card _state)
-   [[(share-poke name)]~ state]
+   ^-  (list card)
+   [(send-canvas-action [%share name ~] [%share name])]~
   ::
   ++  handle-save
     |=  [name=@t svg=@t]
-    ^-  (quip card _state)
-    [[(save-poke name svg)]~ state]
+    ^-  (list card)
+    [(send-canvas-action [%save name ~] [%save name svg])]~
   --
 ::
 ++  handle-view-update
   |=  act=canvas-view
   ^-  (quip card _state)
+  :_  state
   |^
   ?+  -.act  !!
     %paint   (handle-paint +.act)
@@ -328,20 +271,16 @@
   ::
   ++  handle-paint
     |=  [location=@p name=@t strokes=(list stroke)]
-    ^-  (quip card _state)
+    ^-  (list card)
     ~&  "update paint"
-    =/  data=json
-      (canvas-view-response-to-json [%paint location name strokes])
-    :_  state
-    [%give %fact [/primary]~ %json !>(data)]~
+    %-  send-frontend
+    (canvas-view-response-to-json [%paint location name strokes])
   ::
   ++  handle-load
     |=  [name=@t =canvas]
-    ^-  (quip card _state)
+    ^-  (list card)
     ~&  "update load"
-    =/  data=json  (canvas-view-response-to-json [%load name canvas])
-    :_  state
-    [%give %fact [/primary]~ %json !>(data)]~
+    (send-frontend (canvas-view-response-to-json [%load name canvas]))
   --
 ::
 ++  poke-handle-http-request
