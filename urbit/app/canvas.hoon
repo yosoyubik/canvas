@@ -202,27 +202,26 @@
   [%give %fact ~ %canvas-update !>([%load name u.canvas])]~
 ::
 ++  send-paint-update
-  |=  strokes=(list [location=@p name=@t =stroke])
+  |=  [name=@t strokes=(list stroke)]
   ^-  card
-  ?>  ?=(^ strokes)
   :*  %give
       %fact
-      [/canvas/(scot %tas name.i.strokes)]~
+      [/canvas/(scot %tas name)]~
       %canvas-update
-      !>([%paint strokes])
+      !>([%paint our.bowl name strokes])
   ==
 ::
 ++  update-remote-canvas
-  |=  strokes=(list [location=@p name=@t =stroke])
+  |=  [location=@p name=@t strokes=(list stroke)]
   ^-  card
   ?>  ?=(^ strokes)
   :*  %pass
-      [%paint name.i.strokes ~]
+      [%paint name ~]
       %agent
-      [location.i.strokes %canvas]
+      [location %canvas]
       %poke
       %canvas-action
-      !>([%paint strokes])
+      !>([%paint location name strokes])
   ==
 ::
 ++  handle-canvas-action
@@ -241,10 +240,10 @@
   ==
   ::
   ++  handle-paint
-    |=  strokes=(list [location=@p name=@t =stroke])
+    |=  [location=@p name=@t strokes=(list stroke)]
     ^-  (quip card _state)
     ~&  "processing remote paint"
-    (process-remote-paint strokes)
+    (process-remote-paint location name strokes)
   ::
   ++  handle-join
     |=  [=ship name=@t]
@@ -325,7 +324,6 @@
   ^-  (quip card _state)
   |^
   ?-  -.act
-    :: %init    (handle-init +.act)
     %load    (handle-load +.act)
     %paint   (handle-paint +.act)
   ==
@@ -337,27 +335,28 @@
     [%give %fact [/updates]~ %canvas-view !>([%load name canvas])]~
   ::
   ++  handle-paint
-    |=  strokes=(list [location=@p name=@t =stroke])
+    |=  [location=@p name=@t strokes=(list stroke)]
     ^-  (quip card _state)
-    (process-remote-paint strokes)
+    (process-remote-paint location name strokes)
   --
 ::
 ++  process-remote-paint
-  |=  strokes=(list [location=@p name=@t =stroke])
+  |=  [location=@p name=@t strokes=(list stroke)]
   ^-  (quip card _state)
   ?>  ?=(^ strokes)
-  =*  location  location.i.strokes
-  =*  name      name.i.strokes
+  ~&  [location name]
   =/  target-canvas=(unit canvas)  (~(get by gallery) [location name])
+  ~&  target-canvas
   ?~  target-canvas  `state
-  ?.  =(-.stroke.i.strokes -.u.target-canvas)  `state
+  ~&  [-.i.strokes -.u.target-canvas]
+  ?.  =(-.i.strokes -.u.target-canvas)  `state
   |^
   ?-  -.u.target-canvas
     %mesh  (handle-mesh u.target-canvas strokes)
   ==
   ::
   ++  handle-mesh
-    |=  [=canvas strokes=(list [location=@p name=@t =stroke])]
+    |=  [=canvas strokes=(list stroke)]
     ^-  (quip card _state)
     :_  %_    state
             gallery
@@ -369,32 +368,28 @@
       ::  stroke from a remote ship
       ::
       ~&  "foreign, udpate my frontend"
-      [%give %fact [/updates]~ %canvas-view !>([%paint strokes])]~
+      [%give %fact [/updates]~ %canvas-view !>([%paint location name strokes])]~
     ::  stroke from frontend
     ::
     ?:  =(location our.bowl)
       ~&  'local canvas, send to subscribers'
-      [(send-paint-update strokes)]~
+      [(send-paint-update name strokes)]~
     ~&  'remote canvas, poke owner'
-    [(update-remote-canvas strokes)]~
+    [(update-remote-canvas location name strokes)]~
   ::
   ++  update-canvas-mesh
-    |=  [=mesh strokes=(list [@p @t =stroke])]
+    |=  [=mesh strokes=(list stroke)]
     ^-  ^mesh
     |-
     ?~  strokes  mesh
-    =*  stroke  stroke.i.strokes
     %_    $
         strokes
       t.strokes
     ::
         mesh
-      ?.  filled.arc.stroke
-        (~(del by mesh) id.arc.stroke)
-      (~(put by mesh) arc.stroke)
+      ?.  filled.arc.i.strokes
+        (~(del by mesh) id.arc.i.strokes)
+      (~(put by mesh) arc.i.strokes)
     ==
-      ::
-    ::     metadata
-    :: ==
   --
 --

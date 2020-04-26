@@ -26,15 +26,15 @@
     ==
   ::
   ++  paint
-    %-  ar
     %-  ot
     :~  ['location' (su ;~(pfix sig fed:ag))]
         ['canvas-name' so]
-        :-  'stroke'
+      ::
+        :-  'strokes'
+        %-  ar
         %-  of
         [%mesh (ot ~[['id' ni] ['filled' bo]])]~
     ==
-  ::  TODO: combine join & leave
   ::
   ++  subscription
     (ot ~[['ship' (su ;~(pfix sig fed:ag))] ['canvas-name' so]])
@@ -55,13 +55,9 @@
   %+  frond  -.act
   ?+     -.act  ~|(%action-not-supported !!)
       %init
-    :: :-  %a
-    :: %+  turn  gallery.act
-    :: |=  [@tas mesh =metadata]
-    :: ^-  json
-    :: (pairs ~[['name' s+name.metadata] ['type' s+type.metadata]])
     %-  pairs
-    %+  turn  gallery.act
+    %+  turn
+      gallery.act
     |=  =canvas
     ^-  [@t json]
     :-  name.metadata.canvas
@@ -75,18 +71,19 @@
     %+  weld
       (canvas-to-json canvas.act)
     (metadata-to-json metadata.canvas.act)
-
   ::
       %paint
-    :-  %a
-    %+  turn  strokes.act
-    |=  [location=@p name=@t =stroke]
     %-  pairs
-    %+  weld
-      (stroke-to-json stroke)
     ^-  (list [@t json])
-    :~  ['name' s+name]
-        ['location' s+(scot %p location)]
+    :~  ['name' s+name.act]
+        ['location' s+(scot %p location.act)]
+      ::
+        =;  strokes
+          ['strokes' a+strokes]
+        %+  turn  strokes.act
+        |=  =stroke
+        ^-  json
+        (pairs (stroke-to-json stroke))
     ==
   ==
 ::

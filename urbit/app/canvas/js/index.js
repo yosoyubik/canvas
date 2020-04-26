@@ -55127,19 +55127,13 @@
                   if (d.fill !== mousing > 0) {
                     // console.log(canvasName);
                     // Save stroke remotely
-                    apiCalls.push({
-                      "canvas-name": canvasName,
-                      "location": location,
-                      "stroke": {"mesh": {"id": d.id, "filled": mousing > 0}}
-                    });
+                    apiCalls.push({"mesh": {"id": d.id, "filled": mousing > 0}});
                     // Save stroke locally on browser
                     canvasData[d.id] = mousing > 0;
                   }
                   // d3.select(this).classed("point fill", d.fill = mousing > 0);
                   select(this).style('fill', () => {
                     d.fill = mousing > 0;
-                    // console.log(selectedColor(colors));
-                    // console.log(d3.color(selectedColor(colors).style.fill).toString());
                     if (d.fill) {
                       return color(selectedColor(colors).style.fill).toString();
                     } else {
@@ -55151,10 +55145,13 @@
               };
 
               const mouseup = function() {
-                // console.log("mouseup");
                 mousemove.apply(this, arguments);
                 if (apiCalls.length > 0) {
-                  props.api.canvas.paint(apiCalls);
+                  props.api.canvas.paint({
+                    "canvas-name": canvasName,
+                    "location": location,
+                    "strokes": apiCalls
+                  });
                   apiCalls = [];
                 }
                 mousing = 0;
@@ -55235,12 +55232,12 @@
               };
             };
 
-            const updateCanvas = (arc) => {
+            const updateCanvas = (arc, canvas) => {
               selectAll(".point").attr("class", function (d) {
                 if (arc.id === d.id) {
                   console.log(d, arc);
                 }
-                if (arc.id === d.id && arc.name === d.name) {
+                if (arc.id === d.id && canvas === d.name) {
                   d.fill = arc.fill;
                 }
                 return d.fill ? "fill point" : "point"
@@ -63921,14 +63918,12 @@ lyrtesmudnytbyrsenwegfyrmurtelreptegpecnelnevfes\
                     //  data = {name: 'name', arc-id: : filled?}
                     //
                     console.log(data, state.canvasList);
-                    data.forEach((stroke, i) => {
-                      if (stroke.name in state.canvasList) {
-                        store.state.canvasList[stroke.name].data[stroke.id] = stroke.fill;
-                        console.log(state.canvasList[stroke.name]);
-                        console.log(stroke.id);
-                        updateCanvas(stroke);
-                      }
-                    });
+                    if (data.name in state.canvasList) {
+                      data.strokes.forEach((stroke, i) => {
+                          store.state.canvasList[data.name].data[stroke.id] = stroke.fill;
+                          updateCanvas(stroke, data.name);
+                      });
+                    }
                   }
                 }
             }

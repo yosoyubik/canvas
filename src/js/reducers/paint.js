@@ -9,14 +9,12 @@ export class PaintReducer {
         //  data = {name: 'name', arc-id: : filled?}
         //
         console.log(data, state.canvasList);
-        data.forEach((stroke, i) => {
-          if (stroke.name in state.canvasList) {
-            store.state.canvasList[stroke.name].data[stroke.id] = stroke.fill;
-            console.log(state.canvasList[stroke.name]);
-            console.log(stroke.id);
-            updateCanvas(stroke);
-          }
-        });
+        if (data.name in state.canvasList) {
+          data.strokes.forEach((stroke, i) => {
+              store.state.canvasList[data.name].data[stroke.id] = stroke.fill;
+              updateCanvas(stroke, data.name);
+          });
+        }
       }
     }
 }

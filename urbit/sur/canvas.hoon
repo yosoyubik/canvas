@@ -18,7 +18,7 @@
   ==
 ::
 +$  canvas-action
-  $%  [%paint strokes=(list [location=@p name=@t =stroke])]
+  $%  [%paint location=@p name=@t strokes=(list stroke)]
       [%init gallery=(list canvas)]
       :: [%init gallery=(list [@tas mesh metadata])]
       [%load name=@t =canvas]
@@ -32,14 +32,14 @@
   ==
 ::
 +$  canvas-update
-  $%  [%paint (list [location=@p name=@t =stroke])]
+  $%  [%paint location=@p name=@t strokes=(list stroke)]
       [%load name=@t =canvas]
   ==
 ::
 +$  canvas-view
   $%  [%init ~]
       [%load name=@t =canvas]
-      [%paint (list [location=@p name=@t =stroke])]
+      [%paint location=@p name=@t strokes=(list stroke)]
       [%join =ship name=@t]
       [%leave =ship name=@t]
       [%create =metadata]

@@ -70,19 +70,13 @@ const drawHexCanvas = (props) => {
       if (d.fill !== mousing > 0) {
         // console.log(canvasName);
         // Save stroke remotely
-        apiCalls.push({
-          "canvas-name": canvasName,
-          "location": location,
-          "stroke": {"mesh": {"id": d.id, "filled": mousing > 0}}
-        });
+        apiCalls.push({"mesh": {"id": d.id, "filled": mousing > 0}});
         // Save stroke locally on browser
         canvasData[d.id] = mousing > 0;
       }
       // d3.select(this).classed("point fill", d.fill = mousing > 0);
       d3.select(this).style('fill', () => {
         d.fill = mousing > 0;
-        // console.log(selectedColor(colors));
-        // console.log(d3.color(selectedColor(colors).style.fill).toString());
         if (d.fill) {
           return d3.color(selectedColor(colors).style.fill).toString();
         } else {
@@ -94,10 +88,13 @@ const drawHexCanvas = (props) => {
   }
 
   const mouseup = function() {
-    // console.log("mouseup");
     mousemove.apply(this, arguments);
     if (apiCalls.length > 0) {
-      props.api.canvas.paint(apiCalls);
+      props.api.canvas.paint({
+        "canvas-name": canvasName,
+        "location": location,
+        "strokes": apiCalls
+      });
       apiCalls = [];
     }
     mousing = 0;
@@ -178,12 +175,12 @@ const hexTopology = (radius, width, height, hexagons, canvasName) => {
   };
 }
 
-const updateCanvas = (arc) => {
+const updateCanvas = (arc, canvas) => {
   d3.selectAll(".point").attr("class", function (d) {
     if (arc.id === d.id) {
       console.log(d, arc);
     }
-    if (arc.id === d.id && arc.name === d.name) {
+    if (arc.id === d.id && canvas === d.name) {
       d.fill = arc.fill;
     }
     return d.fill ? "fill point" : "point"
