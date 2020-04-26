@@ -100,16 +100,23 @@ class UrbitApi {
     });
   }
 
-  paint(name, location, stroke) {
-    console.log(name, stroke);
+  paint(strokes) {
+    // console.log(strokes);
     this.action("canvas-view", "canvas-view", {
-      paint: {
-        'canvas-name': name,
-        'stroke': stroke,
-        'location': location
-      }
+      paint: strokes
     });
   }
+
+  // paint(name, location, stroke) {
+  //   console.log(name, stroke);
+  //   this.action("canvas-view", "canvas-view", {
+  //     paint: {
+  //       'canvas-name': name,
+  //       'stroke': stroke,
+  //       'location': location
+  //     }
+  //   });
+  // }
 
   action(appl, mark, data) {
     return new Promise((resolve, reject) => {

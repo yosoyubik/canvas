@@ -202,25 +202,27 @@
   [%give %fact ~ %canvas-update !>([%load name u.canvas])]~
 ::
 ++  send-paint-update
-  |=  [name=@t =stroke]
+  |=  strokes=(list [location=@p name=@t =stroke])
   ^-  card
+  ?>  ?=(^ strokes)
   :*  %give
       %fact
-      [/canvas/(scot %tas name)]~
+      [/canvas/(scot %tas name.i.strokes)]~
       %canvas-update
-      !>([%paint our.bowl name stroke])
+      !>([%paint strokes])
   ==
 ::
 ++  update-remote-canvas
-  |=  [name=@t =stroke location=@p]
+  |=  strokes=(list [location=@p name=@t =stroke])
   ^-  card
+  ?>  ?=(^ strokes)
   :*  %pass
-      [%paint name ~]
+      [%paint name.i.strokes ~]
       %agent
-      [location %canvas]
+      [location.i.strokes %canvas]
       %poke
       %canvas-action
-      !>([%paint location name stroke])
+      !>([%paint strokes])
   ==
 ::
 ++  handle-canvas-action
@@ -239,10 +241,10 @@
   ==
   ::
   ++  handle-paint
-    |=  [location=@p name=@t =stroke]
+    |=  strokes=(list [location=@p name=@t =stroke])
     ^-  (quip card _state)
     ~&  "processing remote paint"
-    (process-remote-paint location name stroke)
+    (process-remote-paint strokes)
   ::
   ++  handle-join
     |=  [=ship name=@t]
@@ -335,89 +337,64 @@
     [%give %fact [/updates]~ %canvas-view !>([%load name canvas])]~
   ::
   ++  handle-paint
-    |=  [location=@p name=@t =stroke]
+    |=  strokes=(list [location=@p name=@t =stroke])
     ^-  (quip card _state)
-    (process-remote-paint location name stroke)
+    (process-remote-paint strokes)
   --
 ::
 ++  process-remote-paint
-  |=  [location=@p name=@t edit=stroke]
+  |=  strokes=(list [location=@p name=@t =stroke])
   ^-  (quip card _state)
+  ?>  ?=(^ strokes)
+  =*  location  location.i.strokes
+  =*  name      name.i.strokes
   =/  target-canvas=(unit canvas)  (~(get by gallery) [location name])
   ?~  target-canvas  `state
-  ?.  =(-.edit -.u.target-canvas)  `state
+  ?.  =(-.stroke.i.strokes -.u.target-canvas)  `state
   |^
   ?-  -.u.target-canvas
-    %mesh  (handle-mesh name +.u.target-canvas edit location)
+    %mesh  (handle-mesh u.target-canvas strokes)
   ==
   ::
   ++  handle-mesh
-    |=  [name=@t [=mesh =metadata] =stroke location=@p]
+    |=  [=canvas strokes=(list [location=@p name=@t =stroke])]
     ^-  (quip card _state)
-    :_  %_  state
+    :_  %_    state
             gallery
-          %+  ~(put by gallery)  [location name]
-          ^-  canvas
-          :*  %mesh
-            ::
-              ?.  filled.arc.stroke
-                (~(del by mesh) id.arc.stroke)
-              (~(put by mesh) arc.stroke)
-            ::
-              metadata
-          ==
+          %+  ~(put by gallery)
+            [location name]
+          [%mesh (update-canvas-mesh mesh.canvas strokes) metadata.canvas]
         ==
     ?.  (team:title our.bowl src.bowl)
       ::  stroke from a remote ship
       ::
       ~&  "foreign, udpate my frontend"
-      [%give %fact [/updates]~ %canvas-view !>([%paint name location stroke])]~
+      [%give %fact [/updates]~ %canvas-view !>([%paint strokes])]~
     ::  stroke from frontend
     ::
     ?:  =(location our.bowl)
       ~&  'local canvas, send to subscribers'
-      [(send-paint-update name stroke)]~
+      [(send-paint-update strokes)]~
     ~&  'remote canvas, poke owner'
-    [(update-remote-canvas name stroke location)]~
+    [(update-remote-canvas strokes)]~
+  ::
+  ++  update-canvas-mesh
+    |=  [=mesh strokes=(list [@p @t =stroke])]
+    ^-  ^mesh
+    |-
+    ?~  strokes  mesh
+    =*  stroke  stroke.i.strokes
+    %_    $
+        strokes
+      t.strokes
+    ::
+        mesh
+      ?.  filled.arc.stroke
+        (~(del by mesh) id.arc.stroke)
+      (~(put by mesh) arc.stroke)
+    ==
+      ::
+    ::     metadata
+    :: ==
   --
-::
-:: ++  poke-handle-http-request
-::   |=  [=inbound-request:eyre url=(list @t)]
-::   ^-  simple-payload:http
-::   |^
-::   ?:  ?=([%'~canvas' %svg ^] url)
-::     (handle-svg-call i.t.t.url)
-::   %+  require-authorization:app  inbound-request
-::   handle-auth-call
-::   ::
-::   ++  handle-svg-call
-::     |=  file=@t
-::     ^-  simple-payload:http
-::     ~&  file
-::     =/  svg  (~(get by canvas-svg) file)
-::     ?~  svg
-::       not-found:gen
-::     (svg-response:gen (as-octs:mimes:html u.svg))
-::   ::
-::   ++  handle-auth-call
-::     |=  =inbound-request:eyre
-::     ^-  simple-payload:http
-::     =/  url=request-line
-::       (parse-request-line url.request.inbound-request)
-::     ?+  site.url  not-found:gen
-::       [%'~canvas' %css %index ~]  (css-response:gen style)
-::       [%'~canvas' %js %tile ~]    (js-response:gen tile-js)
-::       [%'~canvas' %js %index ~]   (js-response:gen script)
-::       [%'~canvas' %img @t *]      (handle-img-call i.t.t.site.url)
-::       [%'~canvas' *]              (html-response:gen index)
-::     ==
-::   ::
-::   ++  handle-img-call
-::     |=  name=@t
-::     ^-  simple-payload:http
-::     =/  img  (~(get by canvas-png) name)
-::     ?~  img
-::       not-found:gen
-::     (png-response:gen (as-octs:mimes:html u.img))
-::   --
 --

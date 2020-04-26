@@ -5,8 +5,8 @@ import * as topojson from "topojson";
 
 
 const width = 960,
-      height = 500,
-      radius = 20;
+      height = 900,
+      radius = 10;
 
 const hexProjection = (radius) => {
   var dx = radius * 2 * Math.sin(Math.PI / 3),
@@ -35,7 +35,7 @@ const selectedColor = (colors) => {
       return true;
     }
   });
-  console.log(test);
+  // console.log(test);
   return test;
 }
 
@@ -56,6 +56,7 @@ const drawHexCanvas = (props) => {
   const topology = hexTopology(radius, width, height, canvasData, canvasName);
   console.log(canvasName);
   let mousing = 0;
+  let apiCalls = [];
 
   const mousedown = function(d) {
     // console.log("mousedown");
@@ -67,19 +68,21 @@ const drawHexCanvas = (props) => {
     if (mousing) {
       const colors = d3.select(".legend").selectAll("rect").nodes();
       if (d.fill !== mousing > 0) {
-        console.log(canvasName);
+        // console.log(canvasName);
         // Save stroke remotely
-        props.api.canvas.paint(canvasName, location,
-          {"mesh": {"id": d.id, "filled": mousing > 0}}
-        );
+        apiCalls.push({
+          "canvas-name": canvasName,
+          "location": location,
+          "stroke": {"mesh": {"id": d.id, "filled": mousing > 0}}
+        });
         // Save stroke locally on browser
         canvasData[d.id] = mousing > 0;
       }
       // d3.select(this).classed("point fill", d.fill = mousing > 0);
       d3.select(this).style('fill', () => {
         d.fill = mousing > 0;
-        console.log(selectedColor(colors));
-        console.log(d3.color(selectedColor(colors).style.fill).toString());
+        // console.log(selectedColor(colors));
+        // console.log(d3.color(selectedColor(colors).style.fill).toString());
         if (d.fill) {
           return d3.color(selectedColor(colors).style.fill).toString();
         } else {
@@ -93,6 +96,10 @@ const drawHexCanvas = (props) => {
   const mouseup = function() {
     // console.log("mouseup");
     mousemove.apply(this, arguments);
+    if (apiCalls.length > 0) {
+      props.api.canvas.paint(apiCalls);
+      apiCalls = [];
+    }
     mousing = 0;
   }
 

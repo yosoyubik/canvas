@@ -26,9 +26,10 @@
     ==
   ::
   ++  paint
+    %-  ar
     %-  ot
-    :~  ['canvas-name' so]
-        ['location' (su ;~(pfix sig fed:ag))]
+    :~  ['location' (su ;~(pfix sig fed:ag))]
+        ['canvas-name' so]
         :-  'stroke'
         %-  of
         [%mesh (ot ~[['id' ni] ['filled' bo]])]~
@@ -77,12 +78,15 @@
 
   ::
       %paint
+    :-  %a
+    %+  turn  strokes.act
+    |=  [location=@p name=@t =stroke]
     %-  pairs
     %+  weld
-      (stroke-to-json stroke.act)
+      (stroke-to-json stroke)
     ^-  (list [@t json])
-    :~  ['name' s+name.act]
-        ['location' s+(scot %p location.act)]
+    :~  ['name' s+name]
+        ['location' s+(scot %p location)]
     ==
   ==
 ::

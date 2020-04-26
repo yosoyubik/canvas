@@ -28,7 +28,7 @@ class Store {
         this.paintReducer.reduce(json, this.state);
         console.log(this.state);
         if (!('paint' in json)) {
-          console.log("painting!!!!!!!!!!!");
+          console.log("not painting!!!!!!!!!!!");
           this.setState(this.state);
         }
     }

@@ -48747,16 +48747,23 @@
                 });
               }
 
-              paint(name, location, stroke) {
-                console.log(name, stroke);
+              paint(strokes) {
+                // console.log(strokes);
                 this.action("canvas-view", "canvas-view", {
-                  paint: {
-                    'canvas-name': name,
-                    'stroke': stroke,
-                    'location': location
-                  }
+                  paint: strokes
                 });
               }
+
+              // paint(name, location, stroke) {
+              //   console.log(name, stroke);
+              //   this.action("canvas-view", "canvas-view", {
+              //     paint: {
+              //       'canvas-name': name,
+              //       'stroke': stroke,
+              //       'location': location
+              //     }
+              //   });
+              // }
 
               action(appl, mark, data) {
                 return new Promise((resolve, reject) => {
@@ -55055,8 +55062,8 @@
 
 
             const width = 960,
-                  height = 500,
-                  radius = 20;
+                  height = 900,
+                  radius = 10;
 
             const hexProjection = (radius) => {
               var dx = radius * 2 * Math.sin(Math.PI / 3),
@@ -55085,7 +55092,7 @@
                   return true;
                 }
               });
-              console.log(test);
+              // console.log(test);
               return test;
             };
 
@@ -55106,6 +55113,7 @@
               const topology = hexTopology(radius, width, height, canvasData, canvasName);
               console.log(canvasName);
               let mousing = 0;
+              let apiCalls = [];
 
               const mousedown = function(d) {
                 // console.log("mousedown");
@@ -55117,19 +55125,21 @@
                 if (mousing) {
                   const colors = select(".legend").selectAll("rect").nodes();
                   if (d.fill !== mousing > 0) {
-                    console.log(canvasName);
+                    // console.log(canvasName);
                     // Save stroke remotely
-                    props.api.canvas.paint(canvasName, location,
-                      {"mesh": {"id": d.id, "filled": mousing > 0}}
-                    );
+                    apiCalls.push({
+                      "canvas-name": canvasName,
+                      "location": location,
+                      "stroke": {"mesh": {"id": d.id, "filled": mousing > 0}}
+                    });
                     // Save stroke locally on browser
                     canvasData[d.id] = mousing > 0;
                   }
                   // d3.select(this).classed("point fill", d.fill = mousing > 0);
                   select(this).style('fill', () => {
                     d.fill = mousing > 0;
-                    console.log(selectedColor(colors));
-                    console.log(color(selectedColor(colors).style.fill).toString());
+                    // console.log(selectedColor(colors));
+                    // console.log(d3.color(selectedColor(colors).style.fill).toString());
                     if (d.fill) {
                       return color(selectedColor(colors).style.fill).toString();
                     } else {
@@ -55143,6 +55153,10 @@
               const mouseup = function() {
                 // console.log("mouseup");
                 mousemove.apply(this, arguments);
+                if (apiCalls.length > 0) {
+                  props.api.canvas.paint(apiCalls);
+                  apiCalls = [];
+                }
                 mousing = 0;
               };
 
@@ -63907,12 +63921,14 @@ lyrtesmudnytbyrsenwegfyrmurtelreptegpecnelnevfes\
                     //  data = {name: 'name', arc-id: : filled?}
                     //
                     console.log(data, state.canvasList);
-                    if (data.name in state.canvasList) {
-                      store.state.canvasList[data.name].data[data.id] = data.fill;
-                      console.log(state.canvasList[data.name]);
-                      console.log(data.id);
-                      updateCanvas(data);
-                    }
+                    data.forEach((stroke, i) => {
+                      if (stroke.name in state.canvasList) {
+                        store.state.canvasList[stroke.name].data[stroke.id] = stroke.fill;
+                        console.log(state.canvasList[stroke.name]);
+                        console.log(stroke.id);
+                        updateCanvas(stroke);
+                      }
+                    });
                   }
                 }
             }
@@ -63942,7 +63958,7 @@ lyrtesmudnytbyrsenwegfyrmurtelreptegpecnelnevfes\
                     this.paintReducer.reduce(json, this.state);
                     console.log(this.state);
                     if (!('paint' in json)) {
-                      console.log("painting!!!!!!!!!!!");
+                      console.log("not painting!!!!!!!!!!!");
                       this.setState(this.state);
                     }
                 }

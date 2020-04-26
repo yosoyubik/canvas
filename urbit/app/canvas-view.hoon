@@ -197,15 +197,16 @@
   ==
 ::
 ++  paint-poke
-  |=  [name=@t location=@p =stroke]
+  |=  strokes=(list [location=@p name=@t =stroke])
   ^-  card
+  ?~  strokes  !!
   :*  %pass
-      [%paint name ~]
+      [%paint name.i.strokes ~]
       %agent
       [our.bowl %canvas]
       %poke
       %canvas-action
-      !>([%paint location name stroke])
+      !>([%paint strokes])
   ==
 ::
 ++  join-poke
@@ -285,9 +286,9 @@
     [%give %fact [/primary]~ %json !>(data)]~
   ::
   ++  handle-paint
-    |=  [name=@t location=@p =stroke]
+    |=  strokes=(list [location=@p name=@t =stroke])
     ^-  (quip card _state)
-    [[(paint-poke name location stroke)]~ state]
+    [[(paint-poke strokes)]~ state]
   ::
   ++  handle-join
     |=  [=ship canvas-name=@t]
@@ -327,10 +328,10 @@
   ==
   ::
   ++  handle-paint
-    |=  [name=@t location=@p =stroke]
+    |=  strokes=(list [location=@p name=@t =stroke])
     ^-  (quip card _state)
     ~&  "update paint"
-    =/  data=json  (canvas-view-response-to-json [%paint location name stroke])
+    =/  data=json  (canvas-view-response-to-json [%paint strokes])
     :_  state
     [%give %fact [/primary]~ %json !>(data)]~
   ::
