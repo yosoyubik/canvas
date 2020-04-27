@@ -1,4 +1,3 @@
-
 ::  canvas-view: A Canvas app for Urbit
 ::
 /-  *canvas, *chat-store
@@ -253,7 +252,7 @@
    ^-  canvas-action
    :-  %create
    :_  [~ metadata.canvas]
-   ?-  -.canvas
+   ?+  -.canvas  !!
      %mesh  %mesh
      %map   %mesh
    ==

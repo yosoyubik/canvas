@@ -5,6 +5,7 @@ import _ from 'lodash';
 import { Skeleton } from '/components/skeleton';
 import { Hexagons } from "/components/hexagons";
 import { MapCanvas } from "/components/map";
+import { DrawCanvas } from "/components/draw";
 import { NewScreen } from "/components/new";
 import { JoinScreen } from "/components/join";
 
@@ -49,6 +50,20 @@ export class Root extends Component {
                   </Skeleton>
                 );
             }} />
+          <Route exact path="/~canvas/draw"
+                render={ (props) => {
+                  return (
+                    <Skeleton
+                      history={props.history}
+                      canvasList={canvasList}
+                      activeDrawer="rightPanel">
+                      <DrawCanvas
+                        history={props.history}
+                        api={api}
+                      />
+                    </Skeleton>
+                  );
+              }} />
           <Route exact path="/~canvas/item/:name"
               render={ (props) => {
                 const name =  props.match.params.name;

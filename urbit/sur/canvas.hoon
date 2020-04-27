@@ -1,18 +1,21 @@
 |%
-+$  arc          [filled=? color=@t]
-+$  mesh         (map @ud arc)
 +$  canvas-type  ?(%mesh %map)
++$  arc          [filled=? color=@t]
++$  form         [strokes=(list [@ud @ud]) line-width=@ud style-stroke=@t]
++$  mesh         (map @ud arc)
++$  draw         (list form)
 +$  metadata     [name=@t type=canvas-type location=ship]
 +$  location     [host=ship canvas=@t]
 +$  canvas
   $%  [%mesh =mesh =metadata]
       [%map =mesh =metadata]
-      :: [%free id=@t name=@t data=*]
+      [%draw =draw =metadata]
   ==
 ::
 +$  stroke
   $%  [%mesh id=@ud =arc]
       [%map id=@ud =arc]
+      [%draw =form]
   ==
 ::
 +$  canvas-response

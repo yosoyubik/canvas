@@ -17,7 +17,8 @@ export class MapCanvas extends Component {
 
   componentDidMount() {
     console.log("mounting");
-    const { props, state } = this;
+    const { props, state, animationRef } = this;
+
     fetch("/~canvas/map/us.json")
       .then((response) => response.json())
       .then((json) => {
@@ -38,7 +39,7 @@ export class MapCanvas extends Component {
   }
 
   render() {
-    const { props, state } = this;
+    const { props, state, animationRef } = this;
     d3.select(".foreground").selectAll("path").remove();
     if (state.data) {
       initMapCanvas(state.data);
@@ -52,8 +53,7 @@ export class MapCanvas extends Component {
           <Link to="/~canvas/">{"⟵ Canvas"}</Link>
         </div>
         <div className="absolute mw5"
-             style={{right: "20px", top: "20px"}}
-          >
+             style={{right: "20px", top: "20px"}} >
           <button
             onClick={this.onClickSave.bind(this)}
             className="pointer mr2 f9 green2 bg-gray0-d ba pv3 ph4 b--green2">

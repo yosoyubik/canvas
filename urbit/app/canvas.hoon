@@ -323,14 +323,22 @@
   |=  [location=@p name=@t strokes=(list stroke)]
   ^-  (quip card _state)
   ?>  ?=(^ strokes)
-  =/  target-canvas=(unit canvas)  (~(get by gallery) [location name])
-  ?~  target-canvas  `state
-  ?.  =(-.i.strokes -.u.target-canvas)  `state
+  =/  canvas=(unit canvas)  (~(get by gallery) [location name])
+  ?~  canvas  `state
+  ?.  =(-.i.strokes -.u.canvas)  `state
   |^
+  =*  meta  metadata.u.canvas
   :-  (send-effects strokes)
-  ?-  -.u.target-canvas
-    %mesh  (handle-mesh u.target-canvas strokes)
-    %map   (handle-map u.target-canvas strokes)
+  %_    state
+      gallery
+    %+  ~(put by gallery)
+      [location name]
+    ^-  ^canvas
+    ?-  -.u.canvas
+      %mesh  [%mesh (update-mesh mesh.u.canvas strokes) meta]
+      %map   [%map (update-mesh mesh.u.canvas strokes) meta]
+      %draw  [%draw (update-draw draw.u.canvas strokes) meta]
+    ==
   ==
   ::
   ++  send-effects
@@ -349,35 +357,36 @@
     ~&  'remote canvas, poke owner'
     [(update-remote-canvas location name strokes)]~
   ::
-  ++  handle-mesh
-    |=  [=canvas strokes=(list stroke)]
-    ^-  _state
-    %_    state
-        gallery
-      %+  ~(put by gallery)
-        [location name]
-      :+  %mesh
-        (update-canvas-mesh mesh.canvas strokes)
-      metadata.canvas
-    ==
+  :: ++  handle-mesh
+  ::   |=  [=canvas strokes=(list stroke)]
+  ::   ^-  _state
+  ::   %_    state
+  ::       gallery
+  ::     %+  ~(put by gallery)
+  ::       [location name]
+  ::     :+  %mesh
+  ::       (update-canvas-mesh mesh.canvas strokes)
+  ::     metadata.canvas
+  ::   ==
+  :: ::
+  :: ++  handle-map
+  ::   |=  [=canvas strokes=(list stroke)]
+  ::   ^-  _state
+  ::   %_    state
+  ::       gallery
+  ::     %+  ~(put by gallery)
+  ::       [location name]
+  ::     :+  %map
+  ::       (update-canvas-mesh mesh.canvas strokes)
+  ::     metadata.canvas
+  ::   ==
   ::
-  ++  handle-map
-    |=  [=canvas strokes=(list stroke)]
-    ^-  _state
-    %_    state
-        gallery
-      %+  ~(put by gallery)
-        [location name]
-      :+  %map
-        (update-canvas-mesh mesh.canvas strokes)
-      metadata.canvas
-    ==
-  ::
-  ++  update-canvas-mesh
+  ++  update-mesh
     |=  [=mesh strokes=(list stroke)]
     ^-  ^mesh
     |-
     ?~  strokes  mesh
+    ?>  ?=([?(%map %mesh) @ud =arc] i.strokes)
     %_    $
         strokes
       t.strokes
@@ -386,6 +395,17 @@
       ?.  filled.arc.i.strokes
         (~(del by mesh) id.i.strokes)
       (~(put by mesh) [id.i.strokes arc.i.strokes])
+    ==
+  ::
+  ++  update-draw
+    |=  [=draw strokes=(list stroke)]
+    ^-  ^draw
+    |-
+    ?~  strokes  draw
+    ?>  ?=([%draw *] i.strokes)
+    %_    $
+        draw     (snoc draw form.i.strokes)
+        strokes  t.strokes
     ==
   --
 --

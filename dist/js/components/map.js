@@ -17,7 +17,8 @@ export class MapCanvas extends Component {
 
   componentDidMount() {
     console.log("mounting");
-    const { props, state } = this;
+    const { props, state, animationRef } = this;
+
     fetch("/~canvas/map/us.json")
       .then((response) => response.json())
       .then((json) => {
@@ -38,7 +39,7 @@ export class MapCanvas extends Component {
   }
 
   render() {
-    const { props, state } = this;
+    const { props, state, animationRef } = this;
     d3.select(".foreground").selectAll("path").remove();
     if (state.data) {
       initMapCanvas(state.data);
@@ -47,13 +48,12 @@ export class MapCanvas extends Component {
     }
 
     return (
-      React.createElement('div', { className: "h-100 w-100 pa3 pt4 bg-gray0-d white-d flex flex-column"       , __self: this, __source: {fileName: _jsxFileName, lineNumber: 50}}
-        , React.createElement('div', { className: "w-100 dn-m dn-l dn-xl inter pt1 pb6 f8"       , __self: this, __source: {fileName: _jsxFileName, lineNumber: 51}}
-          , React.createElement(Link, { to: "/~canvas/", __self: this, __source: {fileName: _jsxFileName, lineNumber: 52}}, "⟵ Canvas")
+      React.createElement('div', { className: "h-100 w-100 pa3 pt4 bg-gray0-d white-d flex flex-column"       , __self: this, __source: {fileName: _jsxFileName, lineNumber: 51}}
+        , React.createElement('div', { className: "w-100 dn-m dn-l dn-xl inter pt1 pb6 f8"       , __self: this, __source: {fileName: _jsxFileName, lineNumber: 52}}
+          , React.createElement(Link, { to: "/~canvas/", __self: this, __source: {fileName: _jsxFileName, lineNumber: 53}}, "⟵ Canvas")
         )
         , React.createElement('div', { className: "absolute mw5" ,
-             style: {right: "20px", top: "20px"}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 54}}
-          
+             style: {right: "20px", top: "20px"}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 55}} 
           , React.createElement('button', {
             onClick: this.onClickSave.bind(this),
             className: "pointer mr2 f9 green2 bg-gray0-d ba pv3 ph4 b--green2"        , __self: this, __source: {fileName: _jsxFileName, lineNumber: 57}}, "Save Image"

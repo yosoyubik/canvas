@@ -5,6 +5,7 @@ import _ from 'lodash';
 import { Skeleton } from '/components/skeleton';
 import { Hexagons } from "/components/hexagons";
 import { MapCanvas } from "/components/map";
+import { DrawCanvas } from "/components/draw";
 import { NewScreen } from "/components/new";
 import { JoinScreen } from "/components/join";
 
@@ -23,32 +24,46 @@ export class Root extends Component {
     const { props, state } = this;
     let canvasList = !!state.canvasList ? state.canvasList : {};
     return (
-      React.createElement(BrowserRouter, {__self: this, __source: {fileName: _jsxFileName, lineNumber: 26}}
-        , React.createElement('div', { className: "absolute h-100 w-100 bg-gray0-d ph4-m ph4-l ph4-xl pb4-m pb4-l pb4-xl"         , __self: this, __source: {fileName: _jsxFileName, lineNumber: 27}}
+      React.createElement(BrowserRouter, {__self: this, __source: {fileName: _jsxFileName, lineNumber: 27}}
+        , React.createElement('div', { className: "absolute h-100 w-100 bg-gray0-d ph4-m ph4-l ph4-xl pb4-m pb4-l pb4-xl"         , __self: this, __source: {fileName: _jsxFileName, lineNumber: 28}}
           , React.createElement(Route, { exact: true, path: "/~canvas",
             render:  () => {
               return (
                 React.createElement(Skeleton, {
                   activeDrawer: "canvas",
                   history: props.history,
-                  canvasList: canvasList, __self: this, __source: {fileName: _jsxFileName, lineNumber: 31}} 
-                  , React.createElement(Hexagons, { api: api, canvas: {}, name: 'test', location: 'test', __self: this, __source: {fileName: _jsxFileName, lineNumber: 35}} )
+                  canvasList: canvasList, __self: this, __source: {fileName: _jsxFileName, lineNumber: 32}} 
+                  , React.createElement(Hexagons, { api: api, canvas: {}, name: 'test', location: 'test', __self: this, __source: {fileName: _jsxFileName, lineNumber: 36}} )
                   )
-              )}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 28}} )
+              )}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 29}} )
           , React.createElement(Route, { exact: true, path: "/~canvas/new",
               render:  (props) => {
                 return (
                   React.createElement(Skeleton, {
                     history: props.history,
                     canvasList: canvasList,
-                    activeDrawer: "rightPanel", __self: this, __source: {fileName: _jsxFileName, lineNumber: 41}}
+                    activeDrawer: "rightPanel", __self: this, __source: {fileName: _jsxFileName, lineNumber: 42}}
                     , React.createElement(NewScreen, {
                       history: props.history,
-                      api: api, __self: this, __source: {fileName: _jsxFileName, lineNumber: 45}}
+                      api: api, __self: this, __source: {fileName: _jsxFileName, lineNumber: 46}}
                     )
                   )
                 );
-            }, __self: this, __source: {fileName: _jsxFileName, lineNumber: 38}} )
+            }, __self: this, __source: {fileName: _jsxFileName, lineNumber: 39}} )
+          , React.createElement(Route, { exact: true, path: "/~canvas/draw",
+                render:  (props) => {
+                  return (
+                    React.createElement(Skeleton, {
+                      history: props.history,
+                      canvasList: canvasList,
+                      activeDrawer: "rightPanel", __self: this, __source: {fileName: _jsxFileName, lineNumber: 56}}
+                      , React.createElement(DrawCanvas, {
+                        history: props.history,
+                        api: api, __self: this, __source: {fileName: _jsxFileName, lineNumber: 60}}
+                      )
+                    )
+                  );
+              }, __self: this, __source: {fileName: _jsxFileName, lineNumber: 53}} )
           , React.createElement(Route, { exact: true, path: "/~canvas/item/:name",
               render:  (props) => {
                 const name =  props.match.params.name;
@@ -60,10 +75,10 @@ export class Root extends Component {
                   const location = !!canvasList[name] ? canvasList[name].metadata.location : "";
                   switch (canvasType) {
                     case 'mesh':
-                      canvas = React.createElement(Hexagons, { api: api, canvas: data, name: name, location: location, __self: this, __source: {fileName: _jsxFileName, lineNumber: 63}} );
+                      canvas = React.createElement(Hexagons, { api: api, canvas: data, name: name, location: location, __self: this, __source: {fileName: _jsxFileName, lineNumber: 78}} );
                       break;
                     case 'map':
-                      canvas = React.createElement(MapCanvas, { api: api, canvas: data, name: name, location: location, __self: this, __source: {fileName: _jsxFileName, lineNumber: 66}} );
+                      canvas = React.createElement(MapCanvas, { api: api, canvas: data, name: name, location: location, __self: this, __source: {fileName: _jsxFileName, lineNumber: 81}} );
                       break;
                     default: canvas = null;
                   }
@@ -72,12 +87,12 @@ export class Root extends Component {
                     React.createElement(Skeleton, {
                       history: props.history,
                       canvasList: canvasList,
-                      activeDrawer: "rightPanel", __self: this, __source: {fileName: _jsxFileName, lineNumber: 72}}
+                      activeDrawer: "rightPanel", __self: this, __source: {fileName: _jsxFileName, lineNumber: 87}}
                       , canvas
                     )
                   );
                 }
-            }, __self: this, __source: {fileName: _jsxFileName, lineNumber: 52}} )
+            }, __self: this, __source: {fileName: _jsxFileName, lineNumber: 67}} )
           , React.createElement(Route, { exact: true, path: "/~canvas/join/(~)?/:ship?/:canvas?",
             render: props => {
               let canvas =
@@ -91,15 +106,15 @@ export class Root extends Component {
                 React.createElement(Skeleton, {
                   history: props.history,
                   canvasList: canvasList,
-                  activeDrawer: "rightPanel", __self: this, __source: {fileName: _jsxFileName, lineNumber: 91}}
+                  activeDrawer: "rightPanel", __self: this, __source: {fileName: _jsxFileName, lineNumber: 106}}
                   , React.createElement(JoinScreen, {
                     api: api,
                     canvasList: canvasList,
                     autoJoin: canvas,
-                    ...props, __self: this, __source: {fileName: _jsxFileName, lineNumber: 95}} )
+                    ...props, __self: this, __source: {fileName: _jsxFileName, lineNumber: 110}} )
                 )
               );
-            }, __self: this, __source: {fileName: _jsxFileName, lineNumber: 81}}
+            }, __self: this, __source: {fileName: _jsxFileName, lineNumber: 96}}
           )
         )
       )

@@ -23,6 +23,7 @@
     %-  of
     :~  [%map metadata]
         [%mesh metadata]
+        [%draw metadata]
     ==
     ::
     ++  metadata
@@ -49,10 +50,27 @@
         %-  of
         :~  [%mesh arc-data]
             [%map arc-data]
+            [%draw form-data]
     ==  ==
     ::
     ++  arc-data
       (ot ~[['id' ni] ['filled' bo] ['color' so]])
+    ::
+    ++  form-data
+      %-  ot
+      :~  =;  coords-parser
+            ['coords' (cu coords-parser (ar (ar ni)))]
+          |=  l=(list (list @ud))
+          ^-  (list [@ud @ud])
+          %+  turn  l
+          |=  coords=(list @ud)
+          ^-  [@ud @ud]
+          ?>  ?=([@ud @ud ~] coords)
+          [i.coords i.t.coords]
+        ::
+          ['lineWidth' ni]
+          ['styleStroke' so]
+      ==
     --
   ::
   ++  subscription
@@ -110,21 +128,33 @@
   |=  =canvas
   ^-  (list [@t json])
   =,  enjs:format
+  :_  ~
+  :-  'data'
   ?-    -.canvas
       %mesh
-    :_  ~
-    :-  'data'
     %-  pairs
     %-  zing
     (turn ~(tap by mesh.canvas) arc-to-json)
   ::
       %map
-    :_  ~
-    :-  'data'
     %-  pairs
     %-  zing
     (turn ~(tap by mesh.canvas) arc-to-json)
   ::
+      %draw
+    :-  %a
+    %-  zing
+    %+  turn  draw.canvas
+    |=  =form
+    %+  weld
+      ^-  (list json)
+      (form-strokes-to-json strokes.form)
+    ^-  (list json)
+    :_  ~
+    %-  pairs
+    :~  ['lineWidth' (numb line-width.form)]
+        ['styleStroke' s+style-stroke.form]
+    ==
   ==
 ::
 ++  metadata-to-json
@@ -136,7 +166,7 @@
   ==
 ::
 ++  arc-to-json
-  |=  [id=@u =arc]
+  |=  [id=@ud =arc]
   ^-  (list [@t json])
   :_  ~
   :-  (crip ((d-co:co 1) id))
@@ -147,17 +177,33 @@
 ++  stroke-to-json
   |=  =stroke
   ^-  (list [@t json])
+  =,  enjs:format
   ?-    -.stroke
       %mesh
-    :~  ['id' (numb:enjs:format id.stroke)]
+    :~  ['id' (numb id.stroke)]
         ['fill' b+filled.arc.stroke]
         ['color' s+color.arc.stroke]
     ==
   ::
       %map
-    :~  ['id' (numb:enjs:format id.stroke)]
+    :~  ['id' (numb id.stroke)]
         ['fill' b+filled.arc.stroke]
         ['color' s+color.arc.stroke]
     ==
+  ::
+      %draw
+    :~  ['lineWidth' (numb line-width.form.stroke)]
+        ['styleStroke' s+style-stroke.form.stroke]
+        ['strokes' a+(form-strokes-to-json strokes.form.stroke)]
+    ==
   ==
+::
+++  form-strokes-to-json
+  |=  strokes=(list [@ud @ud])
+  ^-  (list json)
+  =,  enjs:format
+  %+  turn  strokes
+  |=  [x=@ud y=@ud]
+  ^-  json
+  [%a ~[(numb x) (numb y)]]
 --
