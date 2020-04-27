@@ -44,7 +44,7 @@ export class CanvasSidebar extends Component {
       canvasItems = Object.entries(props.canvasList).map((each, i) => {
         console.log(each, i);
         return (
-          <CanvasTitle id={each[0]} location={each[1].metadata.location} />
+          <CanvasTitle key={i} id={each[0]} location={each[1].metadata.location} />
         )
       });
     }

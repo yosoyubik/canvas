@@ -3,9 +3,10 @@ import { BrowserRouter, Route, Switch } from "react-router-dom";
 import _ from 'lodash';
 
 import { Skeleton } from '/components/skeleton';
-import { Hexagons } from "/components/hexagons"
-import { NewScreen } from "/components/new"
-import { JoinScreen } from "/components/join"
+import { Hexagons } from "/components/hexagons";
+import { MapCanvas } from "/components/map";
+import { NewScreen } from "/components/new";
+import { JoinScreen } from "/components/join";
 
 import { store } from '/store';
 import { api } from '/api';
@@ -61,7 +62,9 @@ export class Root extends Component {
                     case 'mesh':
                       canvas = <Hexagons api={api} canvas={data} name={name} location={location} />;
                       break;
-                    case 'map': canvas = null; break;
+                    case 'map':
+                      canvas = <MapCanvas api={api} canvas={data} name={name} location={location} />;
+                      break;
                     default: canvas = null;
                   }
                   console.log(canvas);

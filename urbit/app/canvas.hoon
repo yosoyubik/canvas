@@ -327,19 +327,15 @@
   ?~  target-canvas  `state
   ?.  =(-.i.strokes -.u.target-canvas)  `state
   |^
+  :-  (send-effects strokes)
   ?-  -.u.target-canvas
     %mesh  (handle-mesh u.target-canvas strokes)
+    %map   (handle-map u.target-canvas strokes)
   ==
   ::
-  ++  handle-mesh
-    |=  [=canvas strokes=(list stroke)]
-    ^-  (quip card _state)
-    :_  %_    state
-            gallery
-          %+  ~(put by gallery)
-            [location name]
-          [%mesh (update-canvas-mesh mesh.canvas strokes) metadata.canvas]
-        ==
+  ++  send-effects
+    |=  strokes=(list stroke)
+    ^-  (list card)
     ?.  (team:title our.bowl src.bowl)
       ::  stroke from a remote ship
       ::
@@ -352,6 +348,30 @@
       [(send-paint-update name strokes)]~
     ~&  'remote canvas, poke owner'
     [(update-remote-canvas location name strokes)]~
+  ::
+  ++  handle-mesh
+    |=  [=canvas strokes=(list stroke)]
+    ^-  _state
+    %_    state
+        gallery
+      %+  ~(put by gallery)
+        [location name]
+      :+  %mesh
+        (update-canvas-mesh mesh.canvas strokes)
+      metadata.canvas
+    ==
+  ::
+  ++  handle-map
+    |=  [=canvas strokes=(list stroke)]
+    ^-  _state
+    %_    state
+        gallery
+      %+  ~(put by gallery)
+        [location name]
+      :+  %map
+        (update-canvas-mesh mesh.canvas strokes)
+      metadata.canvas
+    ==
   ::
   ++  update-canvas-mesh
     |=  [=mesh strokes=(list stroke)]

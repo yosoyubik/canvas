@@ -44,7 +44,7 @@ export class CanvasSidebar extends Component {
       canvasItems = Object.entries(props.canvasList).map((each, i) => {
         console.log(each, i);
         return (
-          React.createElement(CanvasTitle, { id: each[0], location: each[1].metadata.location, __self: this, __source: {fileName: _jsxFileName, lineNumber: 47}} )
+          React.createElement(CanvasTitle, { key: i, id: each[0], location: each[1].metadata.location, __self: this, __source: {fileName: _jsxFileName, lineNumber: 47}} )
         )
       });
     }

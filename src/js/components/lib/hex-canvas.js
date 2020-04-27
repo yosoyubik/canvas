@@ -5,7 +5,7 @@ import * as topojson from "topojson";
 
 
 const width = 960,
-      height = 900,
+      height = 960,
       radius = 10;
 
 const hexProjection = (radius) => {
@@ -28,12 +28,11 @@ const projection = hexProjection(radius);
 const path = d3.geoPath().projection(projection);
 
 const selectedColor = (colors) => {
-  let test= colors.find(color => {
+  return colors.find(color => {
     if (color.style.stroke) {
       return true;
     }
   });
-  return test;
 }
 
 const initHexMesh = () => {
@@ -99,22 +98,10 @@ const drawHexCanvas = (props) => {
     mousing = 0;
   }
 
-  // const changeColor = function(d){
-  //   return d.fill ? "fill point" : "point";
-  // }
-
   const addStyle = function(d) {
     return d.attr ? d.attr.color : undefined;
   }
 
-  // const redraw = (border) => {
-  //   console.log("redrawing", border);
-  //   border.attr("d",
-  //     path(topojson.mesh(topology, topology.objects.hexagons,
-  //       function(a, b) { return a.fill ^ b.fill; })
-  //     )
-  //   );
-  // }
   const svg = d3.select("svg");
   const g = d3.select(".hexagon");
 

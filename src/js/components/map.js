@@ -3,29 +3,29 @@ import { Route, Link } from 'react-router-dom';
 
 import * as d3 from "d3";
 import { parseSVG, simpleParseSVG } from "./lib/compile-svg";
-import { initHexMesh,
-         drawHexCanvas,
-         width,
-         height,
-         radius }
-from "./lib/hex-canvas";
+import { initMapCanvas, drawMapCanvas, width, height } from "./lib/map-canvas";
 import { createColorPicker } from "./lib/color";
 
 
-export class Hexagons extends Component {
+export class MapCanvas extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      name: '',
-      data: {}
+      name: ''
     }
   }
 
   componentDidMount() {
     console.log("mounting");
-    drawHexCanvas(this.props);
-    initHexMesh();
-    createColorPicker(width);
+    const { props, state } = this;
+    fetch("/~canvas/map/us.json")
+      .then((response) => response.json())
+      .then((json) => {
+        console.log(json);
+        this.setState({
+          data: json
+        });
+      });
   }
 
   onClickSave () {
@@ -38,10 +38,12 @@ export class Hexagons extends Component {
   }
 
   render() {
-    d3.select(".hexagon").selectAll("path").remove();
-    if (this.props.canvas) {
-      console.log("rendering", this.props.name);
-      drawHexCanvas(this.props);
+    const { props, state } = this;
+    d3.select(".foreground").selectAll("path").remove();
+    if (state.data) {
+      initMapCanvas(state.data);
+      drawMapCanvas(state.data, props);
+      createColorPicker(width);
     }
 
     return (
@@ -65,10 +67,9 @@ export class Hexagons extends Component {
           </button>
         </div>
         <div ref="canvas" className="w-100 mb4 pr6 pr0-l pr0-xl">
-          <svg className="db" id="canvas" width={width} height={height}>
-            <g className="hexagon" />
-            <g className="mesh-group" />
-            <g className="border-group" />
+          <svg className="db" id="canvas" width={ width } height={ height }>
+            <g className="foreground" style={{ cursor: "pointer", strokeOpacity: .5 }}/>
+            <g className="background" />
             <g className="legend" />
           </svg>
         </div>

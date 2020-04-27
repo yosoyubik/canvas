@@ -1,3 +1,4 @@
+
 ::  canvas-view: A Canvas app for Urbit
 ::
 /-  *canvas, *chat-store
@@ -37,6 +38,9 @@
 /=  canvas-svg
   /^  (map knot @)
   /:  /===/app/canvas/svg  /_  /svg/
+/=  canvas-maps
+  /^  (map knot @)
+  /:  /===/app/canvas/map  /_  /atom/
 ::  State
 ::
 =>  |%
@@ -241,12 +245,18 @@
     [%leave ship canvas-name]
   ::
   ++  handle-create
-   |=  =metadata
+   |=  =canvas
    ^-  (list card)
    :_  ~
    %+  send-canvas-action
-     [%create name.metadata ~]
-   [%create [%mesh ~ metadata]]
+     [%create name.metadata.canvas ~]
+   ^-  canvas-action
+   :-  %create
+   :_  [~ metadata.canvas]
+   ?-  -.canvas
+     %mesh  %mesh
+     %map   %mesh
+   ==
   ::
   ++  handle-share
    |=  name=@t
@@ -310,6 +320,7 @@
       [%'~canvas' %css %index ~]  (css-response:gen style)
       [%'~canvas' %js %tile ~]    (js-response:gen tile-js)
       [%'~canvas' %js %index ~]   (js-response:gen script)
+      [%'~canvas' %map @t *]      (handle-json-call i.t.t.site.url)
       [%'~canvas' %img @t *]      (handle-img-call i.t.t.site.url)
       [%'~canvas' *]              (html-response:gen index)
     ==
@@ -321,5 +332,14 @@
     ?~  img
       not-found:gen
     (png-response:gen (as-octs:mimes:html u.img))
+  ::
+  ++  handle-json-call
+    |=  name=@t
+    ^-  simple-payload:http
+    ~&  name
+    =/  json  (~(get by canvas-maps) name)
+    ?~  json
+      not-found:gen
+    (json-response:gen (as-octs:mimes:html u.json))
   --
 --

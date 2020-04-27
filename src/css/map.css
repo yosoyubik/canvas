@@ -1,0 +1,15 @@
+.background, .foreground  
+path {
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.background {
+  fill: none;
+  stroke: #ddd;
+}
+
+.foreground {
+  fill: none;
+  pointer-events: all;
+}

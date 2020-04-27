@@ -19,13 +19,27 @@
     ==
   ::
   ++  create
-    %-  ot
-    :~  ['name' so]
-        ['type' (cu canvas-type so)]
-        ['location' (su ;~(pfix sig fed:ag))]
+    |^
+    %-  of
+    :~  [%map metadata]
+        [%mesh metadata]
     ==
+    ::
+    ++  metadata
+      %-  ot
+      :~  ['canvas' ul]
+        ::
+          :-  'metadata'
+          %-  ot
+          :~  ['name' so]
+              ['type' (cu canvas-type so)]
+              ['location' (su ;~(pfix sig fed:ag))]
+      ==  ==
+    ::
+    --
   ::
   ++  paint
+    |^
     %-  ot
     :~  ['location' (su ;~(pfix sig fed:ag))]
         ['canvas-name' so]
@@ -33,8 +47,13 @@
         :-  'strokes'
         %-  ar
         %-  of
-        [%mesh (ot ~[['id' ni] ['filled' bo] ['color' so]])]~
-    ==
+        :~  [%mesh arc-data]
+            [%map arc-data]
+    ==  ==
+    ::
+    ++  arc-data
+      (ot ~[['id' ni] ['filled' bo] ['color' so]])
+    --
   ::
   ++  subscription
     (ot ~[['ship' (su ;~(pfix sig fed:ag))] ['canvas-name' so]])
@@ -99,6 +118,13 @@
     %-  zing
     (turn ~(tap by mesh.canvas) arc-to-json)
   ::
+      %map
+    :_  ~
+    :-  'data'
+    %-  pairs
+    %-  zing
+    (turn ~(tap by mesh.canvas) arc-to-json)
+  ::
   ==
 ::
 ++  metadata-to-json
@@ -123,6 +149,12 @@
   ^-  (list [@t json])
   ?-    -.stroke
       %mesh
+    :~  ['id' (numb:enjs:format id.stroke)]
+        ['fill' b+filled.arc.stroke]
+        ['color' s+color.arc.stroke]
+    ==
+  ::
+      %map
     :~  ['id' (numb:enjs:format id.stroke)]
         ['fill' b+filled.arc.stroke]
         ['color' s+color.arc.stroke]

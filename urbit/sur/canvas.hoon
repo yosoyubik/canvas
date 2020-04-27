@@ -1,16 +1,18 @@
 |%
 +$  arc          [filled=? color=@t]
 +$  mesh         (map @ud arc)
-+$  canvas-type  ?(%mesh)
++$  canvas-type  ?(%mesh %map)
 +$  metadata     [name=@t type=canvas-type location=ship]
 +$  location     [host=ship canvas=@t]
 +$  canvas
   $%  [%mesh =mesh =metadata]
+      [%map =mesh =metadata]
       :: [%free id=@t name=@t data=*]
   ==
 ::
 +$  stroke
   $%  [%mesh id=@ud =arc]
+      [%map id=@ud =arc]
   ==
 ::
 +$  canvas-response
@@ -42,7 +44,7 @@
       [%paint location=@p name=@t strokes=(list stroke)]
       [%join =ship name=@t]
       [%leave =ship name=@t]
-      [%create =metadata]
+      [%create =canvas]
       ::  TODO: add chat name
       ::
       [%share name=@t]

@@ -91,12 +91,17 @@ class UrbitApi {
 
   create(name, type, location) {
     console.log("creating");
-    return this.action("canvas-view", "canvas-view", {
-      create: {
+    let create = {};
+    create[type] = {
+      'canvas': null,
+      'metadata': {
         'name': name,
         'type': type,
         'location': location
       }
+    };
+    return this.action("canvas-view", "canvas-view", {
+      create: create
     });
   }
 
