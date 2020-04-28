@@ -4,8 +4,10 @@ import { Route, Link } from 'react-router-dom';
 import * as d3 from "d3";
 import { parseSVG, simpleParseSVG } from "./lib/compile-svg";
 
-import { Runtime, Inspector } from "@observablehq/runtime";
-import notebook from "@yosoyubik/draw-me";
+// import { Runtime, Inspector } from "@observablehq/runtime";
+// import notebook from "@yosoyubik/draw-me";
+
+import { width, height, initDrawCanvas, drawHexCanvas } from "./lib/draw-canvas";
 
 
 export class DrawCanvas extends Component {
@@ -30,65 +32,41 @@ export class DrawCanvas extends Component {
   componentDidMount() {
     const { drawRef, lineWidthRef, strokeStyleRef, props, state } = this;
 
-    const runtime = new Runtime();
-    const observer = runtime.module(notebook, name => {
-      console.log(name);
-      switch (name) {
-        case "inputData":
-          return { fulfilled(value) {
-            console.log("inputData", value);
-            state.forms = value;
-          }}
-        case "render":
-          return { fulfilled(value) {
-            console.log("render", value);
-          }}
-          // console.log(props.canvas);
-          // if (props.canvas.length) {
-          //   return props.canvas;
-          // } else {
-          //   return [];
-          // }
-        case "viewof exposedData":
-          return new Inspector(drawRef.current);
-        // TODO: implement live update
-        case "exposedData":
-          return { fulfilled(value) {
-            console.log(value);
-            state.buffer = value;
-          }
-            // if (value && value.length) setStrokes(value); }
-          };
-        case "viewof lineWidth":
-          return new Inspector(lineWidthRef.current);
-        case "viewof strokeStyle":
-          return new Inspector(strokeStyleRef.current);
-      }
-    });
-
+    // const runtime = new Runtime();
+    // const observer = runtime.module(notebook, name => {
+    //   console.log(name);
+    //   switch (name) {
+    //     case "viewof exposedData":
+    //       return new Inspector(drawRef.current);
+    //     case "viewof lineWidth":
+    //       return new Inspector(lineWidthRef.current);
+    //     case "viewof strokeStyle":
+    //       return new Inspector(strokeStyleRef.current);
+    //   }
+    // });
+    //
+    initDrawCanvas();
+    console.log(props.canvas);
+    drawHexCanvas(props);
     if (props.canvas.length) {
-      console.log(props.canvas);
-      state.forms.value = props.canvas;
-      state.buffer.value = props.canvas;
-      (async () => {
-        const forms = await observer.value("exposedData");
-        const forms2 = await observer.value("inputData");
-        console.log(forms, forms2);
-        props.canvas.concat(forms)
-        // console.log(props.canvas);
-        observer.redefine("inputData", props.canvas);
-        observer.redefine("exposedData", props.canvas);
-        // Re-render
-        // runtime.module(notebook, name => {
-        //   console.log(name);
-        //   if (name === "viewof exposedData") {
-        //     return Inspector.into(drawRef.current);
-        //   }
-        // });
-      })();
+
+    //   (async () => {
+    //     const forms = await observer.value("inputData");
+    //     props.canvas.concat(forms)
+    //     // console.log(props.canvas);
+    //     observer.redefine("inputData", props.canvas);
+    //     observer.redefine("exposedData", props.canvas);
+    //     // Re-render
+    //     // runtime.module(notebook, name => {
+    //     //   console.log(name);
+    //     //   if (name === "viewof exposedData") {
+    //     //     return Inspector.into(drawRef.current);
+    //     //   }
+    //     // });
+    //   })();
     }
 
-    this.setState({observer: observer});
+    // this.setState({observer: observer});
   }
 
   // TODO: setStrokes doesn't know when the mouse stops moving
@@ -115,24 +93,24 @@ export class DrawCanvas extends Component {
   onClickSave () {
     const { props, state } = this;
     (async () => {
-      const forms = await state.observer.value("exposedData");
-      let formsClone = forms.slice();
-      formsClone.forEach(function(stroke, i, array) {
-        const lineWidth = stroke.lineWidth;
-        const strokeStyle = stroke.strokeStyle;
-        array[i] = { draw: {
-          coords: stroke,
-          lineWidth: lineWidth,
-          strokeStyle: strokeStyle
-        }}
-      });
-
-      // console.log(formsClone, props.location);
-      props.api.canvas.paint({
-        "canvas-name": props.name,
-        "location": props.location,
-        "strokes": formsClone
-      })
+      // const forms = await state.observer.value("exposedData");
+      // let formsClone = forms.slice();
+      // formsClone.forEach(function(stroke, i, array) {
+      //   const lineWidth = stroke.lineWidth;
+      //   const strokeStyle = stroke.strokeStyle;
+      //   array[i] = { draw: {
+      //     coords: stroke,
+      //     lineWidth: lineWidth,
+      //     strokeStyle: strokeStyle
+      //   }}
+      // });
+      //
+      // // console.log(formsClone, props.location);
+      // props.api.canvas.paint({
+      //   "canvas-name": props.name,
+      //   "location": props.location,
+      //   "strokes": formsClone
+      // })
       // .then(() => {
       //   console.log("saving canvas");
       //   // const svgString = simpleParseSVG(d3.select("canvas").node());
@@ -150,24 +128,28 @@ export class DrawCanvas extends Component {
     const { props, state } = this;
 
     return (
-      React.createElement('div', { className: "h-100 w-100 pa3 pt4 bg-gray0-d white-d flex flex-column"       , __self: this, __source: {fileName: _jsxFileName, lineNumber: 153}}
+      React.createElement('div', { className: "h-100 w-100 pa3 pt4 bg-gray0-d white-d flex flex-column"       , __self: this, __source: {fileName: _jsxFileName, lineNumber: 131}}
         , React.createElement('div', { className: "absolute mw5" ,
-             style: {right: "20px", top: "20px"}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 154}} 
+             style: {right: "20px", top: "20px"}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 132}} 
           , React.createElement('button', {
             onClick: this.onClickSave.bind(this),
-            className: "pointer mr2 f9 green2 bg-gray0-d ba pv3 ph4 b--green2"        , __self: this, __source: {fileName: _jsxFileName, lineNumber: 156}}, "Save Image"
+            className: "pointer mr2 f9 green2 bg-gray0-d ba pv3 ph4 b--green2"        , __self: this, __source: {fileName: _jsxFileName, lineNumber: 134}}, "Save Image"
 
           )
           , React.createElement('button', {
             onClick: this.onClickShare.bind(this),
-            className: "pointer f9 green2 bg-gray0-d ba pv3 ph4 b--green2"       , __self: this, __source: {fileName: _jsxFileName, lineNumber: 161}}
+            className: "pointer f9 green2 bg-gray0-d ba pv3 ph4 b--green2"       , __self: this, __source: {fileName: _jsxFileName, lineNumber: 139}}
             , "Share Image"
 
           )
         )
-        , React.createElement('div', { ref: this.lineWidthRef, __self: this, __source: {fileName: _jsxFileName, lineNumber: 168}})
-        , React.createElement('div', { ref: this.strokeStyleRef, __self: this, __source: {fileName: _jsxFileName, lineNumber: 169}})
-        , React.createElement('div', { ref: this.drawRef, __self: this, __source: {fileName: _jsxFileName, lineNumber: 170}})
+        , React.createElement('div', { ref: this.lineWidthRef, __self: this, __source: {fileName: _jsxFileName, lineNumber: 146}}
+        )
+        , React.createElement('div', { ref: this.strokeStyleRef, __self: this, __source: {fileName: _jsxFileName, lineNumber: 148}}
+        )
+        , React.createElement('div', { ref: this.drawRef, __self: this, __source: {fileName: _jsxFileName, lineNumber: 150}}
+          , React.createElement('canvas', { id: "canvas", width: width, height: height, __self: this, __source: {fileName: _jsxFileName, lineNumber: 151}})
+        )
       )
     )
   }

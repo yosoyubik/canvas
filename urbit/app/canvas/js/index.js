@@ -1,10 +1,10 @@
 (function (global, factory) {
             typeof exports === 'object' && typeof module !== 'undefined' ? factory(require('buffer')) :
             typeof define === 'function' && define.amd ? define('index', ['buffer'], factory) :
-            (global = global || self, factory(global.buffer$1));
-}(this, function (buffer$1) { 'use strict';
+            (global = global || self, factory(global.buffer));
+}(this, function (buffer) { 'use strict';
 
-            buffer$1 = buffer$1 && buffer$1.hasOwnProperty('default') ? buffer$1['default'] : buffer$1;
+            buffer = buffer && buffer.hasOwnProperty('default') ? buffer['default'] : buffer;
 
             var global$1 = (typeof global !== "undefined" ? global :
                         typeof self !== "undefined" ? self :
@@ -49745,6 +49745,8 @@
 
             var filterEvents = {};
 
+            var event = null;
+
             if (typeof document !== "undefined") {
               var element = document.documentElement;
               if (!("onmouseenter" in element)) {
@@ -49764,9 +49766,12 @@
 
             function contextListener(listener, index, group) {
               return function(event1) {
+                var event0 = event; // Events can be reentrant (e.g., focus).
+                event = event1;
                 try {
                   listener.call(this, this.__data__, index, group);
                 } finally {
+                  event = event0;
                 }
               };
             }
@@ -49833,6 +49838,17 @@
               if (capture == null) capture = false;
               for (i = 0; i < n; ++i) this.each(on(typenames[i], value, capture));
               return this;
+            }
+
+            function customEvent(event1, listener, that, args) {
+              var event0 = event;
+              event1.sourceEvent = event;
+              event = event1;
+              try {
+                return listener.apply(that, args);
+              } finally {
+                event = event0;
+              }
             }
 
             function dispatchEvent(node, type, params) {
@@ -49920,10 +49936,268 @@
                   : new Selection([[selector]], root);
             }
 
+            function sourceEvent() {
+              var current = event, source;
+              while (source = current.sourceEvent) current = source;
+              return current;
+            }
+
+            function point(node, event) {
+              var svg = node.ownerSVGElement || node;
+
+              if (svg.createSVGPoint) {
+                var point = svg.createSVGPoint();
+                point.x = event.clientX, point.y = event.clientY;
+                point = point.matrixTransform(node.getScreenCTM().inverse());
+                return [point.x, point.y];
+              }
+
+              var rect = node.getBoundingClientRect();
+              return [event.clientX - rect.left - node.clientLeft, event.clientY - rect.top - node.clientTop];
+            }
+
+            function mouse(node) {
+              var event = sourceEvent();
+              if (event.changedTouches) event = event.changedTouches[0];
+              return point(node, event);
+            }
+
             function selectAll(selector) {
               return typeof selector === "string"
                   ? new Selection([document.querySelectorAll(selector)], [document.documentElement])
                   : new Selection([selector == null ? [] : selector], root);
+            }
+
+            function touch(node, touches, identifier) {
+              if (arguments.length < 3) identifier = touches, touches = sourceEvent().changedTouches;
+
+              for (var i = 0, n = touches ? touches.length : 0, touch; i < n; ++i) {
+                if ((touch = touches[i]).identifier === identifier) {
+                  return point(node, touch);
+                }
+              }
+
+              return null;
+            }
+
+            function nopropagation() {
+              event.stopImmediatePropagation();
+            }
+
+            function noevent() {
+              event.preventDefault();
+              event.stopImmediatePropagation();
+            }
+
+            function dragDisable(view) {
+              var root = view.document.documentElement,
+                  selection = select(view).on("dragstart.drag", noevent, true);
+              if ("onselectstart" in root) {
+                selection.on("selectstart.drag", noevent, true);
+              } else {
+                root.__noselect = root.style.MozUserSelect;
+                root.style.MozUserSelect = "none";
+              }
+            }
+
+            function yesdrag(view, noclick) {
+              var root = view.document.documentElement,
+                  selection = select(view).on("dragstart.drag", null);
+              if (noclick) {
+                selection.on("click.drag", noevent, true);
+                setTimeout(function() { selection.on("click.drag", null); }, 0);
+              }
+              if ("onselectstart" in root) {
+                selection.on("selectstart.drag", null);
+              } else {
+                root.style.MozUserSelect = root.__noselect;
+                delete root.__noselect;
+              }
+            }
+
+            function constant$1(x) {
+              return function() {
+                return x;
+              };
+            }
+
+            function DragEvent(target, type, subject, id, active, x, y, dx, dy, dispatch) {
+              this.target = target;
+              this.type = type;
+              this.subject = subject;
+              this.identifier = id;
+              this.active = active;
+              this.x = x;
+              this.y = y;
+              this.dx = dx;
+              this.dy = dy;
+              this._ = dispatch;
+            }
+
+            DragEvent.prototype.on = function() {
+              var value = this._.on.apply(this._, arguments);
+              return value === this._ ? this : value;
+            };
+
+            // Ignore right-click, since that should open the context menu.
+            function defaultFilter() {
+              return !event.ctrlKey && !event.button;
+            }
+
+            function defaultContainer() {
+              return this.parentNode;
+            }
+
+            function defaultSubject(d) {
+              return d == null ? {x: event.x, y: event.y} : d;
+            }
+
+            function defaultTouchable() {
+              return navigator.maxTouchPoints || ("ontouchstart" in this);
+            }
+
+            function drag() {
+              var filter = defaultFilter,
+                  container = defaultContainer,
+                  subject = defaultSubject,
+                  touchable = defaultTouchable,
+                  gestures = {},
+                  listeners = dispatch("start", "drag", "end"),
+                  active = 0,
+                  mousedownx,
+                  mousedowny,
+                  mousemoving,
+                  touchending,
+                  clickDistance2 = 0;
+
+              function drag(selection) {
+                selection
+                    .on("mousedown.drag", mousedowned)
+                  .filter(touchable)
+                    .on("touchstart.drag", touchstarted)
+                    .on("touchmove.drag", touchmoved)
+                    .on("touchend.drag touchcancel.drag", touchended)
+                    .style("touch-action", "none")
+                    .style("-webkit-tap-highlight-color", "rgba(0,0,0,0)");
+              }
+
+              function mousedowned() {
+                if (touchending || !filter.apply(this, arguments)) return;
+                var gesture = beforestart("mouse", container.apply(this, arguments), mouse, this, arguments);
+                if (!gesture) return;
+                select(event.view).on("mousemove.drag", mousemoved, true).on("mouseup.drag", mouseupped, true);
+                dragDisable(event.view);
+                nopropagation();
+                mousemoving = false;
+                mousedownx = event.clientX;
+                mousedowny = event.clientY;
+                gesture("start");
+              }
+
+              function mousemoved() {
+                noevent();
+                if (!mousemoving) {
+                  var dx = event.clientX - mousedownx, dy = event.clientY - mousedowny;
+                  mousemoving = dx * dx + dy * dy > clickDistance2;
+                }
+                gestures.mouse("drag");
+              }
+
+              function mouseupped() {
+                select(event.view).on("mousemove.drag mouseup.drag", null);
+                yesdrag(event.view, mousemoving);
+                noevent();
+                gestures.mouse("end");
+              }
+
+              function touchstarted() {
+                if (!filter.apply(this, arguments)) return;
+                var touches = event.changedTouches,
+                    c = container.apply(this, arguments),
+                    n = touches.length, i, gesture;
+
+                for (i = 0; i < n; ++i) {
+                  if (gesture = beforestart(touches[i].identifier, c, touch, this, arguments)) {
+                    nopropagation();
+                    gesture("start");
+                  }
+                }
+              }
+
+              function touchmoved() {
+                var touches = event.changedTouches,
+                    n = touches.length, i, gesture;
+
+                for (i = 0; i < n; ++i) {
+                  if (gesture = gestures[touches[i].identifier]) {
+                    noevent();
+                    gesture("drag");
+                  }
+                }
+              }
+
+              function touchended() {
+                var touches = event.changedTouches,
+                    n = touches.length, i, gesture;
+
+                if (touchending) clearTimeout(touchending);
+                touchending = setTimeout(function() { touchending = null; }, 500); // Ghost clicks are delayed!
+                for (i = 0; i < n; ++i) {
+                  if (gesture = gestures[touches[i].identifier]) {
+                    nopropagation();
+                    gesture("end");
+                  }
+                }
+              }
+
+              function beforestart(id, container, point, that, args) {
+                var p = point(container, id), s, dx, dy,
+                    sublisteners = listeners.copy();
+
+                if (!customEvent(new DragEvent(drag, "beforestart", s, id, active, p[0], p[1], 0, 0, sublisteners), function() {
+                  if ((event.subject = s = subject.apply(that, args)) == null) return false;
+                  dx = s.x - p[0] || 0;
+                  dy = s.y - p[1] || 0;
+                  return true;
+                })) return;
+
+                return function gesture(type) {
+                  var p0 = p, n;
+                  switch (type) {
+                    case "start": gestures[id] = gesture, n = active++; break;
+                    case "end": delete gestures[id], --active; // nobreak
+                    case "drag": p = point(container, id), n = active; break;
+                  }
+                  customEvent(new DragEvent(drag, type, s, id, n, p[0] + dx, p[1] + dy, p[0] - p0[0], p[1] - p0[1], sublisteners), sublisteners.apply, sublisteners, [type, that, args]);
+                };
+              }
+
+              drag.filter = function(_) {
+                return arguments.length ? (filter = typeof _ === "function" ? _ : constant$1(!!_), drag) : filter;
+              };
+
+              drag.container = function(_) {
+                return arguments.length ? (container = typeof _ === "function" ? _ : constant$1(_), drag) : container;
+              };
+
+              drag.subject = function(_) {
+                return arguments.length ? (subject = typeof _ === "function" ? _ : constant$1(_), drag) : subject;
+              };
+
+              drag.touchable = function(_) {
+                return arguments.length ? (touchable = typeof _ === "function" ? _ : constant$1(!!_), drag) : touchable;
+              };
+
+              drag.on = function() {
+                var value = listeners.on.apply(listeners, arguments);
+                return value === listeners ? drag : value;
+              };
+
+              drag.clickDistance = function(_) {
+                return arguments.length ? (clickDistance2 = (_ = +_) * _, drag) : Math.sqrt(clickDistance2);
+              };
+
+              return drag;
             }
 
             function define(constructor, factory, prototype) {
@@ -50500,7 +50774,7 @@
               };
             }
 
-            function constant$1(x) {
+            function constant$2(x) {
               return function() {
                 return x;
               };
@@ -50520,18 +50794,18 @@
 
             function hue(a, b) {
               var d = b - a;
-              return d ? linear(a, d > 180 || d < -180 ? d - 360 * Math.round(d / 360) : d) : constant$1(isNaN(a) ? b : a);
+              return d ? linear(a, d > 180 || d < -180 ? d - 360 * Math.round(d / 360) : d) : constant$2(isNaN(a) ? b : a);
             }
 
             function gamma(y) {
               return (y = +y) === 1 ? nogamma : function(a, b) {
-                return b - a ? exponential(a, b, y) : constant$1(isNaN(a) ? b : a);
+                return b - a ? exponential(a, b, y) : constant$2(isNaN(a) ? b : a);
               };
             }
 
             function nogamma(a, b) {
               var d = b - a;
-              return d ? linear(a, d) : constant$1(isNaN(a) ? b : a);
+              return d ? linear(a, d) : constant$2(isNaN(a) ? b : a);
             }
 
             var interpolateRgb = (function rgbGamma(y) {
@@ -56040,6 +56314,58 @@
 
             var pi$5 = Math.PI;
 
+            function point$1(that, x, y) {
+              that._context.bezierCurveTo(
+                (2 * that._x0 + that._x1) / 3,
+                (2 * that._y0 + that._y1) / 3,
+                (that._x0 + 2 * that._x1) / 3,
+                (that._y0 + 2 * that._y1) / 3,
+                (that._x0 + 4 * that._x1 + x) / 6,
+                (that._y0 + 4 * that._y1 + y) / 6
+              );
+            }
+
+            function Basis(context) {
+              this._context = context;
+            }
+
+            Basis.prototype = {
+              areaStart: function() {
+                this._line = 0;
+              },
+              areaEnd: function() {
+                this._line = NaN;
+              },
+              lineStart: function() {
+                this._x0 = this._x1 =
+                this._y0 = this._y1 = NaN;
+                this._point = 0;
+              },
+              lineEnd: function() {
+                switch (this._point) {
+                  case 3: point$1(this, this._x1, this._y1); // proceed
+                  case 2: this._context.lineTo(this._x1, this._y1); break;
+                }
+                if (this._line || (this._line !== 0 && this._point === 1)) this._context.closePath();
+                this._line = 1 - this._line;
+              },
+              point: function(x, y) {
+                x = +x, y = +y;
+                switch (this._point) {
+                  case 0: this._point = 1; this._line ? this._context.lineTo(x, y) : this._context.moveTo(x, y); break;
+                  case 1: this._point = 2; break;
+                  case 2: this._point = 3; this._context.lineTo((5 * this._x0 + this._x1) / 6, (5 * this._y0 + this._y1) / 6); // proceed
+                  default: point$1(this, x, y); break;
+                }
+                this._x0 = this._x1, this._x1 = x;
+                this._y0 = this._y1, this._y1 = y;
+              }
+            };
+
+            function basis$2(context) {
+              return new Basis(context);
+            }
+
             function sign$1(x) {
               return x < 0 ? -1 : 1;
             }
@@ -56066,7 +56392,7 @@
             // According to https://en.wikipedia.org/wiki/Cubic_Hermite_spline#Representations
             // "you can express cubic Hermite interpolation in terms of cubic Bézier curves
             // with respect to the four values p0, p0 + m0 / 3, p1 - m1 / 3, p1".
-            function point(that, t0, t1) {
+            function point$2(that, t0, t1) {
               var x0 = that._x0,
                   y0 = that._y0,
                   x1 = that._x1,
@@ -56095,7 +56421,7 @@
               lineEnd: function() {
                 switch (this._point) {
                   case 2: this._context.lineTo(this._x1, this._y1); break;
-                  case 3: point(this, this._t0, slope2(this, this._t0)); break;
+                  case 3: point$2(this, this._t0, slope2(this, this._t0)); break;
                 }
                 if (this._line || (this._line !== 0 && this._point === 1)) this._context.closePath();
                 this._line = 1 - this._line;
@@ -56108,8 +56434,8 @@
                 switch (this._point) {
                   case 0: this._point = 1; this._line ? this._context.lineTo(x, y) : this._context.moveTo(x, y); break;
                   case 1: this._point = 2; break;
-                  case 2: this._point = 3; point(this, slope2(this, t1 = slope3(this, x, y)), t1); break;
-                  default: point(this, this._t0, t1 = slope3(this, x, y)); break;
+                  case 2: this._point = 3; point$2(this, slope2(this, t1 = slope3(this, x, y)), t1); break;
+                  default: point$2(this, this._t0, t1 = slope3(this, x, y)); break;
                 }
 
                 this._x0 = this._x1, this._x1 = x;
@@ -56905,2419 +57231,104 @@
               }
             }
 
-            function dispatch$1(node, type, detail) {
-              detail = detail || {};
-              var document = node.ownerDocument, event = document.defaultView.CustomEvent;
-              if (typeof event === "function") {
-                event = new event(type, {detail: detail});
-              } else {
-                event = document.createEvent("Event");
-                event.initEvent(type, false, false);
-                event.detail = detail;
-              }
-              node.dispatchEvent(event);
-            }
+            // Forked of https://observablehq.com/@d3/draw-me
 
-            // TODO https://twitter.com/mbostock/status/702737065121742848
-            function isarray$1(value) {
-              return Array.isArray(value)
-                  || value instanceof Int8Array
-                  || value instanceof Int16Array
-                  || value instanceof Int32Array
-                  || value instanceof Uint8Array
-                  || value instanceof Uint8ClampedArray
-                  || value instanceof Uint16Array
-                  || value instanceof Uint32Array
-                  || value instanceof Float32Array
-                  || value instanceof Float64Array;
-            }
+            const width$2 = 960,
+                  height$2 = 960;
 
-            // Non-integer keys in arrays, e.g. [1, 2, 0.5: "value"].
-            function isindex(key) {
-              return key === (key | 0) + "";
-            }
+            let context$1;
+            let curve;
 
-            function inspectName(name) {
-              const n = document.createElement("span");
-              n.className = "observablehq--cellname";
-              n.textContent = `${name} = `;
-              return n;
-            }
+            const redo = [];
 
-            const symbolToString = Symbol.prototype.toString;
-
-            // Symbols do not coerce to strings; they must be explicitly converted.
-            function formatSymbol(symbol) {
-              return symbolToString.call(symbol);
-            }
-
-            const {getOwnPropertySymbols: getOwnPropertySymbols$1, prototype: {hasOwnProperty: hasOwnProperty$1}} = Object;
-            const {toStringTag} = Symbol;
-
-            const FORBIDDEN = {};
-
-            const symbolsof = getOwnPropertySymbols$1;
-
-            function isown(object, key) {
-              return hasOwnProperty$1.call(object, key);
-            }
-
-            function tagof(object) {
-              return object[toStringTag]
-                  || (object.constructor && object.constructor.name)
-                  || "Object";
-            }
-
-            function valueof(object, key) {
-              try {
-                const value = object[key];
-                if (value) value.constructor; // Test for SecurityError.
-                return value;
-              } catch (ignore) {
-                return FORBIDDEN;
-              }
-            }
-
-            const SYMBOLS = [
-              { symbol: "@@__IMMUTABLE_INDEXED__@@", name: "Indexed", modifier: true },
-              { symbol: "@@__IMMUTABLE_KEYED__@@", name: "Keyed", modifier: true },
-              { symbol: "@@__IMMUTABLE_LIST__@@", name: "List", arrayish: true },
-              { symbol: "@@__IMMUTABLE_MAP__@@", name: "Map" },
-              {
-                symbol: "@@__IMMUTABLE_ORDERED__@@",
-                name: "Ordered",
-                modifier: true,
-                prefix: true
-              },
-              { symbol: "@@__IMMUTABLE_RECORD__@@", name: "Record" },
-              {
-                symbol: "@@__IMMUTABLE_SET__@@",
-                name: "Set",
-                arrayish: true,
-                setish: true
-              },
-              { symbol: "@@__IMMUTABLE_STACK__@@", name: "Stack", arrayish: true }
-            ];
-
-            function immutableName(obj) {
-              try {
-                let symbols = SYMBOLS.filter(({ symbol }) => obj[symbol] === true);
-                if (!symbols.length) return;
-
-                const name = symbols.find(s => !s.modifier);
-                const prefix =
-                  name.name === "Map" && symbols.find(s => s.modifier && s.prefix);
-
-                const arrayish = symbols.some(s => s.arrayish);
-                const setish = symbols.some(s => s.setish);
-
-                return {
-                  name: `${prefix ? prefix.name : ""}${name.name}`,
-                  symbols,
-                  arrayish: arrayish && !setish,
-                  setish
-                };
-              } catch (e) {
-                return null;
-              }
-            }
-
-            const {getPrototypeOf, getOwnPropertyDescriptors} = Object;
-            const objectPrototype = getPrototypeOf({});
-
-            function inspectExpanded(object, _, name, proto) {
-              let arrayish = isarray$1(object);
-              let tag, fields, next, n;
-
-              if (object instanceof Map) {
-                tag = `Map(${object.size})`;
-                fields = iterateMap;
-              } else if (object instanceof Set) {
-                tag = `Set(${object.size})`;
-                fields = iterateSet;
-              } else if (arrayish) {
-                tag = `${object.constructor.name}(${object.length})`;
-                fields = iterateArray;
-              } else if ((n = immutableName(object))) {
-                tag = `Immutable.${n.name}${n.name === "Record" ? "" : `(${object.size})`}`;
-                arrayish = n.arrayish;
-                fields = n.arrayish
-                  ? iterateImArray
-                  : n.setish
-                  ? iterateImSet
-                  : iterateImObject;
-              } else if (proto) {
-                tag = tagof(object);
-                fields = iterateProto;
-              } else {
-                tag = tagof(object);
-                fields = iterateObject;
-              }
-
-              const span = document.createElement("span");
-              span.className = "observablehq--expanded";
-              if (name) {
-                span.appendChild(inspectName(name));
-              }
-              const a = span.appendChild(document.createElement("a"));
-              a.innerHTML = `<svg width=8 height=8 class='observablehq--caret'>
-    <path d='M4 7L0 1h8z' fill='currentColor' />
-  </svg>`;
-              a.appendChild(document.createTextNode(`${tag}${arrayish ? " [" : " {"}`));
-              a.addEventListener("mouseup", function(event) {
-                event.stopPropagation();
-                replace(span, inspectCollapsed(object, null, name, proto));
-              });
-
-              fields = fields(object);
-              for (let i = 0; !(next = fields.next()).done && i < 20; ++i) {
-                span.appendChild(next.value);
-              }
-
-              if (!next.done) {
-                const a = span.appendChild(document.createElement("a"));
-                a.className = "observablehq--field";
-                a.style.display = "block";
-                a.appendChild(document.createTextNode(`  … more`));
-                a.addEventListener("mouseup", function(event) {
-                  event.stopPropagation();
-                  span.insertBefore(next.value, span.lastChild.previousSibling);
-                  for (let i = 0; !(next = fields.next()).done && i < 19; ++i) {
-                    span.insertBefore(next.value, span.lastChild.previousSibling);
-                  }
-                  if (next.done) span.removeChild(span.lastChild.previousSibling);
-                  dispatch$1(span, "load");
-                });
-              }
-
-              span.appendChild(document.createTextNode(arrayish ? "]" : "}"));
-
-              return span;
-            }
-
-            function* iterateMap(map) {
-              for (const [key, value] of map) {
-                yield formatMapField(key, value);
-              }
-              yield* iterateObject(map);
-            }
-
-            function* iterateSet(set) {
-              for (const value of set) {
-                yield formatSetField(value);
-              }
-              yield* iterateObject(set);
-            }
-
-            function* iterateImSet(set) {
-              for (const value of set) {
-                yield formatSetField(value);
-              }
-            }
-
-            function* iterateArray(array) {
-              for (let i = 0, n = array.length; i < n; ++i) {
-                if (i in array) {
-                  yield formatField(i, valueof(array, i), "observablehq--index");
-                }
-              }
-              for (const key in array) {
-                if (!isindex(key) && isown(array, key)) {
-                  yield formatField(key, valueof(array, key), "observablehq--key");
-                }
-              }
-              for (const symbol of symbolsof(array)) {
-                yield formatField(
-                  formatSymbol(symbol),
-                  valueof(array, symbol),
-                  "observablehq--symbol"
-                );
-              }
-            }
-
-            function* iterateImArray(array) {
-              let i1 = 0;
-              for (const n = array.size; i1 < n; ++i1) {
-                yield formatField(i1, array.get(i1), true);
-              }
-            }
-
-            function* iterateProto(object) {
-              for (const key in getOwnPropertyDescriptors(object)) {
-                yield formatField(key, valueof(object, key), "observablehq--key");
-              }
-              for (const symbol of symbolsof(object)) {
-                yield formatField(
-                  formatSymbol(symbol),
-                  valueof(object, symbol),
-                  "observablehq--symbol"
-                );
-              }
-
-              const proto = getPrototypeOf(object);
-              if (proto && proto !== objectPrototype) {
-                yield formatPrototype(proto);
-              }
-            }
-
-            function* iterateObject(object) {
-              for (const key in object) {
-                if (isown(object, key)) {
-                  yield formatField(key, valueof(object, key), "observablehq--key");
-                }
-              }
-              for (const symbol of symbolsof(object)) {
-                yield formatField(
-                  formatSymbol(symbol),
-                  valueof(object, symbol),
-                  "observablehq--symbol"
-                );
-              }
-
-              const proto = getPrototypeOf(object);
-              if (proto && proto !== objectPrototype) {
-                yield formatPrototype(proto);
-              }
-            }
-
-            function* iterateImObject(object) {
-              for (const [key, value] of object) {
-                yield formatField(key, value, "observablehq--key");
-              }
-            }
-
-            function formatPrototype(value) {
-              const item = document.createElement("div");
-              const span = item.appendChild(document.createElement("span"));
-              item.className = "observablehq--field";
-              span.className = "observablehq--prototype-key";
-              span.textContent = `  <prototype>`;
-              item.appendChild(document.createTextNode(": "));
-              item.appendChild(inspect(value, undefined, undefined, undefined, true));
-              return item;
-            }
-
-            function formatField(key, value, className) {
-              const item = document.createElement("div");
-              const span = item.appendChild(document.createElement("span"));
-              item.className = "observablehq--field";
-              span.className = className;
-              span.textContent = `  ${key}`;
-              item.appendChild(document.createTextNode(": "));
-              item.appendChild(inspect(value));
-              return item;
-            }
-
-            function formatMapField(key, value) {
-              const item = document.createElement("div");
-              item.className = "observablehq--field";
-              item.appendChild(document.createTextNode("  "));
-              item.appendChild(inspect(key));
-              item.appendChild(document.createTextNode(" => "));
-              item.appendChild(inspect(value));
-              return item;
-            }
-
-            function formatSetField(value) {
-              const item = document.createElement("div");
-              item.className = "observablehq--field";
-              item.appendChild(document.createTextNode("  "));
-              item.appendChild(inspect(value));
-              return item;
-            }
-
-            function hasSelection(elem) {
-              const sel = window.getSelection();
-              return (
-                sel.type === "Range" &&
-                (sel.containsNode(elem, true) ||
-                  sel.anchorNode.isSelfOrDescendant(elem) ||
-                  sel.focusNode.isSelfOrDescendant(elem))
-              );
-            }
-
-            function inspectCollapsed(object, shallow, name, proto) {
-              let arrayish = isarray$1(object);
-              let tag, fields, next, n;
-
-              if (object instanceof Map) {
-                tag = `Map(${object.size})`;
-                fields = iterateMap$1;
-              } else if (object instanceof Set) {
-                tag = `Set(${object.size})`;
-                fields = iterateSet$1;
-              } else if (arrayish) {
-                tag = `${object.constructor.name}(${object.length})`;
-                fields = iterateArray$1;
-              } else if ((n = immutableName(object))) {
-                tag = `Immutable.${n.name}${n.name === 'Record' ? '' : `(${object.size})`}`;
-                arrayish = n.arrayish;
-                fields = n.arrayish ? iterateImArray$1 : n.setish ? iterateImSet$1 : iterateImObject$1;
-              } else {
-                tag = tagof(object);
-                fields = iterateObject$1;
-              }
-
-              if (shallow) {
-                const span = document.createElement("span");
-                span.className = "observablehq--shallow";
-                if (name) {
-                  span.appendChild(inspectName(name));
-                }
-                span.appendChild(document.createTextNode(tag));
-                span.addEventListener("mouseup", function(event) {
-                  if (hasSelection(span)) return;
-                  event.stopPropagation();
-                  replace(span, inspectCollapsed(object));
-                });
-                return span;
-              }
-
-              const span = document.createElement("span");
-              span.className = "observablehq--collapsed";
-              if (name) {
-                span.appendChild(inspectName(name));
-              }
-              const a = span.appendChild(document.createElement("a"));
-              a.innerHTML = `<svg width=8 height=8 class='observablehq--caret'>
-    <path d='M7 4L1 8V0z' fill='currentColor' />
-  </svg>`;
-              a.appendChild(document.createTextNode(`${tag}${arrayish ? " [" : " {"}`));
-              span.addEventListener("mouseup", function(event) {
-                if (hasSelection(span)) return;
-                event.stopPropagation();
-                replace(span, inspectExpanded(object, null, name, proto));
-              }, true);
-
-              fields = fields(object);
-              for (let i = 0; !(next = fields.next()).done && i < 20; ++i) {
-                if (i > 0) span.appendChild(document.createTextNode(", "));
-                span.appendChild(next.value);
-              }
-
-              if (!next.done) span.appendChild(document.createTextNode(", …"));
-              span.appendChild(document.createTextNode(arrayish ? "]" : "}"));
-
-              return span;
-            }
-
-            function* iterateMap$1(map) {
-              for (const [key, value] of map) {
-                yield formatMapField$1(key, value);
-              }
-              yield* iterateObject$1(map);
-            }
-
-            function* iterateSet$1(set) {
-              for (const value of set) {
-                yield inspect(value, true);
-              }
-              yield* iterateObject$1(set);
-            }
-
-            function* iterateImSet$1(set) {
-              for (const value of set) {
-                yield inspect(value, true);
-              }
-            }
-
-            function* iterateImArray$1(array) {
-              let i0 = -1, i1 = 0;
-              for (const n = array.size; i1 < n; ++i1) {
-                if (i1 > i0 + 1) yield formatEmpty(i1 - i0 - 1);
-                yield inspect(array.get(i1), true);
-                i0 = i1;
-              }
-              if (i1 > i0 + 1) yield formatEmpty(i1 - i0 - 1);
-            }
-
-            function* iterateArray$1(array) {
-              let i0 = -1, i1 = 0;
-              for (const n = array.length; i1 < n; ++i1) {
-                if (i1 in array) {
-                  if (i1 > i0 + 1) yield formatEmpty(i1 - i0 - 1);
-                  yield inspect(valueof(array, i1), true);
-                  i0 = i1;
-                }
-              }
-              if (i1 > i0 + 1) yield formatEmpty(i1 - i0 - 1);
-              for (const key in array) {
-                if (!isindex(key) && isown(array, key)) {
-                  yield formatField$1(key, valueof(array, key), "observablehq--key");
-                }
-              }
-              for (const symbol of symbolsof(array)) {
-                yield formatField$1(formatSymbol(symbol), valueof(array, symbol), "observablehq--symbol");
-              }
-            }
-
-            function* iterateObject$1(object) {
-              for (const key in object) {
-                if (isown(object, key)) {
-                  yield formatField$1(key, valueof(object, key), "observablehq--key");
-                }
-              }
-              for (const symbol of symbolsof(object)) {
-                yield formatField$1(formatSymbol(symbol), valueof(object, symbol), "observablehq--symbol");
-              }
-            }
-
-            function* iterateImObject$1(object) {
-              for (const [key, value] of object) {
-                yield formatField$1(key, value, "observablehq--key");
-              }
-            }
-
-            function formatEmpty(e) {
-              const span = document.createElement("span");
-              span.className = "observablehq--empty";
-              span.textContent = e === 1 ? "empty" : `empty × ${e}`;
-              return span;
-            }
-
-            function formatField$1(key, value, className) {
-              const fragment = document.createDocumentFragment();
-              const span = fragment.appendChild(document.createElement("span"));
-              span.className = className;
-              span.textContent = key;
-              fragment.appendChild(document.createTextNode(": "));
-              fragment.appendChild(inspect(value, true));
-              return fragment;
-            }
-
-            function formatMapField$1(key, value) {
-              const fragment = document.createDocumentFragment();
-              fragment.appendChild(inspect(key, true));
-              fragment.appendChild(document.createTextNode(" => "));
-              fragment.appendChild(inspect(value, true));
-              return fragment;
-            }
-
-            function pad$2(value, width) {
-              var s = value + "", length = s.length;
-              return length < width ? new Array(width - length + 1).join(0) + s : s;
-            }
-
-            function isUTCMidnight(date) {
-              return date.getUTCMilliseconds() === 0
-                  && date.getUTCSeconds() === 0
-                  && date.getUTCMinutes() === 0
-                  && date.getUTCHours() === 0;
-            }
-
-            function formatYear$2(year) {
-              return year < 0 ? "-" + pad$2(-year, 6)
-                : year > 9999 ? "+" + pad$2(year, 6)
-                : pad$2(year, 4);
-            }
-
-            function formatDate$1(date) {
-              return isNaN(date)
-                ? "Invalid Date"
-                : isUTCMidnight(date)
-                  ? formatYear$2(date.getUTCFullYear()) + "-" + pad$2(date.getUTCMonth() + 1, 2) + "-" + pad$2(date.getUTCDate(), 2)
-                  : formatYear$2(date.getFullYear()) + "-" + pad$2(date.getMonth() + 1, 2) + "-" + pad$2(date.getDate(), 2)
-                    + "T" + pad$2(date.getHours(), 2) + ":" + pad$2(date.getMinutes(), 2)
-                    + (date.getMilliseconds() ? ":" + pad$2(date.getSeconds(), 2) + "." + pad$2(date.getMilliseconds(), 3)
-                      : date.getSeconds() ? ":" + pad$2(date.getSeconds(), 2)
-                      : "");
-            }
-
-            var errorToString = Error.prototype.toString;
-
-            function formatError(value) {
-              return value.stack || errorToString.call(value);
-            }
-
-            var regExpToString = RegExp.prototype.toString;
-
-            function formatRegExp(value) {
-              return regExpToString.call(value);
-            }
-
-            /* eslint-disable no-control-regex */
-            const NEWLINE_LIMIT = 20;
-
-            function formatString(string, shallow, expanded, name) {
-              if (shallow === false) {
-                // String has fewer escapes displayed with double quotes
-                if (count(string, /["\n]/g) <= count(string, /`|\${/g)) {
-                  const span = document.createElement("span");
-                  if (name) span.appendChild(inspectName(name));
-                  const textValue = span.appendChild(document.createElement("span"));
-                  textValue.className = "observablehq--string";
-                  textValue.textContent = JSON.stringify(string);
-                  return span;
-                }
-                const lines = string.split("\n");
-                if (lines.length > NEWLINE_LIMIT && !expanded) {
-                  const div = document.createElement("div");
-                  if (name) div.appendChild(inspectName(name));
-                  const textValue = div.appendChild(document.createElement("span"));
-                  textValue.className = "observablehq--string";
-                  textValue.textContent = "`" + templatify(lines.slice(0, NEWLINE_LIMIT).join("\n"));
-                  const splitter = div.appendChild(document.createElement("span"));
-                  const truncatedCount = lines.length - NEWLINE_LIMIT;
-                  splitter.textContent = `Show ${truncatedCount} truncated line${truncatedCount > 1 ? "s": ""}`; splitter.className = "observablehq--string-expand";
-                  splitter.addEventListener("mouseup", function (event) {
-                    event.stopPropagation();
-                    replace(div, inspect(string, shallow, true, name));
-                  });
-                  return div;
-                }
-                const span = document.createElement("span");
-                if (name) span.appendChild(inspectName(name));
-                const textValue = span.appendChild(document.createElement("span"));
-                textValue.className = `observablehq--string${expanded ? " observablehq--expanded" : ""}`;
-                textValue.textContent = "`" + templatify(string) + "`";
-                return span;
-              }
-
-              const span = document.createElement("span");
-              if (name) span.appendChild(inspectName(name));
-              const textValue = span.appendChild(document.createElement("span"));
-              textValue.className = "observablehq--string";
-              textValue.textContent = JSON.stringify(string.length > 100 ?
-                `${string.slice(0, 50)}…${string.slice(-49)}` : string);
-              return span;
-            }
-
-            function templatify(string) {
-              return string.replace(/[\\`\x00-\x09\x0b-\x19]|\${/g, templatifyChar);
-            }
-
-            function templatifyChar(char) {
-              var code = char.charCodeAt(0);
-              switch (code) {
-                case 0x8: return "\\b";
-                case 0x9: return "\\t";
-                case 0xb: return "\\v";
-                case 0xc: return "\\f";
-                case 0xd: return "\\r";
-              }
-              return code < 0x10 ? "\\x0" + code.toString(16)
-                  : code < 0x20 ? "\\x" + code.toString(16)
-                  : "\\" + char;
-            }
-
-            function count(string, re) {
-              var n = 0;
-              while (re.exec(string)) ++n;
-              return n;
-            }
-
-            var toString = Function.prototype.toString,
-                TYPE_ASYNC = {prefix: "async ƒ"},
-                TYPE_ASYNC_GENERATOR = {prefix: "async ƒ*"},
-                TYPE_CLASS = {prefix: "class"},
-                TYPE_FUNCTION = {prefix: "ƒ"},
-                TYPE_GENERATOR = {prefix: "ƒ*"};
-
-            function inspectFunction(f, name) {
-              var type, m, t = toString.call(f);
-
-              switch (f.constructor && f.constructor.name) {
-                case "AsyncFunction": type = TYPE_ASYNC; break;
-                case "AsyncGeneratorFunction": type = TYPE_ASYNC_GENERATOR; break;
-                case "GeneratorFunction": type = TYPE_GENERATOR; break;
-                default: type = /^class\b/.test(t) ? TYPE_CLASS : TYPE_FUNCTION; break;
-              }
-
-              // A class, possibly named.
-              // class Name
-              if (type === TYPE_CLASS) {
-                return formatFunction(type, "", name);
-              }
-
-              // An arrow function with a single argument.
-              // foo =>
-              // async foo =>
-              if ((m = /^(?:async\s*)?(\w+)\s*=>/.exec(t))) {
-                return formatFunction(type, "(" + m[1] + ")", name);
-              }
-
-              // An arrow function with parenthesized arguments.
-              // (…)
-              // async (…)
-              if ((m = /^(?:async\s*)?\(\s*(\w+(?:\s*,\s*\w+)*)?\s*\)/.exec(t))) {
-                return formatFunction(type, m[1] ? "(" + m[1].replace(/\s*,\s*/g, ", ") + ")" : "()", name);
-              }
-
-              // A function, possibly: async, generator, anonymous, simply arguments.
-              // function name(…)
-              // function* name(…)
-              // async function name(…)
-              // async function* name(…)
-              if ((m = /^(?:async\s*)?function(?:\s*\*)?(?:\s*\w+)?\s*\(\s*(\w+(?:\s*,\s*\w+)*)?\s*\)/.exec(t))) {
-                return formatFunction(type, m[1] ? "(" + m[1].replace(/\s*,\s*/g, ", ") + ")" : "()", name);
-              }
-
-              // Something else, like destructuring, comments or default values.
-              return formatFunction(type, "(…)", name);
-            }
-
-            function formatFunction(type, args, cellname) {
-              var span = document.createElement("span");
-              span.className = "observablehq--function";
-              if (cellname) {
-                span.appendChild(inspectName(cellname));
-              }
-              var spanType = span.appendChild(document.createElement("span"));
-              spanType.className = "observablehq--keyword";
-              spanType.textContent = type.prefix;
-              span.appendChild(document.createTextNode(args));
-              return span;
-            }
-
-            const {prototype: {toString: toString$1}} = Object;
-
-            function inspect(value, shallow, expand, name, proto) {
-              let type = typeof value;
-              switch (type) {
-                case "boolean":
-                case "undefined": { value += ""; break; }
-                case "number": { value = value === 0 && 1 / value < 0 ? "-0" : value + ""; break; }
-                case "bigint": { value = value + "n"; break; }
-                case "symbol": { value = formatSymbol(value); break; }
-                case "function": { return inspectFunction(value, name); }
-                case "string": { return formatString(value, shallow, expand, name); }
-                default: {
-                  if (value === null) { type = null, value = "null"; break; }
-                  if (value instanceof Date) { type = "date", value = formatDate$1(value); break; }
-                  if (value === FORBIDDEN) { type = "forbidden", value = "[forbidden]"; break; }
-                  switch (toString$1.call(value)) {
-                    case "[object RegExp]": { type = "regexp", value = formatRegExp(value); break; }
-                    case "[object Error]": // https://github.com/lodash/lodash/blob/master/isError.js#L26
-                    case "[object DOMException]": { type = "error", value = formatError(value); break; }
-                    default: return (expand ? inspectExpanded : inspectCollapsed)(value, shallow, name, proto);
-                  }
-                  break;
-                }
-              }
-              const span = document.createElement("span");
-              if (name) span.appendChild(inspectName(name));
-              const n = span.appendChild(document.createElement("span"));
-              n.className = `observablehq--${type}`;
-              n.textContent = value;
-              return span;
-            }
-
-            function replace(spanOld, spanNew) {
-              if (spanOld.classList.contains("observablehq--inspect")) spanNew.classList.add("observablehq--inspect");
-              spanOld.parentNode.replaceChild(spanNew, spanOld);
-              dispatch$1(spanNew, "load");
-            }
-
-            const LOCATION_MATCH = /\s+\(\d+:\d+\)$/m;
-
-            class Inspector {
-              constructor(node) {
-                if (!node) throw new Error("invalid node");
-                this._node = node;
-                node.classList.add("observablehq");
-              }
-              pending() {
-                const {_node} = this;
-                _node.classList.remove("observablehq--error");
-                _node.classList.add("observablehq--running");
-              }
-              fulfilled(value, name) {
-                const {_node} = this;
-                if (!(value instanceof Element || value instanceof Text) || (value.parentNode && value.parentNode !== _node)) {
-                  value = inspect(value, false, _node.firstChild // TODO Do this better.
-                      && _node.firstChild.classList
-                      && _node.firstChild.classList.contains("observablehq--expanded"), name);
-                  value.classList.add("observablehq--inspect");
-                }
-                _node.classList.remove("observablehq--running", "observablehq--error");
-                if (_node.firstChild !== value) {
-                  if (_node.firstChild) {
-                    while (_node.lastChild !== _node.firstChild) _node.removeChild(_node.lastChild);
-                    _node.replaceChild(value, _node.firstChild);
-                  } else {
-                    _node.appendChild(value);
-                  }
-                }
-                dispatch$1(_node, "update");
-              }
-              rejected(error, name) {
-                const {_node} = this;
-                _node.classList.remove("observablehq--running");
-                _node.classList.add("observablehq--error");
-                while (_node.lastChild) _node.removeChild(_node.lastChild);
-                var div = document.createElement("div");
-                div.className = "observablehq--inspect";
-                if (name) div.appendChild(inspectName(name));
-                div.appendChild(document.createTextNode((error + "").replace(LOCATION_MATCH, "")));
-                _node.appendChild(div);
-                dispatch$1(_node, "error", {error: error});
-              }
-            }
-
-            Inspector.into = function(container) {
-              if (typeof container === "string") {
-                container = document.querySelector(container);
-                if (container == null) throw new Error("container not found");
-              }
-              return function() {
-                return new Inspector(container.appendChild(document.createElement("div")));
-              };
+            const initDrawCanvas = () => {
+              const canvas = document.getElementById('canvas');
+              context$1 = canvas.getContext('2d');
+              context$1.lineJoin = "round";
+              context$1.lineCap = "round";
+              curve = basis$2(context$1);
             };
 
-            async function remote_fetch(file) {
-              const response = await fetch(await file.url());
-              if (!response.ok) throw new Error(`Unable to load file: ${file.name}`);
-              return response;
-            }
+            const drawHexCanvas$1 = (props) => {
+              const strokes = (props.canvas) ? props.canvas : [];
+              context$1.canvas.value = strokes;
+              
+              select("canvas").call(drag()
+                  .container(context$1.canvas)
+                  .subject(dragsubject)
+                  .on("start drag", dragged)
+                  .on("start.render drag.render", render)
+                  .on("end.drag", mouseEnds));
 
-            class FileAttachment {
-              constructor(url, name) {
-                Object.defineProperties(this, {
-                  _url: {value: url},
-                  name: {value: name, enumerable: true}
-                });
-              }
-              async url() {
-                return this._url;
-              }
-              async blob() {
-                return (await remote_fetch(this)).blob();
-              }
-              async arrayBuffer() {
-                return (await remote_fetch(this)).arrayBuffer();
-              }
-              async text() {
-                return (await remote_fetch(this)).text();
-              }
-              async json() {
-                return (await remote_fetch(this)).json();
-              }
-              async stream() {
-                return (await remote_fetch(this)).body;
-              }
-              async image() {
-                const url = await this.url();
-                return new Promise((resolve, reject) => {
-                  const i = new Image;
-                  if (new URL(url, document.baseURI).origin !== new URL(location).origin) {
-                    i.crossOrigin = "anonymous";
-                  }
-                  i.onload = () => resolve(i);
-                  i.onerror = () => reject(new Error(`Unable to load file: ${this.name}`));
-                  i.src = url;
-                });
-              }
-            }
+              render();
 
-            function NoFileAttachments(name) {
-              throw new Error(`File not found: ${name}`);
-            }
-
-            function FileAttachments(resolve) {
-              return name => {
-                const url = resolve(name += ""); // Returns a Promise, string, or null.
-                if (url == null) throw new Error(`File not found: ${name}`);
-                return new FileAttachment(url, name);
-              };
-            }
-
-            const metas = new Map;
-            const queue = [];
-            const map$2 = queue.map;
-            const some = queue.some;
-            const hasOwnProperty$2 = queue.hasOwnProperty;
-            const origin = "https://cdn.jsdelivr.net/npm/";
-            const identifierRe = /^((?:@[^/@]+\/)?[^/@]+)(?:@([^/]+))?(?:\/(.*))?$/;
-            const versionRe = /^\d+\.\d+\.\d+(-[\w-.+]+)?$/;
-            const extensionRe = /\.[^/]*$/;
-            const mains = ["unpkg", "jsdelivr", "browser", "main"];
-
-            class RequireError extends Error {
-              constructor(message) {
-                super(message);
-              }
-            }
-
-            RequireError.prototype.name = RequireError.name;
-
-            function main(meta) {
-              for (const key of mains) {
-                const value = meta[key];
-                if (typeof value === "string") {
-                  return extensionRe.test(value) ? value : `${value}.js`;
-                }
-              }
-            }
-
-            function parseIdentifier(identifier) {
-              const match = identifierRe.exec(identifier);
-              return match && {
-                name: match[1],
-                version: match[2],
-                path: match[3]
-              };
-            }
-
-            function resolveMeta(target) {
-              const url = `${origin}${target.name}${target.version ? `@${target.version}` : ""}/package.json`;
-              let meta = metas.get(url);
-              if (!meta) metas.set(url, meta = fetch(url).then(response => {
-                if (!response.ok) throw new RequireError("unable to load package.json");
-                if (response.redirected && !metas.has(response.url)) metas.set(response.url, meta);
-                return response.json();
-              }));
-              return meta;
-            }
-
-            async function resolve(name, base) {
-              if (name.startsWith(origin)) name = name.substring(origin.length);
-              if (/^(\w+:)|\/\//i.test(name)) return name;
-              if (/^[.]{0,2}\//i.test(name)) return new URL(name, base == null ? location : base).href;
-              if (!name.length || /^[\s._]/.test(name) || /\s$/.test(name)) throw new RequireError("illegal name");
-              const target = parseIdentifier(name);
-              if (!target) return `${origin}${name}`;
-              if (!target.version && base != null && base.startsWith(origin)) {
-                const meta = await resolveMeta(parseIdentifier(base.substring(origin.length)));
-                target.version = meta.dependencies && meta.dependencies[target.name] || meta.peerDependencies && meta.peerDependencies[target.name];
-              }
-              if (target.path && !extensionRe.test(target.path)) target.path += ".js";
-              if (target.path && target.version && versionRe.test(target.version)) return `${origin}${target.name}@${target.version}/${target.path}`;
-              const meta = await resolveMeta(target);
-              return `${origin}${meta.name}@${meta.version}/${target.path || main(meta) || "index.js"}`;
-            }
-
-            var require = requireFrom(resolve);
-
-            function requireFrom(resolver) {
-              const cache = new Map;
-              const requireBase = requireRelative(null);
-
-              function requireAbsolute(url) {
-                if (typeof url !== "string") return url;
-                let module = cache.get(url);
-                if (!module) cache.set(url, module = new Promise((resolve, reject) => {
-                  const script = document.createElement("script");
-                  script.onload = () => {
-                    try { resolve(queue.pop()(requireRelative(url))); }
-                    catch (error) { reject(new RequireError("invalid module")); }
-                    script.remove();
-                  };
-                  script.onerror = () => {
-                    reject(new RequireError("unable to load module"));
-                    script.remove();
-                  };
-                  script.async = true;
-                  script.src = url;
-                  window.define = define$1;
-                  document.head.appendChild(script);
-                }));
-                return module;
-              }
-
-              function requireRelative(base) {
-                return name => Promise.resolve(resolver(name, base)).then(requireAbsolute);
-              }
-
-              function requireAlias(aliases) {
-                return requireFrom((name, base) => {
-                  if (name in aliases) {
-                    name = aliases[name], base = null;
-                    if (typeof name !== "string") return name;
-                  }
-                  return resolver(name, base);
-                });
-              }
-
-              function require(name) {
-                return arguments.length > 1
-                    ? Promise.all(map$2.call(arguments, requireBase)).then(merge$1)
-                    : requireBase(name);
-              }
-
-              require.alias = requireAlias;
-              require.resolve = resolver;
-
-              return require;
-            }
-
-            function merge$1(modules) {
-              const o = {};
-              for (const m of modules) {
-                for (const k in m) {
-                  if (hasOwnProperty$2.call(m, k)) {
-                    if (m[k] == null) Object.defineProperty(o, k, {get: getter(m, k)});
-                    else o[k] = m[k];
-                  }
-                }
-              }
-              return o;
-            }
-
-            function getter(object, name) {
-              return () => object[name];
-            }
-
-            function isbuiltin(name) {
-              name = name + "";
-              return name === "exports" || name === "module";
-            }
-
-            function define$1(name, dependencies, factory) {
-              const n = arguments.length;
-              if (n < 2) factory = name, dependencies = [];
-              else if (n < 3) factory = dependencies, dependencies = typeof name === "string" ? [] : name;
-              queue.push(some.call(dependencies, isbuiltin) ? require => {
-                const exports = {};
-                const module = {exports};
-                return Promise.all(map$2.call(dependencies, name => {
-                  name = name + "";
-                  return name === "exports" ? exports : name === "module" ? module : require(name);
-                })).then(dependencies => {
-                  factory.apply(null, dependencies);
-                  return module.exports;
-                });
-              } : require => {
-                return Promise.all(map$2.call(dependencies, require)).then(dependencies => {
-                  return typeof factory === "function" ? factory.apply(null, dependencies) : factory;
-                });
-              });
-            }
-
-            define$1.amd = {};
-
-            function constant$2(x) {
-              return function() {
-                return x;
-              };
-            }
-
-            function canvas(width, height) {
-              var canvas = document.createElement("canvas");
-              canvas.width = width;
-              canvas.height = height;
-              return canvas;
-            }
-
-            function context2d(width, height, dpi) {
-              if (dpi == null) dpi = devicePixelRatio;
-              var canvas = document.createElement("canvas");
-              canvas.width = width * dpi;
-              canvas.height = height * dpi;
-              canvas.style.width = width + "px";
-              var context = canvas.getContext("2d");
-              context.scale(dpi, dpi);
-              return context;
-            }
-
-            function download(value, name = "untitled", label = "Save") {
-              const a = document.createElement("a");
-              const b = a.appendChild(document.createElement("button"));
-              b.textContent = label;
-              a.download = name;
-
-              async function reset() {
-                await new Promise(requestAnimationFrame);
-                URL.revokeObjectURL(a.href);
-                a.removeAttribute("href");
-                b.textContent = label;
-                b.disabled = false;
-              }
-
-              a.onclick = async event => {
-                b.disabled = true;
-                if (a.href) return reset(); // Already saved.
-                b.textContent = "Saving…";
-                try {
-                  const object = await (typeof value === "function" ? value() : value);
-                  b.textContent = "Download";
-                  a.href = URL.createObjectURL(object); // eslint-disable-line require-atomic-updates
-                } catch (ignore) {
-                  b.textContent = label;
-                }
-                if (event.eventPhase) return reset(); // Already downloaded.
-                b.disabled = false;
+              context$1.canvas.undo = () => {
+                if (strokes.length === 0) return;
+                redo.push(strokes.pop());
+                render();
               };
 
-              return a;
-            }
-
-            var namespaces$1 = {
-              math: "http://www.w3.org/1998/Math/MathML",
-              svg: "http://www.w3.org/2000/svg",
-              xhtml: "http://www.w3.org/1999/xhtml",
-              xlink: "http://www.w3.org/1999/xlink",
-              xml: "http://www.w3.org/XML/1998/namespace",
-              xmlns: "http://www.w3.org/2000/xmlns/"
-            };
-
-            function element$1(name, attributes) {
-              var prefix = name += "", i = prefix.indexOf(":"), value;
-              if (i >= 0 && (prefix = name.slice(0, i)) !== "xmlns") name = name.slice(i + 1);
-              var element = namespaces$1.hasOwnProperty(prefix) // eslint-disable-line no-prototype-builtins
-                  ? document.createElementNS(namespaces$1[prefix], name)
-                  : document.createElement(name);
-              if (attributes) for (var key in attributes) {
-                prefix = key, i = prefix.indexOf(":"), value = attributes[key];
-                if (i >= 0 && (prefix = key.slice(0, i)) !== "xmlns") key = key.slice(i + 1);
-                if (namespaces$1.hasOwnProperty(prefix)) element.setAttributeNS(namespaces$1[prefix], key, value); // eslint-disable-line no-prototype-builtins
-                else element.setAttribute(key, value);
-              }
-              return element;
-            }
-
-            function input(type) {
-              var input = document.createElement("input");
-              if (type != null) input.type = type;
-              return input;
-            }
-
-            function range(min, max, step) {
-              if (arguments.length === 1) max = min, min = null;
-              var input = document.createElement("input");
-              input.min = min = min == null ? 0 : +min;
-              input.max = max = max == null ? 1 : +max;
-              input.step = step == null ? "any" : step = +step;
-              input.type = "range";
-              return input;
-            }
-
-            function select$1(values) {
-              var select = document.createElement("select");
-              Array.prototype.forEach.call(values, function(value) {
-                var option = document.createElement("option");
-                option.value = option.textContent = value;
-                select.appendChild(option);
-              });
-              return select;
-            }
-
-            function svg(width, height) {
-              var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-              svg.setAttribute("viewBox", [0, 0, width, height]);
-              svg.setAttribute("width", width);
-              svg.setAttribute("height", height);
-              return svg;
-            }
-
-            function text(value) {
-              return document.createTextNode(value);
-            }
-
-            var count$1 = 0;
-
-            function uid(name) {
-              return new Id$1("O-" + (name == null ? "" : name + "-") + ++count$1);
-            }
-
-            function Id$1(id) {
-              this.id = id;
-              this.href = new URL(`#${id}`, location) + "";
-            }
-
-            Id$1.prototype.toString = function() {
-              return "url(" + this.href + ")";
-            };
-
-            var DOM = {
-              canvas: canvas,
-              context2d: context2d,
-              download: download,
-              element: element$1,
-              input: input,
-              range: range,
-              select: select$1,
-              svg: svg,
-              text: text,
-              uid: uid
-            };
-
-            function buffer(file) {
-              return new Promise(function(resolve, reject) {
-                var reader = new FileReader;
-                reader.onload = function() { resolve(reader.result); };
-                reader.onerror = reject;
-                reader.readAsArrayBuffer(file);
-              });
-            }
-
-            function text$1(file) {
-              return new Promise(function(resolve, reject) {
-                var reader = new FileReader;
-                reader.onload = function() { resolve(reader.result); };
-                reader.onerror = reject;
-                reader.readAsText(file);
-              });
-            }
-
-            function url(file) {
-              return new Promise(function(resolve, reject) {
-                var reader = new FileReader;
-                reader.onload = function() { resolve(reader.result); };
-                reader.onerror = reject;
-                reader.readAsDataURL(file);
-              });
-            }
-
-            var Files = {
-              buffer: buffer,
-              text: text$1,
-              url: url
-            };
-
-            function that() {
-              return this;
-            }
-
-            function disposable(value, dispose) {
-              let done = false;
-              if (typeof dispose !== "function") {
-                throw new Error("dispose is not a function");
-              }
-              return {
-                [Symbol.iterator]: that,
-                next: () => done ? {done: true} : (done = true, {done: false, value}),
-                return: () => (done = true, dispose(value), {done: true}),
-                throw: () => ({done: done = true})
+              context$1.canvas.redo = stroke => {
+                if (redo.length === 0) return;
+                strokes.push(redo.pop());
+                render();
               };
-            }
 
-            function* filter(iterator, test) {
-              var result, index = -1;
-              while (!(result = iterator.next()).done) {
-                if (test(result.value, ++index)) {
-                  yield result.value;
-                }
-              }
-            }
-
-            function observe(initialize) {
-              let stale = false;
-              let value;
-              let resolve;
-              const dispose = initialize(change);
-
-              if (dispose != null && typeof dispose !== "function") {
-                throw new Error(typeof dispose.then === "function"
-                    ? "async initializers are not supported"
-                    : "initializer returned something, but not a dispose function");
-              }
-
-              function change(x) {
-                if (resolve) resolve(x), resolve = null;
-                else stale = true;
-                return value = x;
-              }
-
-              function next() {
-                return {done: false, value: stale
-                    ? (stale = false, Promise.resolve(value))
-                    : new Promise(_ => (resolve = _))};
-              }
-
-              return {
-                [Symbol.iterator]: that,
-                throw: () => ({done: true}),
-                return: () => (dispose != null && dispose(), {done: true}),
-                next
-              };
-            }
-
-            function input$1(input) {
-              return observe(function(change) {
-                var event = eventof(input), value = valueof$1(input);
-                function inputted() { change(valueof$1(input)); }
-                input.addEventListener(event, inputted);
-                if (value !== undefined) change(value);
-                return function() { input.removeEventListener(event, inputted); };
-              });
-            }
-
-            function valueof$1(input) {
-              switch (input.type) {
-                case "range":
-                case "number": return input.valueAsNumber;
-                case "date": return input.valueAsDate;
-                case "checkbox": return input.checked;
-                case "file": return input.multiple ? input.files : input.files[0];
-                case "select-multiple": return Array.from(input.selectedOptions, o => o.value);
-                default: return input.value;
-              }
-            }
-
-            function eventof(input) {
-              switch (input.type) {
-                case "button":
-                case "submit":
-                case "checkbox": return "click";
-                case "file": return "change";
-                default: return "input";
-              }
-            }
-
-            function* map$3(iterator, transform) {
-              var result, index = -1;
-              while (!(result = iterator.next()).done) {
-                yield transform(result.value, ++index);
-              }
-            }
-
-            function queue$1(initialize) {
-              let resolve;
-              const queue = [];
-              const dispose = initialize(push);
-
-              if (dispose != null && typeof dispose !== "function") {
-                throw new Error(typeof dispose.then === "function"
-                    ? "async initializers are not supported"
-                    : "initializer returned something, but not a dispose function");
-              }
-
-              function push(x) {
-                queue.push(x);
-                if (resolve) resolve(queue.shift()), resolve = null;
-                return x;
-              }
-
-              function next() {
-                return {done: false, value: queue.length
-                    ? Promise.resolve(queue.shift())
-                    : new Promise(_ => (resolve = _))};
-              }
-
-              return {
-                [Symbol.iterator]: that,
-                throw: () => ({done: true}),
-                return: () => (dispose != null && dispose(), {done: true}),
-                next
-              };
-            }
-
-            function* range$1(start, stop, step) {
-              start = +start;
-              stop = +stop;
-              step = (n = arguments.length) < 2 ? (stop = start, start = 0, 1) : n < 3 ? 1 : +step;
-              var i = -1, n = Math.max(0, Math.ceil((stop - start) / step)) | 0;
-              while (++i < n) {
-                yield start + i * step;
-              }
-            }
-
-            function valueAt(iterator, i) {
-              if (!isFinite(i = +i) || i < 0 || i !== i | 0) return;
-              var result, index = -1;
-              while (!(result = iterator.next()).done) {
-                if (++index === i) {
-                  return result.value;
-                }
-              }
-            }
-
-            function worker(source) {
-              const url = URL.createObjectURL(new Blob([source], {type: "text/javascript"}));
-              const worker = new Worker(url);
-              return disposable(worker, () => {
-                worker.terminate();
-                URL.revokeObjectURL(url);
-              });
-            }
-
-            var Generators = {
-              disposable: disposable,
-              filter: filter,
-              input: input$1,
-              map: map$3,
-              observe: observe,
-              queue: queue$1,
-              range: range$1,
-              valueAt: valueAt,
-              worker: worker
-            };
-
-            function template(render, wrapper) {
-              return function(strings) {
-                var string = strings[0],
-                    parts = [], part,
-                    root = null,
-                    node, nodes,
-                    walker,
-                    i, n, j, m, k = -1;
-
-                // Concatenate the text using comments as placeholders.
-                for (i = 1, n = arguments.length; i < n; ++i) {
-                  part = arguments[i];
-                  if (part instanceof Node) {
-                    parts[++k] = part;
-                    string += "<!--o:" + k + "-->";
-                  } else if (Array.isArray(part)) {
-                    for (j = 0, m = part.length; j < m; ++j) {
-                      node = part[j];
-                      if (node instanceof Node) {
-                        if (root === null) {
-                          parts[++k] = root = document.createDocumentFragment();
-                          string += "<!--o:" + k + "-->";
-                        }
-                        root.appendChild(node);
-                      } else {
-                        root = null;
-                        string += node;
-                      }
+              function mouseEnds() {
+                const stroke = strokes[strokes.length - 1];
+                console.log("finished", stroke);
+                // const lineWidth = stroke.lineWidth;
+                // const strokeStyle = stroke.strokeStyle;
+                props.api.canvas.paint({
+                  "canvas-name": props.name,
+                  "location": props.location,
+                  "strokes": [{
+                    draw: {
+                      coords: stroke,
+                      lineWidth: 1,
+                      strokeStyle: "#000000"
                     }
-                    root = null;
-                  } else {
-                    string += part;
-                  }
-                  string += strings[i];
-                }
-
-                // Render the text.
-                root = render(string);
-
-                // Walk the rendered content to replace comment placeholders.
-                if (++k > 0) {
-                  nodes = new Array(k);
-                  walker = document.createTreeWalker(root, NodeFilter.SHOW_COMMENT, null, false);
-                  while (walker.nextNode()) {
-                    node = walker.currentNode;
-                    if (/^o:/.test(node.nodeValue)) {
-                      nodes[+node.nodeValue.slice(2)] = node;
-                    }
-                  }
-                  for (i = 0; i < k; ++i) {
-                    if (node = nodes[i]) {
-                      node.parentNode.replaceChild(parts[i], node);
-                    }
-                  }
-                }
-
-                // Is the rendered content
-                // … a parent of a single child? Detach and return the child.
-                // … a document fragment? Replace the fragment with an element.
-                // … some other node? Return it.
-                return root.childNodes.length === 1 ? root.removeChild(root.firstChild)
-                    : root.nodeType === 11 ? ((node = wrapper()).appendChild(root), node)
-                    : root;
-              };
-            }
-
-            var html = template(function(string) {
-              var template = document.createElement("template");
-              template.innerHTML = string.trim();
-              return document.importNode(template.content, true);
-            }, function() {
-              return document.createElement("span");
-            });
-
-            const HL_ROOT =
-              "https://cdn.jsdelivr.net/npm/@observablehq/highlight.js@2.0.0/";
-
-            function md$1(require) {
-              return function() {
-                return require("marked@0.3.12/marked.min.js").then(function(marked) {
-                  return template(
-                    function(string) {
-                      var root = document.createElement("div");
-                      root.innerHTML = marked(string, {langPrefix: ""}).trim();
-                      var code = root.querySelectorAll("pre code[class]");
-                      if (code.length > 0) {
-                        require(HL_ROOT + "highlight.min.js").then(function(hl) {
-                          code.forEach(function(block) {
-                            function done() {
-                              hl.highlightBlock(block);
-                              block.parentNode.classList.add("observablehq--md-pre");
-                            }
-                            if (hl.getLanguage(block.className)) {
-                              done();
-                            } else {
-                              require(HL_ROOT + "async-languages/index.js")
-                                .then(index => {
-                                  if (index.has(block.className)) {
-                                    return require(HL_ROOT +
-                                      "async-languages/" +
-                                      index.get(block.className)).then(language => {
-                                      hl.registerLanguage(block.className, language);
-                                    });
-                                  }
-                                })
-                                .then(done, done);
-                            }
-                          });
-                        });
-                      }
-                      return root;
-                    },
-                    function() {
-                      return document.createElement("div");
-                    }
-                  );
-                });
-              };
-            }
-
-            function Mutable(value) {
-              let change;
-              Object.defineProperties(this, {
-                generator: {value: observe(_ => void (change = _))},
-                value: {get: () => value, set: x => change(value = x)}
-              });
-              if (value !== undefined) change(value);
-            }
-
-            function* now$1() {
-              while (true) {
-                yield Date.now();
-              }
-            }
-
-            function delay(duration, value) {
-              return new Promise(function(resolve) {
-                setTimeout(function() {
-                  resolve(value);
-                }, duration);
-              });
-            }
-
-            var timeouts = new Map;
-
-            function timeout$2(now, time) {
-              var t = new Promise(function(resolve) {
-                timeouts.delete(time);
-                var delay = time - now;
-                if (!(delay > 0)) throw new Error("invalid time");
-                if (delay > 0x7fffffff) throw new Error("too long to wait");
-                setTimeout(resolve, delay);
-              });
-              timeouts.set(time, t);
-              return t;
-            }
-
-            function when(time, value) {
-              var now;
-              return (now = timeouts.get(time = +time)) ? now.then(constant$2(value))
-                  : (now = Date.now()) >= time ? Promise.resolve(value)
-                  : timeout$2(now, time).then(constant$2(value));
-            }
-
-            function tick(duration, value) {
-              return when(Math.ceil((Date.now() + 1) / duration) * duration, value);
-            }
-
-            var Promises = {
-              delay: delay,
-              tick: tick,
-              when: when
-            };
-
-            function resolve$1(name, base) {
-              if (/^(\w+:)|\/\//i.test(name)) return name;
-              if (/^[.]{0,2}\//i.test(name)) return new URL(name, base == null ? location : base).href;
-              if (!name.length || /^[\s._]/.test(name) || /\s$/.test(name)) throw new Error("illegal name");
-              return "https://unpkg.com/" + name;
-            }
-
-            function requirer(resolve) {
-              return resolve == null ? require : requireFrom(resolve);
-            }
-
-            var svg$1 = template(function(string) {
-              var root = document.createElementNS("http://www.w3.org/2000/svg", "g");
-              root.innerHTML = string.trim();
-              return root;
-            }, function() {
-              return document.createElementNS("http://www.w3.org/2000/svg", "g");
-            });
-
-            var raw = String.raw;
-
-            function style(href) {
-              return new Promise(function(resolve, reject) {
-                var link = document.createElement("link");
-                link.rel = "stylesheet";
-                link.href = href;
-                link.onerror = reject;
-                link.onload = resolve;
-                document.head.appendChild(link);
-              });
-            }
-
-            function tex(require) {
-              return function() {
-                return Promise.all([
-                  require("@observablehq/katex@0.11.1/dist/katex.min.js"),
-                  require.resolve("@observablehq/katex@0.11.1/dist/katex.min.css").then(style)
-                ]).then(function(values) {
-                  var katex = values[0], tex = renderer();
-
-                  function renderer(options) {
-                    return function() {
-                      var root = document.createElement("div");
-                      katex.render(raw.apply(String, arguments), root, options);
-                      return root.removeChild(root.firstChild);
-                    };
-                  }
-
-                  tex.options = renderer;
-                  tex.block = renderer({displayMode: true});
-                  return tex;
-                });
-              };
-            }
-
-            function width$2() {
-              return observe(function(change) {
-                var width = change(document.body.clientWidth);
-                function resized() {
-                  var w = document.body.clientWidth;
-                  if (w !== width) change(width = w);
-                }
-                window.addEventListener("resize", resized);
-                return function() {
-                  window.removeEventListener("resize", resized);
-                };
-              });
-            }
-
-            var Library = Object.assign(function Library(resolver) {
-              const require = requirer(resolver);
-              Object.defineProperties(this, {
-                DOM: {value: DOM, writable: true, enumerable: true},
-                FileAttachment: {value: constant$2(NoFileAttachments), writable: true, enumerable: true},
-                Files: {value: Files, writable: true, enumerable: true},
-                Generators: {value: Generators, writable: true, enumerable: true},
-                html: {value: constant$2(html), writable: true, enumerable: true},
-                md: {value: md$1(require), writable: true, enumerable: true},
-                Mutable: {value: constant$2(Mutable), writable: true, enumerable: true},
-                now: {value: now$1, writable: true, enumerable: true},
-                Promises: {value: Promises, writable: true, enumerable: true},
-                require: {value: constant$2(require), writable: true, enumerable: true},
-                resolve: {value: constant$2(resolve$1), writable: true, enumerable: true},
-                svg: {value: constant$2(svg$1), writable: true, enumerable: true},
-                tex: {value: tex(require), writable: true, enumerable: true},
-                width: {value: width$2, writable: true, enumerable: true}
-              });
-            }, {resolve: require.resolve});
-
-            function RuntimeError(message, input) {
-              this.message = message + "";
-              this.input = input;
-            }
-
-            RuntimeError.prototype = Object.create(Error.prototype);
-            RuntimeError.prototype.name = "RuntimeError";
-            RuntimeError.prototype.constructor = RuntimeError;
-
-            function generatorish(value) {
-              return value
-                  && typeof value.next === "function"
-                  && typeof value.return === "function";
-            }
-
-            function load(notebook, library, observer) {
-              if (typeof library == "function") observer = library, library = null;
-              if (typeof observer !== "function") throw new Error("invalid observer");
-              if (library == null) library = new Library();
-
-              const {modules, id} = notebook;
-              const map = new Map;
-              const runtime = new Runtime(library);
-              const main = runtime_module(id);
-
-              function runtime_module(id) {
-                let module = map.get(id);
-                if (!module) map.set(id, module = runtime.module());
-                return module;
-              }
-
-              for (const m of modules) {
-                const module = runtime_module(m.id);
-                let i = 0;
-                for (const v of m.variables) {
-                  if (v.from) module.import(v.remote, v.name, runtime_module(v.from));
-                  else if (module === main) module.variable(observer(v, i, m.variables)).define(v.name, v.inputs, v.value);
-                  else module.define(v.name, v.inputs, v.value);
-                  ++i;
-                }
-              }
-
-              return runtime;
-            }
-
-            var prototype = Array.prototype;
-            var map$4 = prototype.map;
-            var forEach = prototype.forEach;
-
-            function constant$3(x) {
-              return function() {
-                return x;
-              };
-            }
-
-            function identity$4(x) {
-              return x;
-            }
-
-            function rethrow(e) {
-              return function() {
-                throw e;
-              };
-            }
-
-            function noop$3() {}
-
-            var TYPE_NORMAL = 1; // a normal variable
-            var TYPE_IMPLICIT = 2; // created on reference
-            var TYPE_DUPLICATE = 3; // created on duplicate definition
-
-            var no_observer = {};
-
-            function Variable(type, module, observer) {
-              if (observer == null) observer = no_observer;
-              Object.defineProperties(this, {
-                _observer: {value: observer, writable: true},
-                _definition: {value: variable_undefined, writable: true},
-                _duplicate: {value: undefined, writable: true},
-                _duplicates: {value: undefined, writable: true},
-                _indegree: {value: NaN, writable: true}, // The number of computing inputs.
-                _inputs: {value: [], writable: true},
-                _invalidate: {value: noop$3, writable: true},
-                _module: {value: module},
-                _name: {value: null, writable: true},
-                _outputs: {value: new Set, writable: true},
-                _promise: {value: Promise.resolve(undefined), writable: true},
-                _reachable: {value: observer !== no_observer, writable: true}, // Is this variable transitively visible?
-                _rejector: {value: variable_rejector(this)},
-                _type: {value: type},
-                _value: {value: undefined, writable: true},
-                _version: {value: 0, writable: true}
-              });
-            }
-
-            Object.defineProperties(Variable.prototype, {
-              _pending: {value: variable_pending, writable: true, configurable: true},
-              _fulfilled: {value: variable_fulfilled, writable: true, configurable: true},
-              _rejected: {value: variable_rejected, writable: true, configurable: true},
-              define: {value: variable_define, writable: true, configurable: true},
-              delete: {value: variable_delete, writable: true, configurable: true},
-              import: {value: variable_import, writable: true, configurable: true}
-            });
-
-            function variable_attach(variable) {
-              variable._module._runtime._dirty.add(variable);
-              variable._outputs.add(this);
-            }
-
-            function variable_detach(variable) {
-              variable._module._runtime._dirty.add(variable);
-              variable._outputs.delete(this);
-            }
-
-            function variable_undefined() {
-              throw variable_undefined;
-            }
-
-            function variable_rejector(variable) {
-              return function(error) {
-                if (error === variable_undefined) throw new RuntimeError(variable._name + " is not defined", variable._name);
-                throw new RuntimeError(variable._name + " could not be resolved", variable._name);
-              };
-            }
-
-            function variable_duplicate(name) {
-              return function() {
-                throw new RuntimeError(name + " is defined more than once");
-              };
-            }
-
-            function variable_define(name, inputs, definition) {
-              switch (arguments.length) {
-                case 1: {
-                  definition = name, name = inputs = null;
-                  break;
-                }
-                case 2: {
-                  definition = inputs;
-                  if (typeof name === "string") inputs = null;
-                  else inputs = name, name = null;
-                  break;
-                }
-              }
-              return variable_defineImpl.call(this,
-                name == null ? null : name + "",
-                inputs == null ? [] : map$4.call(inputs, this._module._resolve, this._module),
-                typeof definition === "function" ? definition : constant$3(definition)
-              );
-            }
-
-            function variable_defineImpl(name, inputs, definition) {
-              var scope = this._module._scope, runtime = this._module._runtime;
-
-              this._inputs.forEach(variable_detach, this);
-              inputs.forEach(variable_attach, this);
-              this._inputs = inputs;
-              this._definition = definition;
-              this._value = undefined;
-
-              // Is this an active variable (that may require disposal)?
-              if (definition === noop$3) runtime._variables.delete(this);
-              else runtime._variables.add(this);
-
-              // Did the variable’s name change? Time to patch references!
-              if (name == this._name && scope.get(name) === this) {
-                this._outputs.forEach(runtime._updates.add, runtime._updates);
-              } else {
-                var error, found;
-
-                if (this._name) { // Did this variable previously have a name?
-                  if (this._outputs.size) { // And did other variables reference this variable?
-                    scope.delete(this._name);
-                    found = this._module._resolve(this._name);
-                    found._outputs = this._outputs, this._outputs = new Set;
-                    found._outputs.forEach(function(output) { output._inputs[output._inputs.indexOf(this)] = found; }, this);
-                    found._outputs.forEach(runtime._updates.add, runtime._updates);
-                    runtime._dirty.add(found).add(this);
-                    scope.set(this._name, found);
-                  } else if ((found = scope.get(this._name)) === this) { // Do no other variables reference this variable?
-                    scope.delete(this._name); // It’s safe to delete!
-                  } else if (found._type === TYPE_DUPLICATE) { // Do other variables assign this name?
-                    found._duplicates.delete(this); // This variable no longer assigns this name.
-                    this._duplicate = undefined;
-                    if (found._duplicates.size === 1) { // Is there now only one variable assigning this name?
-                      found = found._duplicates.keys().next().value; // Any references are now fixed!
-                      error = scope.get(this._name);
-                      found._outputs = error._outputs, error._outputs = new Set;
-                      found._outputs.forEach(function(output) { output._inputs[output._inputs.indexOf(error)] = found; });
-                      found._definition = found._duplicate, found._duplicate = undefined;
-                      runtime._dirty.add(error).add(found);
-                      runtime._updates.add(found);
-                      scope.set(this._name, found);
-                    }
-                  } else {
-                    throw new Error;
-                  }
-                }
-
-                if (this._outputs.size) throw new Error;
-
-                if (name) { // Does this variable have a new name?
-                  if (found = scope.get(name)) { // Do other variables reference or assign this name?
-                    if (found._type === TYPE_DUPLICATE) { // Do multiple other variables already define this name?
-                      this._definition = variable_duplicate(name), this._duplicate = definition;
-                      found._duplicates.add(this);
-                    } else if (found._type === TYPE_IMPLICIT) { // Are the variable references broken?
-                      this._outputs = found._outputs, found._outputs = new Set; // Now they’re fixed!
-                      this._outputs.forEach(function(output) { output._inputs[output._inputs.indexOf(found)] = this; }, this);
-                      runtime._dirty.add(found).add(this);
-                      scope.set(name, this);
-                    } else { // Does another variable define this name?
-                      found._duplicate = found._definition, this._duplicate = definition; // Now they’re duplicates.
-                      error = new Variable(TYPE_DUPLICATE, this._module);
-                      error._name = name;
-                      error._definition = this._definition = found._definition = variable_duplicate(name);
-                      error._outputs = found._outputs, found._outputs = new Set;
-                      error._outputs.forEach(function(output) { output._inputs[output._inputs.indexOf(found)] = error; });
-                      error._duplicates = new Set([this, found]);
-                      runtime._dirty.add(found).add(error);
-                      runtime._updates.add(found).add(error);
-                      scope.set(name, error);
-                    }
-                  } else {
-                    scope.set(name, this);
-                  }
-                }
-
-                this._name = name;
-              }
-
-              runtime._updates.add(this);
-              runtime._compute();
-              return this;
-            }
-
-            function variable_import(remote, name, module) {
-              if (arguments.length < 3) module = name, name = remote;
-              return variable_defineImpl.call(this, name + "", [module._resolve(remote + "")], identity$4);
-            }
-
-            function variable_delete() {
-              return variable_defineImpl.call(this, null, [], noop$3);
-            }
-
-            function variable_pending() {
-              if (this._observer.pending) this._observer.pending();
-            }
-
-            function variable_fulfilled(value) {
-              if (this._observer.fulfilled) this._observer.fulfilled(value, this._name);
-            }
-
-            function variable_rejected(error) {
-              if (this._observer.rejected) this._observer.rejected(error, this._name);
-            }
-
-            function Module(runtime, builtins = []) {
-              Object.defineProperties(this, {
-                _runtime: {value: runtime},
-                _scope: {value: new Map},
-                _builtins: {value: new Map([
-                  ["invalidation", variable_invalidation],
-                  ["visibility", variable_visibility],
-                  ...builtins
-                ])},
-                _source: {value: null, writable: true}
-              });
-            }
-
-            Object.defineProperties(Module.prototype, {
-              _copy: {value: module_copy, writable: true, configurable: true},
-              _resolve: {value: module_resolve, writable: true, configurable: true},
-              redefine: {value: module_redefine, writable: true, configurable: true},
-              define: {value: module_define, writable: true, configurable: true},
-              derive: {value: module_derive, writable: true, configurable: true},
-              import: {value: module_import, writable: true, configurable: true},
-              value: {value: module_value, writable: true, configurable: true},
-              variable: {value: module_variable, writable: true, configurable: true},
-              builtin: {value: module_builtin, writable: true, configurable: true}
-            });
-
-            function module_redefine(name) {
-              var v = this._scope.get(name);
-              if (!v) throw new RuntimeError(name + " is not defined");
-              if (v._type === TYPE_DUPLICATE) throw new RuntimeError(name + " is defined more than once");
-              return v.define.apply(v, arguments);
-            }
-
-            function module_define() {
-              var v = new Variable(TYPE_NORMAL, this);
-              return v.define.apply(v, arguments);
-            }
-
-            function module_import() {
-              var v = new Variable(TYPE_NORMAL, this);
-              return v.import.apply(v, arguments);
-            }
-
-            function module_variable(observer) {
-              return new Variable(TYPE_NORMAL, this, observer);
-            }
-
-            async function module_value(name) {
-              var v = this._scope.get(name);
-              if (!v) throw new RuntimeError(name + " is not defined");
-              if (v._observer === no_observer) {
-                v._observer = true;
-                this._runtime._dirty.add(v);
-              }
-              await this._runtime._compute();
-              return v._promise;
-            }
-
-            function module_derive(injects, injectModule) {
-              var copy = new Module(this._runtime, this._builtins);
-              copy._source = this;
-              forEach.call(injects, function(inject) {
-                if (typeof inject !== "object") inject = {name: inject + ""};
-                if (inject.alias == null) inject.alias = inject.name;
-                copy.import(inject.name, inject.alias, injectModule);
-              });
-              Promise.resolve().then(() => {
-                const modules = new Set([this]);
-                for (const module of modules) {
-                  for (const variable of module._scope.values()) {
-                    if (variable._definition === identity$4) { // import
-                      const module = variable._inputs[0]._module;
-                      const source = module._source || module;
-                      if (source === this) { // circular import-with!
-                        console.warn("circular module definition; ignoring"); // eslint-disable-line no-console
-                        return;
-                      }
-                      modules.add(source);
-                    }
-                  }
-                }
-                this._copy(copy, new Map);
-              });
-              return copy;
-            }
-
-            function module_copy(copy, map) {
-              copy._source = this;
-              map.set(this, copy);
-              for (const [name, source] of this._scope) {
-                var target = copy._scope.get(name);
-                if (target && target._type === TYPE_NORMAL) continue; // injection
-                if (source._definition === identity$4) { // import
-                  var sourceInput = source._inputs[0],
-                      sourceModule = sourceInput._module;
-                  copy.import(sourceInput._name, name, map.get(sourceModule)
-                    || (sourceModule._source
-                       ? sourceModule._copy(new Module(copy._runtime, copy._builtins), map) // import-with
-                       : sourceModule));
-                } else {
-                  copy.define(name, source._inputs.map(variable_name), source._definition);
-                }
-              }
-              return copy;
-            }
-
-            function module_resolve(name) {
-              var variable = this._scope.get(name), value;
-              if (!variable) {
-                variable = new Variable(TYPE_IMPLICIT, this);
-                if (this._builtins.has(name)) {
-                  variable.define(name, constant$3(this._builtins.get(name)));
-                } else if (this._runtime._builtin._scope.has(name)) {
-                  variable.import(name, this._runtime._builtin);
-                } else {
-                  try {
-                    value = this._runtime._global(name);
-                  } catch (error) {
-                    return variable.define(name, rethrow(error));
-                  }
-                  if (value === undefined) {
-                    this._scope.set(variable._name = name, variable);
-                  } else {
-                    variable.define(name, constant$3(value));
-                  }
-                }
-              }
-              return variable;
-            }
-
-            function module_builtin(name, value) {
-              this._builtins.set(name, value);
-            }
-
-            function variable_name(variable) {
-              return variable._name;
-            }
-
-            const frame$1 = typeof requestAnimationFrame === "function" ? requestAnimationFrame : setImmediate;
-
-            var variable_invalidation = {};
-            var variable_visibility = {};
-
-            function Runtime(builtins = new Library, global = window_global) {
-              var builtin = this.module();
-              Object.defineProperties(this, {
-                _dirty: {value: new Set},
-                _updates: {value: new Set},
-                _computing: {value: null, writable: true},
-                _init: {value: null, writable: true},
-                _modules: {value: new Map},
-                _variables: {value: new Set},
-                _disposed: {value: false, writable: true},
-                _builtin: {value: builtin},
-                _global: {value: global}
-              });
-              if (builtins) for (var name in builtins) {
-                (new Variable(TYPE_IMPLICIT, builtin)).define(name, [], builtins[name]);
-              }
-            }
-
-            Object.defineProperties(Runtime, {
-              load: {value: load, writable: true, configurable: true}
-            });
-
-            Object.defineProperties(Runtime.prototype, {
-              _compute: {value: runtime_compute, writable: true, configurable: true},
-              _computeSoon: {value: runtime_computeSoon, writable: true, configurable: true},
-              _computeNow: {value: runtime_computeNow, writable: true, configurable: true},
-              dispose: {value: runtime_dispose, writable: true, configurable: true},
-              module: {value: runtime_module, writable: true, configurable: true},
-              fileAttachments: {value: FileAttachments, writable: true, configurable: true}
-            });
-
-            function runtime_dispose() {
-              this._computing = Promise.resolve();
-              this._disposed = true;
-              this._variables.forEach(v => {
-                v._invalidate();
-                v._version = NaN;
-              });
-            }
-
-            function runtime_module(define, observer = noop$3) {
-              let module;
-              if (define === undefined) {
-                if (module = this._init) {
-                  this._init = null;
-                  return module;
-                }
-                return new Module(this);
-              }
-              module = this._modules.get(define);
-              if (module) return module;
-              this._init = module = new Module(this);
-              this._modules.set(define, module);
-              try {
-                define(this, observer);
-              } finally {
-                this._init = null;
-              }
-              return module;
-            }
-
-            function runtime_compute() {
-              return this._computing || (this._computing = this._computeSoon());
-            }
-
-            function runtime_computeSoon() {
-              var runtime = this;
-              return new Promise(function(resolve) {
-                frame$1(function() {
-                  resolve();
-                  runtime._disposed || runtime._computeNow();
-                });
-              });
-            }
-
-            function runtime_computeNow() {
-              var queue = [],
-                  variables,
-                  variable;
-
-              // Compute the reachability of the transitive closure of dirty variables.
-              // Any newly-reachable variable must also be recomputed.
-              // Any no-longer-reachable variable must be terminated.
-              variables = new Set(this._dirty);
-              variables.forEach(function(variable) {
-                variable._inputs.forEach(variables.add, variables);
-                const reachable = variable_reachable(variable);
-                if (reachable > variable._reachable) {
-                  this._updates.add(variable);
-                } else if (reachable < variable._reachable) {
-                  variable._invalidate();
-                }
-                variable._reachable = reachable;
-              }, this);
-
-              // Compute the transitive closure of updating, reachable variables.
-              variables = new Set(this._updates);
-              variables.forEach(function(variable) {
-                if (variable._reachable) {
-                  variable._indegree = 0;
-                  variable._outputs.forEach(variables.add, variables);
-                } else {
-                  variable._indegree = NaN;
-                  variables.delete(variable);
-                }
-              });
-
-              this._computing = null;
-              this._updates.clear();
-              this._dirty.clear();
-
-              // Compute the indegree of updating variables.
-              variables.forEach(function(variable) {
-                variable._outputs.forEach(variable_increment);
-              });
-
-              do {
-                // Identify the root variables (those with no updating inputs).
-                variables.forEach(function(variable) {
-                  if (variable._indegree === 0) {
-                    queue.push(variable);
-                  }
-                });
-
-                // Compute the variables in topological order.
-                while (variable = queue.pop()) {
-                  variable_compute(variable);
-                  variable._outputs.forEach(postqueue);
-                  variables.delete(variable);
-                }
-
-                // Any remaining variables are circular, or depend on them.
-                variables.forEach(function(variable) {
-                  if (variable_circular(variable)) {
-                    variable_error(variable, new RuntimeError("circular definition"));
-                    variable._outputs.forEach(variable_decrement);
-                    variables.delete(variable);
-                  }
-                });
-              } while (variables.size);
-
-              function postqueue(variable) {
-                if (--variable._indegree === 0) {
-                  queue.push(variable);
-                }
-              }
-            }
-
-            function variable_circular(variable) {
-              const inputs = new Set(variable._inputs);
-              for (const i of inputs) {
-                if (i === variable) return true;
-                i._inputs.forEach(inputs.add, inputs);
-              }
-              return false;
-            }
-
-            function variable_increment(variable) {
-              ++variable._indegree;
-            }
-
-            function variable_decrement(variable) {
-              --variable._indegree;
-            }
-
-            function variable_value(variable) {
-              return variable._promise.catch(variable._rejector);
-            }
-
-            function variable_invalidator(variable) {
-              return new Promise(function(resolve) {
-                variable._invalidate = resolve;
-              });
-            }
-
-            function variable_intersector(invalidation, variable) {
-              let node = typeof IntersectionObserver === "function" && variable._observer && variable._observer._node;
-              let visible = !node, resolve = noop$3, reject = noop$3, promise, observer;
-              if (node) {
-                observer = new IntersectionObserver(([entry]) => (visible = entry.isIntersecting) && (promise = null, resolve()));
-                observer.observe(node);
-                invalidation.then(() => (observer.disconnect(), observer = null, reject()));
-              }
-              return function(value) {
-                if (visible) return Promise.resolve(value);
-                if (!observer) return Promise.reject();
-                if (!promise) promise = new Promise((y, n) => (resolve = y, reject = n));
-                return promise.then(() => value);
-              };
-            }
-
-            function variable_compute(variable) {
-              variable._invalidate();
-              variable._invalidate = noop$3;
-              variable._pending();
-              var value0 = variable._value,
-                  version = ++variable._version,
-                  invalidation = null,
-                  promise = variable._promise = Promise.all(variable._inputs.map(variable_value)).then(function(inputs) {
-                if (variable._version !== version) return;
-
-                // Replace any reference to invalidation with the promise, lazily.
-                for (var i = 0, n = inputs.length; i < n; ++i) {
-                  switch (inputs[i]) {
-                    case variable_invalidation: {
-                      inputs[i] = invalidation = variable_invalidator(variable);
-                      break;
-                    }
-                    case variable_visibility: {
-                      if (!invalidation) invalidation = variable_invalidator(variable);
-                      inputs[i] = variable_intersector(invalidation, variable);
-                      break;
-                    }
-                  }
-                }
-
-                // Compute the initial value of the variable.
-                return variable._definition.apply(value0, inputs);
-              }).then(function(value) {
-                // If the value is a generator, then retrieve its first value,
-                // and dispose of the generator if the variable is invalidated.
-                // Note that the cell may already have been invalidated here,
-                // in which case we need to terminate the generator immediately!
-                if (generatorish(value)) {
-                  if (variable._version !== version) return void value.return();
-                  (invalidation || variable_invalidator(variable)).then(variable_return(value));
-                  return variable_precompute(variable, version, promise, value);
-                }
-                return value;
-              });
-              promise.then(function(value) {
-                if (variable._version !== version) return;
-                variable._value = value;
-                variable._fulfilled(value);
-              }, function(error) {
-                if (variable._version !== version) return;
-                variable._value = undefined;
-                variable._rejected(error);
-              });
-            }
-
-            function variable_precompute(variable, version, promise, generator) {
-              function recompute() {
-                var promise = new Promise(function(resolve) {
-                  resolve(generator.next());
-                }).then(function(next) {
-                  return next.done ? undefined : Promise.resolve(next.value).then(function(value) {
-                    if (variable._version !== version) return;
-                    variable_postrecompute(variable, value, promise).then(recompute);
-                    variable._fulfilled(value);
-                    return value;
-                  });
-                });
-                promise.catch(function(error) {
-                  if (variable._version !== version) return;
-                  variable_postrecompute(variable, undefined, promise);
-                  variable._rejected(error);
+                  }]
                 });
               }
-              return new Promise(function(resolve) {
-                resolve(generator.next());
-              }).then(function(next) {
-                if (next.done) return;
-                promise.then(recompute);
-                return next.value;
-              });
-            }
-
-            function variable_postrecompute(variable, value, promise) {
-              var runtime = variable._module._runtime;
-              variable._value = value;
-              variable._promise = promise;
-              variable._outputs.forEach(runtime._updates.add, runtime._updates); // TODO Cleaner?
-              return runtime._compute();
-            }
-
-            function variable_error(variable, error) {
-              variable._invalidate();
-              variable._invalidate = noop$3;
-              variable._pending();
-              ++variable._version;
-              variable._indegree = NaN;
-              (variable._promise = Promise.reject(error)).catch(noop$3);
-              variable._value = undefined;
-              variable._rejected(error);
-            }
-
-            function variable_return(generator) {
-              return function() {
-                generator.return();
-              };
-            }
-
-            function variable_reachable(variable) {
-              if (variable._observer !== no_observer) return true; // Directly reachable.
-              var outputs = new Set(variable._outputs);
-              for (const output of outputs) {
-                if (output._observer !== no_observer) return true;
-                output._outputs.forEach(outputs.add, outputs);
-              }
-              return false;
-            }
-
-            function window_global(name) {
-              return window[name];
-            }
-
-            // https://observablehq.com/@yosoyubik/draw-me@208
-            function define$2(runtime, observer) {
-              const main = runtime.module();
-              main.variable(observer()).define(["md"], function(md){return(
-            md`# Draw Me
-
-Draw something! Command-Z to undo and Shift-Command-Z to redo.`
-            )});
-              main.variable(observer("viewof lineWidth")).define("viewof lineWidth", ["html"], function(html)
-            {
-              const form = html`<form>
-  <input name=i type=range min=0.5 max=20 value=1 step=0.5 style="width:120px;">
-  <output style="font-size:smaller;font-style:oblique;" name=o></output>
-</form>`;
-              form.i.oninput = () => form.o.value = `${form.value = form.i.valueAsNumber}px width`;
-              form.i.oninput();
-              return form;
-            }
-            );
-              main.variable(observer("lineWidth")).define("lineWidth", ["Generators", "viewof lineWidth"], (G, _) => G.input(_));
-              main.variable(observer("viewof strokeStyle")).define("viewof strokeStyle", ["html"], function(html)
-            {
-              const form = html`<form>
-  <input name=i type=color style="width:120px;">
-  <output style="font-size:smaller;font-style:oblique;" name=o>color</output>
-</form>`;
-              form.i.oninput = () => form.value = form.i.value;
-              form.i.oninput();
-              return form;
-            }
-            );
-              main.variable(observer("strokeStyle")).define("strokeStyle", ["Generators", "viewof strokeStyle"], (G, _) => G.input(_));
-              main.variable(observer("viewof exposedData")).define("viewof exposedData", ["DOM","width","height","inputData","d3","viewof lineWidth","viewof strokeStyle"], function(DOM,width,height,inputData,d3,$0,$1)
-            {
-              const context = DOM.context2d(width, height);
-              // this empties the strokes array, making that externals initialiations don't display data
-              // const strokes = context.canvas.value = [];
-              // we split the exposed data and the initial data into separate cells
-              // const strokes = 
-              context.canvas.value = inputData;
-              const curve = d3.curveBasis(context);
-              const redo = [];
-
-              context.lineJoin = "round";
-              context.lineCap = "round";
 
               // Render and report the new value.
               function render() {
-                context.clearRect(0, 0, width, height);
-                for (const stroke of inputData) {
-                  context.beginPath();
+                context$1.clearRect(0, 0, width$2, height$2);
+                for (const stroke of strokes) {
+                  context$1.beginPath();
                   curve.lineStart();
                   for (const point of stroke) {
                     curve.point(...point);
                   }
                   if (stroke.length === 1) curve.point(...stroke[0]);
                   curve.lineEnd();
-                  context.lineWidth = stroke.lineWidth;
-                  context.strokeStyle = stroke.strokeStyle;
-                  context.stroke();
+                  context$1.lineWidth = 1;
+                  context$1.strokeStyle = "#000000";
+                  // context.lineWidth = stroke.lineWidth;
+                  // context.strokeStyle = stroke.strokeStyle;
+                  context$1.stroke();
                 }
-                context.canvas.value = inputData;
-                context.canvas.dispatchEvent(new CustomEvent("input"));
+                context$1.canvas.value = strokes;
+                context$1.canvas.dispatchEvent(new CustomEvent("input"));
               }
-
-              d3.select(context.canvas).call(d3.drag()
-                  .container(context.canvas)
-                  .subject(dragsubject)
-                  .on("start drag", dragged)
-                  .on("start.render drag.render", render));
-
-              context.canvas.undo = () => {
-                if (inputData.length === 0) return;
-                redo.push(inputData.pop());
-                render();
-              };
-
-              context.canvas.redo = stroke => {
-                if (redo.length === 0) return;
-                inputData.push(redo.pop());
-                render();
-              };
 
               // Create a new empty stroke at the start of a drag gesture.
               function dragsubject() {
                 const stroke = [];
-                stroke.lineWidth = $0.value;
-                stroke.strokeStyle = $1.value;
-                inputData.push(stroke);
+                // stroke.lineWidth = viewof lineWidth.value;
+                // stroke.strokeStyle = viewof strokeStyle.value;
+                strokes.push(stroke);
                 redo.length = 0;
                 return stroke;
               }
 
               // Add to the stroke when dragging.
               function dragged() {
-                d3.event.subject.push([d3.event.x, d3.event.y]);
+                event.subject.push([event.x, event.y]);
               }
 
-              return context.canvas;
-            }
-            );
-              main.variable(observer("exposedData")).define("exposedData", ["Generators", "viewof exposedData"], (G, _) => G.input(_));
-              main.variable(observer("inputData")).define("inputData", function(){return(
-            []
-            )});
-              main.variable(observer()).define(["exposedData"], function(exposedData){return(
-            exposedData
-            )});
-              main.variable(observer("height")).define("height", function(){return(
-            500
-            )});
-              main.variable(observer("d3")).define("d3", ["require"], function(require){return(
-            require("d3@5")
-            )});
-              return main;
-            }
+            };
 
             const _jsxFileName$8 = "/Users/jose/urbit/canvas/src/js/components/draw.js";
 
@@ -59343,65 +57354,25 @@ Draw something! Command-Z to undo and Shift-Command-Z to redo.`
               componentDidMount() {
                 const { drawRef, lineWidthRef, strokeStyleRef, props, state } = this;
 
-                const runtime = new Runtime();
-                const observer = runtime.module(define$2, name => {
-                  console.log(name);
-                  switch (name) {
-                    case "inputData":
-                      return { fulfilled(value) {
-                        console.log("inputData", value);
-                        state.forms = value;
-                      }}
-                    case "render":
-                      return { fulfilled(value) {
-                        console.log("render", value);
-                      }}
-                      // console.log(props.canvas);
-                      // if (props.canvas.length) {
-                      //   return props.canvas;
-                      // } else {
-                      //   return [];
-                      // }
-                    case "viewof exposedData":
-                      return new Inspector(drawRef.current);
-                    // TODO: implement live update
-                    case "exposedData":
-                      return { fulfilled(value) {
-                        console.log(value);
-                        state.buffer = value;
-                      }
-                        // if (value && value.length) setStrokes(value); }
-                      };
-                    case "viewof lineWidth":
-                      return new Inspector(lineWidthRef.current);
-                    case "viewof strokeStyle":
-                      return new Inspector(strokeStyleRef.current);
-                  }
-                });
+                // const runtime = new Runtime();
+                // const observer = runtime.module(notebook, name => {
+                //   console.log(name);
+                //   switch (name) {
+                //     case "viewof exposedData":
+                //       return new Inspector(drawRef.current);
+                //     case "viewof lineWidth":
+                //       return new Inspector(lineWidthRef.current);
+                //     case "viewof strokeStyle":
+                //       return new Inspector(strokeStyleRef.current);
+                //   }
+                // });
+                //
+                initDrawCanvas();
+                console.log(props.canvas);
+                drawHexCanvas$1(props);
+                if (props.canvas.length) ;
 
-                if (props.canvas.length) {
-                  console.log(props.canvas);
-                  state.forms.value = props.canvas;
-                  state.buffer.value = props.canvas;
-                  (async () => {
-                    const forms = await observer.value("exposedData");
-                    const forms2 = await observer.value("inputData");
-                    console.log(forms, forms2);
-                    props.canvas.concat(forms);
-                    // console.log(props.canvas);
-                    observer.redefine("inputData", props.canvas);
-                    observer.redefine("exposedData", props.canvas);
-                    // Re-render
-                    // runtime.module(notebook, name => {
-                    //   console.log(name);
-                    //   if (name === "viewof exposedData") {
-                    //     return Inspector.into(drawRef.current);
-                    //   }
-                    // });
-                  })();
-                }
-
-                this.setState({observer: observer});
+                // this.setState({observer: observer});
               }
 
               // TODO: setStrokes doesn't know when the mouse stops moving
@@ -59426,33 +57397,6 @@ Draw something! Command-Z to undo and Shift-Command-Z to redo.`
               }
 
               onClickSave () {
-                const { props, state } = this;
-                (async () => {
-                  const forms = await state.observer.value("exposedData");
-                  let formsClone = forms.slice();
-                  formsClone.forEach(function(stroke, i, array) {
-                    const lineWidth = stroke.lineWidth;
-                    const strokeStyle = stroke.strokeStyle;
-                    array[i] = { draw: {
-                      coords: stroke,
-                      lineWidth: lineWidth,
-                      strokeStyle: strokeStyle
-                    }};
-                  });
-
-                  // console.log(formsClone, props.location);
-                  props.api.canvas.paint({
-                    "canvas-name": props.name,
-                    "location": props.location,
-                    "strokes": formsClone
-                  })
-                  // .then(() => {
-                  //   console.log("saving canvas");
-                  //   // const svgString = simpleParseSVG(d3.select("canvas").node());
-                  //   // this.props.api.svg.save(this.props.name, svgString);
-                  // })
-                  ;
-                })();
               }
 
               onClickShare () {
@@ -59462,24 +57406,28 @@ Draw something! Command-Z to undo and Shift-Command-Z to redo.`
               render() {
 
                 return (
-                  react.createElement('div', { className: "h-100 w-100 pa3 pt4 bg-gray0-d white-d flex flex-column"       , __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 153}}
+                  react.createElement('div', { className: "h-100 w-100 pa3 pt4 bg-gray0-d white-d flex flex-column"       , __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 131}}
                     , react.createElement('div', { className: "absolute mw5" ,
-                         style: {right: "20px", top: "20px"}, __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 154}} 
+                         style: {right: "20px", top: "20px"}, __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 132}} 
                       , react.createElement('button', {
                         onClick: this.onClickSave.bind(this),
-                        className: "pointer mr2 f9 green2 bg-gray0-d ba pv3 ph4 b--green2"        , __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 156}}, "Save Image"
+                        className: "pointer mr2 f9 green2 bg-gray0-d ba pv3 ph4 b--green2"        , __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 134}}, "Save Image"
 
                       )
                       , react.createElement('button', {
                         onClick: this.onClickShare.bind(this),
-                        className: "pointer f9 green2 bg-gray0-d ba pv3 ph4 b--green2"       , __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 161}}
+                        className: "pointer f9 green2 bg-gray0-d ba pv3 ph4 b--green2"       , __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 139}}
                         , "Share Image"
 
                       )
                     )
-                    , react.createElement('div', { ref: this.lineWidthRef, __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 168}})
-                    , react.createElement('div', { ref: this.strokeStyleRef, __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 169}})
-                    , react.createElement('div', { ref: this.drawRef, __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 170}})
+                    , react.createElement('div', { ref: this.lineWidthRef, __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 146}}
+                    )
+                    , react.createElement('div', { ref: this.strokeStyleRef, __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 148}}
+                    )
+                    , react.createElement('div', { ref: this.drawRef, __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 150}}
+                      , react.createElement('canvas', { id: "canvas", width: width$2, height: height$2, __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 151}})
+                    )
                   )
                 )
               }
@@ -59811,10 +57759,10 @@ Draw something! Command-Z to undo and Shift-Command-Z to redo.`
               buffer[offset + i - d] |= s * 128;
             }
 
-            var toString$2 = {}.toString;
+            var toString = {}.toString;
 
             var isArray = Array.isArray || function (arr) {
-              return toString$2.call(arr) == '[object Array]';
+              return toString.call(arr) == '[object Array]';
             };
 
             var INSPECT_MAX_BYTES = 50;
@@ -61629,7 +59577,7 @@ Draw something! Command-Z to undo and Shift-Command-Z to redo.`
 
               var Buffer;
               try {
-                Buffer = buffer$1.Buffer;
+                Buffer = buffer.Buffer;
               } catch (e) {
               }
 
