@@ -44,7 +44,7 @@ const initHexMesh = () => {
 }
 
 const drawHexCanvas = (props) => {
-  console.log("drawing", props);
+  // console.log("drawing", props);
   const canvasName = props.name;
   const canvasData = props.canvas;
   const location = props.location;
@@ -77,7 +77,7 @@ const drawHexCanvas = (props) => {
           d.attr.color = color;
           return color;
         } else {
-          return 'white';
+          return '#fff0';
         }
       });
     }

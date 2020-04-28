@@ -69,7 +69,7 @@ export class Root extends Component {
                 const name =  props.match.params.name;
                 if (canvasList) {
                   let canvas;
-                  console.log(canvasList);
+                  // console.log(canvasList);
                   const data = !!canvasList[name] ? canvasList[name].data : {};
                   const canvasType = !!canvasList[name] ? canvasList[name].metadata.type : "";
                   const location = !!canvasList[name] ? canvasList[name].metadata.location : "";
@@ -85,7 +85,7 @@ export class Root extends Component {
                       break;
                     default: canvas = null;
                   }
-                  console.log(canvas);
+                  // console.log(canvas);
                   return (
                     React.createElement(Skeleton, {
                       history: props.history,

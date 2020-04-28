@@ -30,7 +30,7 @@ const contains = (str, arr) => {
 const getCSSStyles = ( parentElement ) => {
   let extractedCSSText = '';
   const s = document.styleSheets[0];
-  console.log(s);
+  // console.log(s);
   var cssRules = s.cssRules;
   for (let r = 0; r < cssRules.length; r++) {
     if ( contains( cssRules[r].selectorText, hexClasses ) )

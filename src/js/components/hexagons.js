@@ -22,7 +22,7 @@ export class Hexagons extends Component {
   }
 
   componentDidMount() {
-    console.log("mounting");
+    // console.log("mounting");
     drawHexCanvas(this.props);
     initHexMesh();
     createColorPicker(width);
@@ -40,7 +40,7 @@ export class Hexagons extends Component {
   render() {
     d3.select(".hexagon").selectAll("path").remove();
     if (this.props.canvas) {
-      console.log("rendering", this.props.name);
+      // console.log("rendering", this.props.name);
       drawHexCanvas(this.props);
     }
 

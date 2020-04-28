@@ -29,7 +29,13 @@ function createColorPicker(width) {
     legend.selectAll("rect")
       .data(d3.range(18))
     .enter().append("rect")
-      .attr("x", function(d) { return d * 24; })
+      .attr("x", function(d) {
+        if (d < 9) {
+          return d * 24;
+        } else {
+          return (d + 1) * 24;
+        }
+      })
       .attr("width", 24 - 3)
       .attr("height", 24 - 3)
       .style("stroke", function(d) { return d ? null : "#000"; })
@@ -38,12 +44,13 @@ function createColorPicker(width) {
           return color(d);
         }
         else {
-          if (d === 9) {
-            grays(d);
-            return "#ff000000";
-          } else {
-            return grays(d);
-          }
+          return grays(d);
+          // if (d === 9) {
+          //   grays(d);
+          //   return "#ff000000";
+          // } else {
+          //   return grays(d);
+          // }
         }
       })
       .on("click", clicklegend);

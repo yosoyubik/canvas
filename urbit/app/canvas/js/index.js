@@ -48821,7 +48821,7 @@
               }
               render() {
                 const { props, state } = this;
-                console.log(props, state);
+                // console.log(props, state);
                 let selectedClass = (props.selected === "me") ? "bg-gray4 bg-gray1-d" : "bg-white bg-gray0-d";
 
                 let rootIdentity = react.createElement(Link, {
@@ -48848,7 +48848,7 @@
                 let canvasItems = null;
                 if (!!props.canvasList) {
                   canvasItems = Object.entries(props.canvasList).map((each, i) => {
-                    console.log(each, i);
+                    // console.log(each, i);
                     return (
                       react.createElement(CanvasTitle, { key: i, id: each[0], location: each[1].metadata.location, __self: this, __source: {fileName: _jsxFileName$4, lineNumber: 47}} )
                     )
@@ -56156,7 +56156,7 @@
             const getCSSStyles = ( parentElement ) => {
               let extractedCSSText = '';
               const s = document.styleSheets[0];
-              console.log(s);
+              // console.log(s);
               var cssRules = s.cssRules;
               for (let r = 0; r < cssRules.length; r++) {
                 if ( contains( cssRules[r].selectorText, hexClasses ) )
@@ -56473,7 +56473,7 @@
             };
 
             const drawHexCanvas = (props) => {
-              console.log("drawing", props);
+              // console.log("drawing", props);
               const canvasName = props.name;
               const canvasData = props.canvas;
               const location = props.location;
@@ -56506,7 +56506,7 @@
                       d.attr.color = color$1;
                       return color$1;
                     } else {
-                      return 'white';
+                      return '#fff0';
                     }
                   });
                 }
@@ -56624,7 +56624,13 @@
                 legend.selectAll("rect")
                   .data(sequence(18))
                 .enter().append("rect")
-                  .attr("x", function(d) { return d * 24; })
+                  .attr("x", function(d) {
+                    if (d < 9) {
+                      return d * 24;
+                    } else {
+                      return (d + 1) * 24;
+                    }
+                  })
                   .attr("width", 24 - 3)
                   .attr("height", 24 - 3)
                   .style("stroke", function(d) { return d ? null : "#000"; })
@@ -56633,12 +56639,13 @@
                       return color(d);
                     }
                     else {
-                      if (d === 9) {
-                        grays(d);
-                        return "#ff000000";
-                      } else {
-                        return grays(d);
-                      }
+                      return grays(d);
+                      // if (d === 9) {
+                      //   grays(d);
+                      //   return "#ff000000";
+                      // } else {
+                      //   return grays(d);
+                      // }
                     }
                   })
                   .on("click", clicklegend);
@@ -56663,7 +56670,7 @@
               }
 
               componentDidMount() {
-                console.log("mounting");
+                // console.log("mounting");
                 drawHexCanvas(this.props);
                 initHexMesh();
                 createColorPicker(width);
@@ -56681,7 +56688,7 @@
               render() {
                 select(".hexagon").selectAll("path").remove();
                 if (this.props.canvas) {
-                  console.log("rendering", this.props.name);
+                  // console.log("rendering", this.props.name);
                   drawHexCanvas(this.props);
                 }
 
@@ -56740,7 +56747,7 @@
             };
 
             const initMapCanvas = (us) => {
-              console.log(us);
+              // console.log(us);
               select(".background").append("path")
                   .datum(mesh(us, us.objects.states))
                   .attr("class", "background")
@@ -56767,7 +56774,7 @@
               const mousedown = function(d) {
                 const colors = select(".legend").selectAll("rect").nodes();
                 const color$1 = color(selectedColor$1(colors).style.fill).toString();
-                console.log(d);
+                // console.log(d);
                 mousing = (d.attr.fill && d.attr.color === color$1) ? -1 : +1;
                 mousemove.apply(this, arguments);
               };
@@ -56838,12 +56845,11 @@
               }
 
               componentDidMount() {
-                console.log("mounting");
 
                 fetch("/~canvas/map/us.json")
                   .then((response) => response.json())
                   .then((json) => {
-                    console.log(json);
+                    // console.log(json);
                     this.setState({
                       data: json
                     });
@@ -59196,7 +59202,7 @@
               return window[name];
             }
 
-            // https://observablehq.com/@d3/draw-me@132
+            // https://observablehq.com/@yosoyubik/draw-me@208
             function define$2(runtime, observer) {
               const main = runtime.module();
               main.variable(observer()).define(["md"], function(md){return(
@@ -59228,30 +59234,14 @@ Draw something! Command-Z to undo and Shift-Command-Z to redo.`
             }
             );
               main.variable(observer("strokeStyle")).define("strokeStyle", ["Generators", "viewof strokeStyle"], (G, _) => G.input(_));
-              main.variable(observer("undo")).define("undo", ["viewof strokes","html","invalidation"], function($0,html,invalidation)
-            {
-              const keydowned = event => {
-                if (event.key === "z" && event.metaKey && !event.altKey) {
-                  if (event.shiftKey) $0.redo();
-                  else $0.undo();
-                  event.preventDefault();
-                }
-              };
-              const form = html`<form>
-    <button name=undo type=button title="Command-Z">Undo</button>
-    <button name=redo type=button title="Shift-Command-Z">Redo</button>
-  </form>`;
-              form.redo.onclick = () => $0.redo();
-              form.undo.onclick = () => $0.undo();
-              window.addEventListener("keydown", keydowned);
-              invalidation.then(() => window.removeEventListener("keydown", keydowned));
-              return form;
-            }
-            );
-              main.variable(observer("viewof strokes")).define("viewof strokes", ["DOM","width","height","d3","viewof lineWidth","viewof strokeStyle"], function(DOM,width,height,d3,$0,$1)
+              main.variable(observer("viewof exposedData")).define("viewof exposedData", ["DOM","width","height","inputData","d3","viewof lineWidth","viewof strokeStyle"], function(DOM,width,height,inputData,d3,$0,$1)
             {
               const context = DOM.context2d(width, height);
-              const strokes = context.canvas.value = [];
+              // this empties the strokes array, making that externals initialiations don't display data
+              // const strokes = context.canvas.value = [];
+              // we split the exposed data and the initial data into separate cells
+              // const strokes = 
+              context.canvas.value = inputData;
               const curve = d3.curveBasis(context);
               const redo = [];
 
@@ -59261,7 +59251,7 @@ Draw something! Command-Z to undo and Shift-Command-Z to redo.`
               // Render and report the new value.
               function render() {
                 context.clearRect(0, 0, width, height);
-                for (const stroke of strokes) {
+                for (const stroke of inputData) {
                   context.beginPath();
                   curve.lineStart();
                   for (const point of stroke) {
@@ -59273,7 +59263,7 @@ Draw something! Command-Z to undo and Shift-Command-Z to redo.`
                   context.strokeStyle = stroke.strokeStyle;
                   context.stroke();
                 }
-                context.canvas.value = strokes;
+                context.canvas.value = inputData;
                 context.canvas.dispatchEvent(new CustomEvent("input"));
               }
 
@@ -59284,14 +59274,14 @@ Draw something! Command-Z to undo and Shift-Command-Z to redo.`
                   .on("start.render drag.render", render));
 
               context.canvas.undo = () => {
-                if (strokes.length === 0) return;
-                redo.push(strokes.pop());
+                if (inputData.length === 0) return;
+                redo.push(inputData.pop());
                 render();
               };
 
               context.canvas.redo = stroke => {
                 if (redo.length === 0) return;
-                strokes.push(redo.pop());
+                inputData.push(redo.pop());
                 render();
               };
 
@@ -59300,7 +59290,7 @@ Draw something! Command-Z to undo and Shift-Command-Z to redo.`
                 const stroke = [];
                 stroke.lineWidth = $0.value;
                 stroke.strokeStyle = $1.value;
-                strokes.push(stroke);
+                inputData.push(stroke);
                 redo.length = 0;
                 return stroke;
               }
@@ -59313,9 +59303,12 @@ Draw something! Command-Z to undo and Shift-Command-Z to redo.`
               return context.canvas;
             }
             );
-              main.variable(observer("strokes")).define("strokes", ["Generators", "viewof strokes"], (G, _) => G.input(_));
-              main.variable(observer()).define(["strokes"], function(strokes){return(
-            strokes
+              main.variable(observer("exposedData")).define("exposedData", ["Generators", "viewof exposedData"], (G, _) => G.input(_));
+              main.variable(observer("inputData")).define("inputData", function(){return(
+            []
+            )});
+              main.variable(observer()).define(["exposedData"], function(exposedData){return(
+            exposedData
             )});
               main.variable(observer("height")).define("height", function(){return(
             500
@@ -59343,26 +59336,71 @@ Draw something! Command-Z to undo and Shift-Command-Z to redo.`
                 this.setStrokes = this.setStrokes.bind(this);
               }
 
+              componentDidUpdate() {
+                console.log("componentDidUpdate");
+              }
+
               componentDidMount() {
-                const { drawRef, lineWidthRef, strokeStyleRef, setStrokes } = this;
+                const { drawRef, lineWidthRef, strokeStyleRef, props, state } = this;
 
                 const runtime = new Runtime();
                 const observer = runtime.module(define$2, name => {
                   console.log(name);
                   switch (name) {
-                    case "viewof strokes":
+                    case "inputData":
+                      return { fulfilled(value) {
+                        console.log("inputData", value);
+                        state.forms = value;
+                      }}
+                    case "render":
+                      return { fulfilled(value) {
+                        console.log("render", value);
+                      }}
+                      // console.log(props.canvas);
+                      // if (props.canvas.length) {
+                      //   return props.canvas;
+                      // } else {
+                      //   return [];
+                      // }
+                    case "viewof exposedData":
                       return new Inspector(drawRef.current);
                     // TODO: implement live update
-                    // case "strokes":
-                    //   return { fulfilled(value) {
-                    //     if (value && value.length) setStrokes(value); }
-                    //   };
+                    case "exposedData":
+                      return { fulfilled(value) {
+                        console.log(value);
+                        state.buffer = value;
+                      }
+                        // if (value && value.length) setStrokes(value); }
+                      };
                     case "viewof lineWidth":
                       return new Inspector(lineWidthRef.current);
                     case "viewof strokeStyle":
                       return new Inspector(strokeStyleRef.current);
                   }
                 });
+
+                if (props.canvas.length) {
+                  console.log(props.canvas);
+                  state.forms.value = props.canvas;
+                  state.buffer.value = props.canvas;
+                  (async () => {
+                    const forms = await observer.value("exposedData");
+                    const forms2 = await observer.value("inputData");
+                    console.log(forms, forms2);
+                    props.canvas.concat(forms);
+                    // console.log(props.canvas);
+                    observer.redefine("inputData", props.canvas);
+                    observer.redefine("exposedData", props.canvas);
+                    // Re-render
+                    // runtime.module(notebook, name => {
+                    //   console.log(name);
+                    //   if (name === "viewof exposedData") {
+                    //     return Inspector.into(drawRef.current);
+                    //   }
+                    // });
+                  })();
+                }
+
                 this.setState({observer: observer});
               }
 
@@ -59375,7 +59413,6 @@ Draw something! Command-Z to undo and Shift-Command-Z to redo.`
                 } else {
                   setState(state => {
                     const forms = [...state.forms, newForm];
-                    // const buffer = [...state.buffer, newForm];
                     return { forms, buffer: [newForm] };
                   }, () => {
                     props.canvas.push(newForm);
@@ -59391,16 +59428,11 @@ Draw something! Command-Z to undo and Shift-Command-Z to redo.`
               onClickSave () {
                 const { props, state } = this;
                 (async () => {
-                  const forms = await state.observer.value("strokes");
+                  const forms = await state.observer.value("exposedData");
                   let formsClone = forms.slice();
-                  // console.log(strokes[0]["lineWidth"], strokes[0]["strokeStyle"]);
-                  // console.log(strokes[0].lineWidth, strokes[0].strokeStyle);
-                  // console.log(strokes);
                   formsClone.forEach(function(stroke, i, array) {
                     const lineWidth = stroke.lineWidth;
                     const strokeStyle = stroke.strokeStyle;
-                    console.log(lineWidth, strokeStyle),
-                    // delete stroke.lineWidth; delete stroke.strokeStyle;
                     array[i] = { draw: {
                       coords: stroke,
                       lineWidth: lineWidth,
@@ -59430,24 +59462,24 @@ Draw something! Command-Z to undo and Shift-Command-Z to redo.`
               render() {
 
                 return (
-                  react.createElement('div', { className: "h-100 w-100 pa3 pt4 bg-gray0-d white-d flex flex-column"       , __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 114}}
+                  react.createElement('div', { className: "h-100 w-100 pa3 pt4 bg-gray0-d white-d flex flex-column"       , __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 153}}
                     , react.createElement('div', { className: "absolute mw5" ,
-                         style: {right: "20px", top: "20px"}, __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 115}} 
+                         style: {right: "20px", top: "20px"}, __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 154}} 
                       , react.createElement('button', {
                         onClick: this.onClickSave.bind(this),
-                        className: "pointer mr2 f9 green2 bg-gray0-d ba pv3 ph4 b--green2"        , __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 117}}, "Save Image"
+                        className: "pointer mr2 f9 green2 bg-gray0-d ba pv3 ph4 b--green2"        , __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 156}}, "Save Image"
 
                       )
                       , react.createElement('button', {
                         onClick: this.onClickShare.bind(this),
-                        className: "pointer f9 green2 bg-gray0-d ba pv3 ph4 b--green2"       , __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 122}}
+                        className: "pointer f9 green2 bg-gray0-d ba pv3 ph4 b--green2"       , __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 161}}
                         , "Share Image"
 
                       )
                     )
-                    , react.createElement('div', { ref: this.lineWidthRef, __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 129}})
-                    , react.createElement('div', { ref: this.strokeStyleRef, __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 130}})
-                    , react.createElement('div', { ref: this.drawRef, __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 131}})
+                    , react.createElement('div', { ref: this.lineWidthRef, __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 168}})
+                    , react.createElement('div', { ref: this.strokeStyleRef, __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 169}})
+                    , react.createElement('div', { ref: this.drawRef, __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 170}})
                   )
                 )
               }
@@ -68222,11 +68254,30 @@ lyrtesmudnytbyrsenwegfyrmurtelreptegpecnelnevfes\
               }
             }
 
+            function reparseDrawForms(data) {
+              console.log(data);
+              data.forEach(function (item, i, array) {
+                const properties = item[item.length - 1];
+                array[i].strokeStyle = properties.strokeStyle;
+                array[i].lineWidth = parseFloat(properties.lineWidth);
+                array[i].pop();
+                array[i].forEach(function (item, i, array) {
+                  array[i][0] = parseFloat(item[0]),
+                  array[i][1] = parseFloat(item[1]);
+                });
+              });
+              console.log(data);
+              return data;
+            }
+
             class InitialReducer {
                 reduce(json, state) {
                     console.log("initial", json);
                     let data = lodash.get(json, 'init', false);
                     for (let canvas in data) {
+                      if (data[canvas].metadata.type === 'draw') {
+                        data[canvas].data = reparseDrawForms(data[canvas].data);
+                      }
                       state.canvasList[canvas] = data[canvas];
                     }
                 }
@@ -68236,14 +68287,17 @@ lyrtesmudnytbyrsenwegfyrmurtelreptegpecnelnevfes\
                 reduce(json, state) {
                     let data = lodash.get(json, 'load', false);
                     if (data) {
+                        if (data.type === 'draw') {
+                          data.data = reparseDrawForms(data.data);
+                        }
                         state.canvasList[data.name] = {
-                          "type": data.type,
-                          "metadata": {
-                            "name": data.name,
-                            "type": data.type,
-                            "location": data.location
+                          type: data.type,
+                          metadata: {
+                            name: data.name,
+                            type: data.type,
+                            location: data.location
                           },
-                          "data": data.data
+                          data: data.data
                         };
                     }
                 }
@@ -68286,13 +68340,13 @@ lyrtesmudnytbyrsenwegfyrmurtelreptegpecnelnevfes\
                 handleEvent(data) {
                     let json = data.data;
 
-                    console.log(json);
+                    // console.log(json);
                     this.initialReducer.reduce(json, this.state);
                     this.updateReducer.reduce(json, this.state);
                     this.paintReducer.reduce(json, this.state);
-                    console.log(this.state);
+                    // console.log(this.state);
                     if (!('paint' in json)) {
-                      console.log("not painting!!!!!!!!!!!");
+                      // console.log("not painting!!!!!!!!!!!");
                       this.setState(this.state);
                     }
                 }
@@ -68359,7 +68413,7 @@ lyrtesmudnytbyrsenwegfyrmurtelreptegpecnelnevfes\
                             const name =  props.match.params.name;
                             if (canvasList) {
                               let canvas;
-                              console.log(canvasList);
+                              // console.log(canvasList);
                               const data = !!canvasList[name] ? canvasList[name].data : {};
                               const canvasType = !!canvasList[name] ? canvasList[name].metadata.type : "";
                               const location = !!canvasList[name] ? canvasList[name].metadata.location : "";
@@ -68375,7 +68429,7 @@ lyrtesmudnytbyrsenwegfyrmurtelreptegpecnelnevfes\
                                   break;
                                 default: canvas = null;
                               }
-                              console.log(canvas);
+                              // console.log(canvas);
                               return (
                                 react.createElement(Skeleton, {
                                   history: props.history,

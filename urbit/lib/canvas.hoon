@@ -68,7 +68,7 @@
           ?>  ?=([@t @t ~] coords)
           [i.coords i.t.coords]
         ::
-          ['lineWidth' ni]
+          ['lineWidth' no]
           ['strokeStyle' so]
       ==
     --
@@ -144,17 +144,16 @@
     ::
         %draw
       :-  %a
-      %-  zing
       %+  turn  draw.canvas
       |=  =form
+      ^-  json
+      :-  %a
       %+  weld
-        ^-  (list json)
         (form-strokes-to-json strokes.form)
-      ^-  (list json)
       :_  ~
       %-  pairs
-      :~  ['lineWidth' (numb line-width.form)]
-          ['styleStroke' s+style-stroke.form]
+      :~  ['lineWidth' s+line-width.form]
+          ['strokeStyle' s+style-stroke.form]
       ==
     ==
   ::
@@ -193,7 +192,7 @@
       ==
     ::
         %draw
-      :~  ['lineWidth' (numb line-width.form.stroke)]
+      :~  ['lineWidth' s+line-width.form.stroke]
           ['styleStroke' s+style-stroke.form.stroke]
           ['strokes' a+(form-strokes-to-json strokes.form.stroke)]
       ==
@@ -206,6 +205,6 @@
     %+  turn  strokes
     |=  [x=@t y=@t]
     ^-  json
-    [%a ~[s+x s+y]]
+    a+~[s+x s+y]
   --
 --

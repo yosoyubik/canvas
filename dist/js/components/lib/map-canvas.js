@@ -23,7 +23,7 @@ const addStyle = function(d) {
 }
 
 const initMapCanvas = (us) => {
-  console.log(us);
+  // console.log(us);
   d3.select(".background").append("path")
       .datum(topojson.mesh(us, us.objects.states))
       .attr("class", "background")
@@ -50,7 +50,7 @@ const drawMapCanvas = (us, props) => {
   const mousedown = function(d) {
     const colors = d3.select(".legend").selectAll("rect").nodes();
     const color = d3.color(selectedColor(colors).style.fill).toString();
-    console.log(d);
+    // console.log(d);
     mousing = (d.attr.fill && d.attr.color === color) ? -1 : +1;
     mousemove.apply(this, arguments);
   }

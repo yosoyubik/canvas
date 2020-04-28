@@ -22,13 +22,13 @@ class Store {
     handleEvent(data) {
         let json = data.data;
 
-        console.log(json);
+        // console.log(json);
         this.initialReducer.reduce(json, this.state);
         this.updateReducer.reduce(json, this.state);
         this.paintReducer.reduce(json, this.state);
-        console.log(this.state);
+        // console.log(this.state);
         if (!('paint' in json)) {
-          console.log("not painting!!!!!!!!!!!");
+          // console.log("not painting!!!!!!!!!!!");
           this.setState(this.state);
         }
     }

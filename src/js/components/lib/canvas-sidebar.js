@@ -15,7 +15,7 @@ export class CanvasSidebar extends Component {
   }
   render() {
     const { props, state } = this;
-    console.log(props, state);
+    // console.log(props, state);
     let selectedClass = (props.selected === "me") ? "bg-gray4 bg-gray1-d" : "bg-white bg-gray0-d";
 
     let rootIdentity = <Link
@@ -42,7 +42,7 @@ export class CanvasSidebar extends Component {
     let canvasItems = null;
     if (!!props.canvasList) {
       canvasItems = Object.entries(props.canvasList).map((each, i) => {
-        console.log(each, i);
+        // console.log(each, i);
         return (
           <CanvasTitle key={i} id={each[0]} location={each[1].metadata.location} />
         )

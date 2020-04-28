@@ -16,13 +16,13 @@ export class MapCanvas extends Component {
   }
 
   componentDidMount() {
-    console.log("mounting");
+    // console.log("mounting");
     const { props, state, animationRef } = this;
 
     fetch("/~canvas/map/us.json")
       .then((response) => response.json())
       .then((json) => {
-        console.log(json);
+        // console.log(json);
         this.setState({
           data: json
         });
