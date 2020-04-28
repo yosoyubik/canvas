@@ -16,17 +16,21 @@ export class DrawCanvas extends Component {
     super(props);
     this.state = {
       forms: [],
-      buffer: []
+      line: "1",
+      color: "#000000"
     }
     this.drawRef = React.createRef();
     this.lineWidthRef = React.createRef();
     this.strokeStyleRef = React.createRef();
 
     this.setStrokes = this.setStrokes.bind(this);
+    this.onChangeLine = this.onChangeLine.bind(this);
+    this.onChangeColor = this.onChangeColor.bind(this);
   }
 
   componentDidUpdate() {
-    console.log("componentDidUpdate");
+    console.log("componentDidUpdate", this.state.line, this.state.color);
+    drawHexCanvas(this.props, this.state.line, this.state.color);
   }
 
   componentDidMount() {
@@ -46,8 +50,8 @@ export class DrawCanvas extends Component {
     // });
     //
     initDrawCanvas();
-    console.log(props.canvas);
-    drawHexCanvas(props);
+    console.log(state.line, state.color);
+    drawHexCanvas(props, state.line, state.color);
     if (props.canvas.length) {
 
     //   (async () => {
@@ -120,12 +124,20 @@ export class DrawCanvas extends Component {
     })();
   }
 
+  onChangeLine(event) {
+    this.setState({ line: event.target.value });
+  }
+
+  onChangeColor(event) {
+    this.setState({ color: event.target.value });
+  }
+
   onClickShare () {
     this.props.api.svg.share(this.props.name);
   }
 
   render() {
-    const { props, state } = this;
+    const { props, state, onChangeLine, onChangeColor } = this;
 
     return (
       <div className="h-100 w-100 pa3 pt4 bg-gray0-d white-d flex flex-column">
@@ -144,8 +156,11 @@ export class DrawCanvas extends Component {
           </button>
         </div>
         <div ref={this.lineWidthRef}>
+          <input id="line" type="range" min="0.5" max="20" value={this.state.line}
+                 step="0.5" style={{width:"120px"}} onChange={onChangeLine} />
         </div>
         <div ref={this.strokeStyleRef}>
+          <input id="color" type="color" style={{width:"120px"}} onChange={onChangeColor} />
         </div>
         <div ref={this.drawRef}>
           <canvas id="canvas" width={width} height={height}></canvas>

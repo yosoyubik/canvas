@@ -68,7 +68,7 @@
           ?>  ?=([@t @t ~] coords)
           [i.coords i.t.coords]
         ::
-          ['lineWidth' no]
+          ['lineWidth' so]
           ['strokeStyle' so]
       ==
     --

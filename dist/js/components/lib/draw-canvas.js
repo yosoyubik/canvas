@@ -19,10 +19,10 @@ const initDrawCanvas = () => {
   curve = d3.curveBasis(context);
 }
 
-const drawHexCanvas = (props) => {
+const drawHexCanvas = (props, line, color) => {
   const strokes = (props.canvas) ? props.canvas : [];
   context.canvas.value = strokes;
-  
+
   d3.select("canvas").call(d3.drag()
       .container(context.canvas)
       .subject(dragsubject)
@@ -55,8 +55,8 @@ const drawHexCanvas = (props) => {
       "strokes": [{
         draw: {
           coords: stroke,
-          lineWidth: 1,
-          strokeStyle: "#000000"
+          lineWidth: line,
+          strokeStyle: color
         }
       }]
     });
@@ -73,10 +73,10 @@ const drawHexCanvas = (props) => {
       }
       if (stroke.length === 1) curve.point(...stroke[0]);
       curve.lineEnd();
-      context.lineWidth = 1;
-      context.strokeStyle = "#000000";
-      // context.lineWidth = stroke.lineWidth;
-      // context.strokeStyle = stroke.strokeStyle;
+      // context.lineWidth = line;
+      // context.strokeStyle = color;
+      context.lineWidth = stroke.lineWidth;
+      context.strokeStyle = stroke.strokeStyle;
       context.stroke();
     }
     context.canvas.value = strokes;
@@ -86,8 +86,8 @@ const drawHexCanvas = (props) => {
   // Create a new empty stroke at the start of a drag gesture.
   function dragsubject() {
     const stroke = [];
-    // stroke.lineWidth = viewof lineWidth.value;
-    // stroke.strokeStyle = viewof strokeStyle.value;
+    stroke.lineWidth = line;
+    stroke.strokeStyle = color;
     strokes.push(stroke);
     redo.length = 0;
     return stroke;

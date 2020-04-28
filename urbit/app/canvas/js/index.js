@@ -57249,10 +57249,10 @@
               curve = basis$2(context$1);
             };
 
-            const drawHexCanvas$1 = (props) => {
+            const drawHexCanvas$1 = (props, line, color) => {
               const strokes = (props.canvas) ? props.canvas : [];
               context$1.canvas.value = strokes;
-              
+
               select("canvas").call(drag()
                   .container(context$1.canvas)
                   .subject(dragsubject)
@@ -57285,8 +57285,8 @@
                   "strokes": [{
                     draw: {
                       coords: stroke,
-                      lineWidth: 1,
-                      strokeStyle: "#000000"
+                      lineWidth: line,
+                      strokeStyle: color
                     }
                   }]
                 });
@@ -57303,10 +57303,10 @@
                   }
                   if (stroke.length === 1) curve.point(...stroke[0]);
                   curve.lineEnd();
-                  context$1.lineWidth = 1;
-                  context$1.strokeStyle = "#000000";
-                  // context.lineWidth = stroke.lineWidth;
-                  // context.strokeStyle = stroke.strokeStyle;
+                  // context.lineWidth = line;
+                  // context.strokeStyle = color;
+                  context$1.lineWidth = stroke.lineWidth;
+                  context$1.strokeStyle = stroke.strokeStyle;
                   context$1.stroke();
                 }
                 context$1.canvas.value = strokes;
@@ -57316,8 +57316,8 @@
               // Create a new empty stroke at the start of a drag gesture.
               function dragsubject() {
                 const stroke = [];
-                // stroke.lineWidth = viewof lineWidth.value;
-                // stroke.strokeStyle = viewof strokeStyle.value;
+                stroke.lineWidth = line;
+                stroke.strokeStyle = color;
                 strokes.push(stroke);
                 redo.length = 0;
                 return stroke;
@@ -57338,17 +57338,21 @@
                 super(props);
                 this.state = {
                   forms: [],
-                  buffer: []
+                  line: "1",
+                  color: "#000000"
                 };
                 this.drawRef = react.createRef();
                 this.lineWidthRef = react.createRef();
                 this.strokeStyleRef = react.createRef();
 
                 this.setStrokes = this.setStrokes.bind(this);
+                this.onChangeLine = this.onChangeLine.bind(this);
+                this.onChangeColor = this.onChangeColor.bind(this);
               }
 
               componentDidUpdate() {
-                console.log("componentDidUpdate");
+                console.log("componentDidUpdate", this.state.line, this.state.color);
+                drawHexCanvas$1(this.props, this.state.line, this.state.color);
               }
 
               componentDidMount() {
@@ -57368,8 +57372,8 @@
                 // });
                 //
                 initDrawCanvas();
-                console.log(props.canvas);
-                drawHexCanvas$1(props);
+                console.log(state.line, state.color);
+                drawHexCanvas$1(props, state.line, state.color);
                 if (props.canvas.length) ;
 
                 // this.setState({observer: observer});
@@ -57399,34 +57403,46 @@
               onClickSave () {
               }
 
+              onChangeLine(event) {
+                this.setState({ line: event.target.value });
+              }
+
+              onChangeColor(event) {
+                this.setState({ color: event.target.value });
+              }
+
               onClickShare () {
                 this.props.api.svg.share(this.props.name);
               }
 
               render() {
+                const { props, state, onChangeLine, onChangeColor } = this;
 
                 return (
-                  react.createElement('div', { className: "h-100 w-100 pa3 pt4 bg-gray0-d white-d flex flex-column"       , __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 131}}
+                  react.createElement('div', { className: "h-100 w-100 pa3 pt4 bg-gray0-d white-d flex flex-column"       , __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 143}}
                     , react.createElement('div', { className: "absolute mw5" ,
-                         style: {right: "20px", top: "20px"}, __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 132}} 
+                         style: {right: "20px", top: "20px"}, __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 144}} 
                       , react.createElement('button', {
                         onClick: this.onClickSave.bind(this),
-                        className: "pointer mr2 f9 green2 bg-gray0-d ba pv3 ph4 b--green2"        , __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 134}}, "Save Image"
+                        className: "pointer mr2 f9 green2 bg-gray0-d ba pv3 ph4 b--green2"        , __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 146}}, "Save Image"
 
                       )
                       , react.createElement('button', {
                         onClick: this.onClickShare.bind(this),
-                        className: "pointer f9 green2 bg-gray0-d ba pv3 ph4 b--green2"       , __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 139}}
+                        className: "pointer f9 green2 bg-gray0-d ba pv3 ph4 b--green2"       , __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 151}}
                         , "Share Image"
 
                       )
                     )
-                    , react.createElement('div', { ref: this.lineWidthRef, __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 146}}
+                    , react.createElement('div', { ref: this.lineWidthRef, __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 158}}
+                      , react.createElement('input', { id: "line", type: "range", min: "0.5", max: "20", value: this.state.line,
+                             step: "0.5", style: {width:"120px"}, onChange: onChangeLine, __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 159}} )
                     )
-                    , react.createElement('div', { ref: this.strokeStyleRef, __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 148}}
+                    , react.createElement('div', { ref: this.strokeStyleRef, __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 162}}
+                      , react.createElement('input', { id: "color", type: "color", style: {width:"120px"}, onChange: onChangeColor, __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 163}} )
                     )
-                    , react.createElement('div', { ref: this.drawRef, __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 150}}
-                      , react.createElement('canvas', { id: "canvas", width: width$2, height: height$2, __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 151}})
+                    , react.createElement('div', { ref: this.drawRef, __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 165}}
+                      , react.createElement('canvas', { id: "canvas", width: width$2, height: height$2, __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 166}})
                     )
                   )
                 )
