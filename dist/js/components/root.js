@@ -80,6 +80,9 @@ export class Root extends Component {
                     case 'map':
                       canvas = React.createElement(MapCanvas, { api: api, canvas: data, name: name, location: location, __self: this, __source: {fileName: _jsxFileName, lineNumber: 81}} );
                       break;
+                    case 'draw':
+                      canvas = React.createElement(DrawCanvas, { api: api, canvas: data, name: name, location: location, __self: this, __source: {fileName: _jsxFileName, lineNumber: 84}}  )
+                      break;
                     default: canvas = null;
                   }
                   console.log(canvas);
@@ -87,7 +90,7 @@ export class Root extends Component {
                     React.createElement(Skeleton, {
                       history: props.history,
                       canvasList: canvasList,
-                      activeDrawer: "rightPanel", __self: this, __source: {fileName: _jsxFileName, lineNumber: 87}}
+                      activeDrawer: "rightPanel", __self: this, __source: {fileName: _jsxFileName, lineNumber: 90}}
                       , canvas
                     )
                   );
@@ -106,15 +109,15 @@ export class Root extends Component {
                 React.createElement(Skeleton, {
                   history: props.history,
                   canvasList: canvasList,
-                  activeDrawer: "rightPanel", __self: this, __source: {fileName: _jsxFileName, lineNumber: 106}}
+                  activeDrawer: "rightPanel", __self: this, __source: {fileName: _jsxFileName, lineNumber: 109}}
                   , React.createElement(JoinScreen, {
                     api: api,
                     canvasList: canvasList,
                     autoJoin: canvas,
-                    ...props, __self: this, __source: {fileName: _jsxFileName, lineNumber: 110}} )
+                    ...props, __self: this, __source: {fileName: _jsxFileName, lineNumber: 113}} )
                 )
               );
-            }, __self: this, __source: {fileName: _jsxFileName, lineNumber: 96}}
+            }, __self: this, __source: {fileName: _jsxFileName, lineNumber: 99}}
           )
         )
       )

@@ -46,11 +46,8 @@ export class JoinScreen extends Component {
 
   componentDidUpdate(prevProps, prevState) {
     const { props, state } = this;
-    console.log("ccomponentDidUpdate");
     let canvas = state.canvas.split('/');
-    console.log(canvas);
     let canvasName = canvas[canvas.length - 1];
-    console.log(canvasName, props.canvasList);
     if (canvasName in props.canvasList) {
       props.history.push(`/~canvas/item/${canvasName}`);
     }
@@ -87,7 +84,6 @@ export class JoinScreen extends Component {
       });
       return;
     }
-    console.log(canvas);
     props.api.canvas.join(ship, canvasName);
   }
 

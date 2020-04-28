@@ -1,7 +1,7 @@
 |%
-+$  canvas-type  ?(%mesh %map)
++$  canvas-type  ?(%mesh %map %draw)
 +$  arc          [filled=? color=@t]
-+$  form         [strokes=(list [@ud @ud]) line-width=@ud style-stroke=@t]
++$  form         [strokes=(list [@t @t]) line-width=@ud style-stroke=@t]
 +$  mesh         (map @ud arc)
 +$  draw         (list form)
 +$  metadata     [name=@t type=canvas-type location=ship]

@@ -80,6 +80,9 @@ export class Root extends Component {
                     case 'map':
                       canvas = <MapCanvas api={api} canvas={data} name={name} location={location} />;
                       break;
+                    case 'draw':
+                      canvas = <DrawCanvas api={api} canvas={data} name={name} location={location}  />
+                      break;
                     default: canvas = null;
                   }
                   console.log(canvas);

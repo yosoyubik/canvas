@@ -70,7 +70,6 @@ const drawHexCanvas = (props) => {
         // Save stroke locally on browser
         canvasData[d.id] = {fill: mousing > 0, color: color};
       }
-      // d3.select(this).classed("point fill", d.fill = mousing > 0);
       d3.select(this).style('fill', () => {
         d.attr.fill = mousing > 0;
         if (d.attr.fill) {
@@ -81,7 +80,6 @@ const drawHexCanvas = (props) => {
           return 'white';
         }
       });
-      // border.call(redraw);
     }
   }
 
@@ -109,7 +107,6 @@ const drawHexCanvas = (props) => {
   const hexagons = g
     .selectAll("path")
     .data(topology.objects.hexagons.geometries)
-    // .attr("class", changeColor)
     .style('fill', addStyle);
 
   // enter
@@ -121,15 +118,10 @@ const drawHexCanvas = (props) => {
       .on("mousedown", mousedown)
       .on("mousemove", mousemove)
       .on("mouseup", mouseup);
-
-  // const border = d3.select(".border-group")
-  //   .append("path")
-  //     .attr("class", "border")
-  //     .call(redraw);
 }
 
 const hexTopology = (radius, width, height, hexagons, canvasName) => {
-  // console.log(hexagons);
+
   const dx = radius * 2 * Math.sin(Math.PI / 3),
       dy = radius * 1.5,
       m = Math.ceil((height + radius) / dy) + 1,
@@ -156,7 +148,7 @@ const hexTopology = (radius, width, height, hexagons, canvasName) => {
       ++total;
     }
   }
-  // console.log(geometries, (hexagons ? Object.keys(hexagons).length : 0));
+
   return {
     transform: {translate: [0, 0], scale: [1, 1]},
     objects: {hexagons: {type: "GeometryCollection", geometries: geometries}},

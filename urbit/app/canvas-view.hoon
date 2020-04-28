@@ -251,10 +251,10 @@
      [%create name.metadata.canvas ~]
    ^-  canvas-action
    :-  %create
-   :_  [~ metadata.canvas]
-   ?+  -.canvas  !!
-     %mesh  %mesh
-     %map   %mesh
+   ?-  -.canvas
+     %draw  [%draw ~ metadata.canvas]
+     %mesh  [%mesh ~ metadata.canvas]
+     %map   [%map ~ metadata.canvas]
    ==
   ::
   ++  handle-share

@@ -1,11 +1,6 @@
 import React, { Component } from 'react'
-
 import { Route, Link } from 'react-router-dom';
-import { sigil, stringRenderer } from 'urbit-sigil-js'
-import { deSig } from '/lib/util';
-import urbitOb from 'urbit-ob';
 
-import { store } from '/store';
 
 export class NewScreen extends Component {
   constructor(props) {
@@ -71,7 +66,6 @@ export class NewScreen extends Component {
   }
 
   render() {
-    console.log(this.state, this.props);
     let displayNameErrElem = (<span />);
     if (this.state.displayNameError) {
       displayNameErrElem = (
