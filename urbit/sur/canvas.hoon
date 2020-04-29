@@ -56,5 +56,6 @@
 ::
 +$  canvas-view-response
   $%  canvas-action
+      [%init-frontend gallery=(list canvas) chats=(list path)]
   ==
 --

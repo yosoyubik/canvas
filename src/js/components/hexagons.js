@@ -9,6 +9,7 @@ import { initHexMesh,
          height,
          radius }
 from "./lib/hex-canvas";
+import { ShareImage } from "./lib/share-image";
 import { createColorPicker } from "./lib/color";
 
 
@@ -52,16 +53,11 @@ export class Hexagons extends Component {
         <div className="absolute mw5"
              style={{right: "20px", top: "20px"}}
           >
+          <ShareImage chats={this.props.chats} api={this.props.api} />
           <button
             onClick={this.onClickSave.bind(this)}
-            className="pointer mr2 f9 green2 bg-gray0-d ba pv3 ph4 b--green2">
+            className="pointer ml6 f9 green2 bg-gray0-d ba pv3 ph4 b--green2">
             Save Image
-          </button>
-          <button
-            onClick={this.onClickShare.bind(this)}
-            className="pointer f9 green2 bg-gray0-d ba pv3 ph4 b--green2"
-            >
-            Share Image
           </button>
         </div>
         <div ref="canvas" className="w-100 mb4 pr6 pr0-l pr0-xl">

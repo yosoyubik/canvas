@@ -161,8 +161,6 @@
 |_  bowl=bowl:gall
 ++  gallery-scry
   ~&  "requesting gallery..."
-  ^-  canvas-view-response
-  :-  %init
   .^  (list canvas)
     %gx
     (scot %p our.bowl)
@@ -181,6 +179,17 @@
     %canvas
     (scot %da now.bowl)
     ~[%canvas name %noun]
+  ==
+::
+++  chats-scry
+  ^-  (list path)
+  %~  tap   by
+  .^  (set path)
+    %gx
+    (scot %p our.bowl)
+    %chat-store
+    (scot %da now.bowl)
+    /keys/noun
   ==
 ::
 ++  send-canvas-action
@@ -218,7 +227,8 @@
   ::
   ++  handle-init
     ^-  (list card)
-    (send-frontend (canvas-view-response-to-json gallery-scry))
+    %-  send-frontend
+    (canvas-view-response-to-json [%init-frontend gallery-scry chats-scry])
   ::
   ++  handle-paint
     |=  [location=@p name=@t strokes=(list stroke)]

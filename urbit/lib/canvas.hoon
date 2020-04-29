@@ -92,7 +92,12 @@
   |^
   %+  frond  -.act
   ?+     -.act  ~|(%action-not-supported !!)
-      %init
+      %init-frontend
+    %-  pairs
+    %+  weld
+      ['chats' a+(turn chats.act path)]~
+    :_  ~
+    :-  'canvas'
     %-  pairs
     %+  turn
       gallery.act
