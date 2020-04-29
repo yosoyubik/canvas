@@ -32,8 +32,8 @@
       [%create =canvas]
       ::  TODO: add chat name
       ::
-      [%share name=@t]
-      [%save name=@t svg=@t]
+      [%share name=@t =path]
+      [%save name=@t svg=@t last=?]
   ==
 ::
 +$  canvas-update
@@ -50,8 +50,8 @@
       [%create =canvas]
       ::  TODO: add chat name
       ::
-      [%share name=@t]
-      [%save name=@t svg=@t]
+      [%share name=@t =path]
+      [%save name=@t svg=@t last=?]
   ==
 ::
 +$  canvas-view-response

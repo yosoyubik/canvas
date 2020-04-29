@@ -20,6 +20,7 @@ export class Hexagons extends Component {
       name: '',
       data: {}
     }
+    this.onClickShare = this.onClickShare.bind(this);
   }
 
   componentDidMount() {
@@ -30,12 +31,39 @@ export class Hexagons extends Component {
   }
 
   onClickSave () {
-    const svgString = simpleParseSVG(d3.select("#canvas").node());
-    this.props.api.svg.save(this.props.name, svgString);
+    const canvas = d3.select("#canvas").clone(true).remove('.mesh-group').remove('.legend');
+    const svgString = simpleParseSVG(canvas.node());
+    const chunkSize = Math.round(svgString.length / 4);
+    let last = false;
+    let i = 0;
+    let chunks = [];
+    while (i < svgString.length) {
+      this.props.api.svg.save(
+        this.props.name,
+        svgString.slice(i, chunkSize + i),
+        ((i + chunkSize ) >= svgString.length) );
+      i += chunkSize;
+    }
   }
 
-  onClickShare () {
-    this.props.api.svg.share(this.props.name);
+  onClickShare (chatPath) {
+    // this.setState({
+    //   error: false,
+    //   success: true,
+    //   awaiting: true
+    // }, () => {
+    //   props.api.canvas.create(
+    //     state.canvasName,
+    //     state.template,
+    //     '~' + ship
+    //   ).then(() => {
+    //     this.setState({
+    //       awaiting: false
+    //     });
+    //     props.history.push(`/~canvas/item/${state.canvasName}`);
+    //   })
+    // });
+    this.props.api.svg.share(this.props.name, chatPath);
   }
 
   render() {
@@ -53,7 +81,7 @@ export class Hexagons extends Component {
         <div className="absolute mw5"
              style={{right: "20px", top: "20px"}}
           >
-          <ShareImage chats={this.props.chats} api={this.props.api} />
+          <ShareImage chats={this.props.chats} share={this.onClickShare}/>
           <button
             onClick={this.onClickSave.bind(this)}
             className="pointer ml6 f9 green2 bg-gray0-d ba pv3 ph4 b--green2">

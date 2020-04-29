@@ -79,7 +79,6 @@ const simpleParseSVG = (svgNode) => {
   serializedXML = serializedXML.replace(/(\w+)?:?xlink=/g, 'xmlns:xlink=');
   // Safari NS namespace fix
   serializedXML = serializedXML.replace(/NS\d+:href/g, 'xlink:href');
-  console.log(serializedXML);
   return serializedXML;
 }
 

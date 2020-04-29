@@ -77,12 +77,10 @@
     (ot ~[['ship' (su ;~(pfix sig fed:ag))] ['canvas-name' so]])
   ::
   ++  save
-    (ot ~[['canvas-name' so] ['svg' so]])
+    (ot ~[['canvas-name' so] ['svg' so] ['last' bo]])
   ::
   ++  share
-    ::  TODO: add chat name
-    ::
-    (ot ['canvas-name' so]~)
+    (ot ~[['canvas-name' so] ['chat-path' pa]])
   --
 ::
 ++  canvas-view-response-to-json

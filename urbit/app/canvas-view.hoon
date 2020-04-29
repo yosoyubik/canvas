@@ -1,3 +1,4 @@
+
 ::  canvas-view: A Canvas app for Urbit
 ::
 /-  *canvas, *chat-store
@@ -268,14 +269,14 @@
    ==
   ::
   ++  handle-share
-   |=  name=@t
+   |=  [name=@t =path]
    ^-  (list card)
-   [(send-canvas-action [%share name ~] [%share name])]~
+   [(send-canvas-action [%share name ~] [%share name path])]~
   ::
   ++  handle-save
-    |=  [name=@t svg=@t]
+    |=  [name=@t svg=@t last=?]
     ^-  (list card)
-    [(send-canvas-action [%save name ~] [%save name svg])]~
+    [(send-canvas-action [%save name ~] [%save name svg last])]~
   --
 ::
 ++  handle-view-update

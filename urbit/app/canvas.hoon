@@ -53,6 +53,7 @@
     ::
     +$  state-zero
       $:  gallery=(map location canvas)
+          buffers=(map @t (list @t))
       ==
     --
 ::
@@ -71,6 +72,7 @@
     ++  on-init  on-init:def
     ++  on-poke
       |=  [=mark =vase]
+      ~&  mark
       ^-  (quip card _this)
       ?+    mark  (on-poke:def mark vase)
           %canvas-action
@@ -208,6 +210,7 @@
 ++  handle-canvas-action
   |=  act=canvas-action
   ^-  (quip card _state)
+  ~&  -.act
   |^
   ?+  -.act  !!
     %paint   (handle-paint +.act)
@@ -254,14 +257,14 @@
    state(gallery (~(put by gallery) [[our.bowl name.metadata.canvas] canvas]))
   ::
   ++  handle-share
-   |=  name=@t
+   |=  [name=@t =path]
    ^-  (quip card _state)
    ?>  (team:title our.bowl src.bowl)
    :_  state
    ::  TODO: check if file has been created already?
    ::  disable share on browser if not
    ::
-   =/  =path  (weld /~ [(scot %p our.bowl) name ~])
+   :: =/  =path  (weld /~ [(scot %p our.bowl) name ~])
    =/  serial=@uvH  (shaf %msg-uid eny.bowl)
    =/  =hart:eyre  .^(hart:eyre %e /(scot %p our.bowl)/host/real)
    =/  port=@ud  (need q.hart)
@@ -288,11 +291,27 @@
    ==
   ::
   ++  handle-save
-    |=  [file=@t svg=@t]
+    |=  [file=@t chunk=@t last=?]
     ^-  (quip card _state)
     ?>  (team:title our.bowl src.bowl)
+    =/  chunks=(unit (list @t))  (~(get by buffers) file)
+    ?.  last
+      ::  %eyre was crashing when the svg was ~1MB
+      ::  solution: send chunks and assemble them later
+      ::
+      :-  ~
+      %_    state
+          buffers
+        %-  ~(put by buffers)
+        :-  file
+        ?~  chunks  [chunk]~
+        (snoc u.chunks chunk)
+      ==
+    ?~  chunks  `state
+    =/  svg=@t  (crip (snoc u.chunks chunk))
     =/  =path
       ~[(scot %p our.bowl) %home (scot %da now.bowl) %app %canvas %svg file %svg]
+    ~&  path
     =/  contents=cage  [%svg !>(svg)]
     :_  state
     [%pass /write-file %arvo %c %info (foal:space:userlib path contents)]~

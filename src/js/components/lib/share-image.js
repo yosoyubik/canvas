@@ -45,24 +45,8 @@ export class ShareImage extends Component {
   }
 
   onClickShare () {
-    // this.setState({
-    //   error: false,
-    //   success: true,
-    //   awaiting: true
-    // }, () => {
-    //   props.api.canvas.create(
-    //     state.canvasName,
-    //     state.template,
-    //     '~' + ship
-    //   ).then(() => {
-    //     this.setState({
-    //       awaiting: false
-    //     });
-    //     props.history.push(`/~canvas/item/${state.canvasName}`);
-    //   })
-    // });
     if (this.state.chat){
-      this.props.api.svg.share(this.props.name);
+      this.props.share(this.state.chat);
     }
   }
 
@@ -99,17 +83,20 @@ export class ShareImage extends Component {
       ? "absolute db z-2 bg-white bg-gray0-d white-d ba b--gray3 b--gray1-d"
       : "dn";
 
-    const chatList = state.results.map((path, i) => {
-      const elements = path.split("/");
-      const host = elements[elements.length-2];
-      const chat = elements[elements.length-1];
-      return (
-        <li key={i}
-            className="tl list white-d f9 pv2 ph3 pointer hover-bg-gray4 hover-bg-gray1-d inter"
-            onClick={() => this.selectChat(path, chat)}>
-          <span className="mix-blend-diff white">{chat} on {host}</span>
-        </li>)
-    });
+    let chatList = <div />;
+    if (state.results) {
+      chatList = state.results.map((path, i) => {
+        const elements = path.split("/");
+        const host = elements[elements.length-2];
+        const chat = elements[elements.length-1];
+        return (
+          <li key={i}
+              className="tl list white-d f9 pv2 ph3 pointer hover-bg-gray4 hover-bg-gray1-d inter"
+              onClick={() => this.selectChat(path, chat)}>
+            <span className="mix-blend-diff white">{chat} on {host}</span>
+          </li>)
+      });
+    }
 
     return (
       <div className="ml1 dib">
