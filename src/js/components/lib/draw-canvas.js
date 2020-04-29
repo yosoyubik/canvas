@@ -47,16 +47,16 @@ const drawHexCanvas = (props, line, color) => {
   function mouseEnds() {
     const stroke = strokes[strokes.length - 1];
     console.log("finished", stroke);
-    // const lineWidth = stroke.lineWidth;
-    // const strokeStyle = stroke.strokeStyle;
+    const lineWidth = stroke.lineWidth;
+    const strokeStyle = stroke.strokeStyle;
     props.api.canvas.paint({
       "canvas-name": props.name,
       "location": props.location,
       "strokes": [{
         draw: {
           coords: stroke,
-          lineWidth: line,
-          strokeStyle: color
+          lineWidth: lineWidth,
+          strokeStyle: strokeStyle
         }
       }]
     });
