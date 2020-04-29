@@ -1,20 +1,53 @@
 import React, { Component } from 'react'
 import { Route, Link } from 'react-router-dom';
+import { TemplateSelector } from "/lib/template-selector";
 
 
 export class NewScreen extends Component {
   constructor(props) {
     super(props);
-
+    const templates = {
+      'mesh': 'Hexagon Mesh',
+      'draw': 'Free-hand Canvas',
+      'europe': 'Western Europe',
+      'africa': 'Africa',
+      'us-counties': 'U.S. Counties',
+      'us-states': 'U.S. States'
+    };
     this.state = {
-      canvasName: '',
-      canvasType: 'mesh'
+      open: false,
+      placeholder: 'Choose a template (default: Hexagon Mesh)',
+      template: "mesh",
+      searchTerm: "",
+      results: Object.entries(templates),
+      templates: templates
     }
 
     this.canvasNameChange = this.canvasNameChange.bind(this);
-    this.canvasTypeChange = this.canvasTypeChange.bind(this);
+    this.selectTemplate = this.selectTemplate.bind(this);
+    this.toggleOpen = this.toggleOpen.bind(this);
+    this.search = this.search.bind(this);
+    this.handleClickOutside = this.handleClickOutside.bind(this);
   }
 
+  componentDidMount() {
+    document.addEventListener('mousedown', this.handleClickOutside);
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('mousedown', this.handleClickOutside);
+  }
+
+  toggleOpen() {
+    this.setState({open: !this.state.open});
+  }
+
+  handleClickOutside(evt) {
+    if ((this.dropdown && !this.dropdown.contains(evt.target))
+    && (this.toggleButton && !this.toggleButton.contains(evt.target))) {
+      this.setState({ open: false });
+    }
+  }
 
   canvasNameChange(event) {
     const asciiSafe = event.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-");
@@ -24,16 +57,35 @@ export class NewScreen extends Component {
     });
   }
 
-  canvasTypeChange(event) {
-    // Validate existing types
+  search(evt) {
+    // this.setState({searchTerm: evt.target.value});
+    let term = evt.target.value.toLowerCase();
+
+    // if (term.length < 3) {
+    //   return this.setState({results: []})
+    // }
+
+    let templateMatches = [];
+    templateMatches = Object.entries(this.state.templates).filter(e => {
+      return (e[0].includes(term) ||
+              e[0].split('-').includes(term) ||
+              e[1].toLowerCase().includes(term));
+    });
+    this.setState({results: templateMatches});
+  }
+
+  selectTemplate(template) {
+    console.log(template);
     this.setState({
-      canvasType: event.target.value
+      placeholder: this.state.templates[template],
+      template: template,
+      open: false
     });
   }
 
   onClickCreate() {
     const { props, state } = this;
-
+    if (!(state.canvasName)) return;
     this.setState({
       error: false,
       success: true,
@@ -41,7 +93,7 @@ export class NewScreen extends Component {
     }, () => {
       props.api.canvas.create(
         state.canvasName,
-        state.canvasType,
+        state.template,
         '~' + ship
       ).then(() => {
         this.setState({
@@ -66,6 +118,27 @@ export class NewScreen extends Component {
   }
 
   render() {
+    const { props, state } = this;
+
+    let buttonOpened = (state.open)
+      ? "bg-gray5 bg-gray1-d white-d" : "hover-bg-gray5 hover-bg-gray1-d white-d";
+
+    let allowCreate = "f9 ba pa2 pointer bg-transparent " +
+    (state.canvasName ? "b--green2 green2" : "b--gray4 gray4 b--gray2-d gray2-d")
+
+    let dropdownClass = (state.open)
+      ? "absolute db z-2 bg-white bg-gray0-d white-d ba b--gray3 b--gray1-d"
+      : "dn";
+
+    const templateList = state.results.map((each, i) => {
+      return (
+        <li key={each[0]}
+            className="tl list white-d f9 pv2 ph3 pointer hover-bg-gray4 hover-bg-gray1-d inter"
+            onClick={() => this.selectTemplate(each[0])}>
+          <span className="mix-blend-diff white">{each[1]}</span>
+        </li>)
+    });
+
     let displayNameErrElem = (<span />);
     if (this.state.displayNameError) {
       displayNameErrElem = (
@@ -101,25 +174,34 @@ export class NewScreen extends Component {
           />
           {displayNameErrElem}
 
-          <h2 className="f8">Canvas Type</h2>
-          <textarea
-            className={
-              "f7 ba b--gray3 b--gray2-d bg-gray0-d white-d pa3 db w-100 mt2 " +
-              "focus-b--black focus-b--white-d"
-            }
-            rows={1}
-            placeholder="mesh"
-            style={{
-              resize: "none",
-              height: 48,
-              paddingTop: 14
-            }}
-            onChange={this.canvasTypeChange}
-          />
+          <h2 className="f8">Template</h2>
+          <div className="w-100 pb4">
+            <textarea
+              className={
+                "f7 ba b--gray3 b--gray2-d bg-gray0-d white-d pa3 db w-100 mt2 " +
+                "focus-b--black focus-b--white-d"
+              }
+              rows={1}
+              placeholder={this.state.placeholder}
+              style={{
+                resize: "none",
+                height: 48,
+                paddingTop: 14
+              }}
+              onChange={this.search}
+              onClick={() => this.toggleOpen()}
+              ref={(el) => this.toggleButton = el}
+            />
+          </div>
+          <div className={dropdownClass}
+              style={{ maxHeight: "24rem", width: 285 }}
+              ref={(el) => { this.dropdown = el }}>
+            {templateList}
+          </div>
 
           <button
             onClick={this.onClickCreate.bind(this)}
-            className="f9 ba pa2 b--green2 green2 pointer bg-transparent">
+            className={allowCreate}>
             Create Canvas
           </button>
           <Link to="/~canvas">
