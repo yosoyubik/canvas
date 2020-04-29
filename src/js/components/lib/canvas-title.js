@@ -18,10 +18,10 @@ export class CanvasTitle extends Component {
           </div>
         </Link>
         { (props.location === ("~" + ship)) ?
-          (<p className="ph6 f9 green3">Local</p>) :
-          (<button className="pointer ph6 f9 gray3"
+          (<p className="ph6 f9 pb1 gray2">Local</p>) :
+          (<button className="pointer ph6 f9 pb1 red2"
            onClick={this.onClickLeave.bind(this)}>
-            disconnect from {props.location}
+            leave shared canvas
           </button>)
         }
       </div>

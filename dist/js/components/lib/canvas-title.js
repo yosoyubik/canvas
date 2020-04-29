@@ -18,10 +18,10 @@ export class CanvasTitle extends Component {
           )
         )
         ,  (props.location === ("~" + ship)) ?
-          (React.createElement('p', { className: "ph6 f9 green3"  , __self: this, __source: {fileName: _jsxFileName, lineNumber: 21}}, "Local")) :
-          (React.createElement('button', { className: "pointer ph6 f9 gray3"   ,
-           onClick: this.onClickLeave.bind(this), __self: this, __source: {fileName: _jsxFileName, lineNumber: 22}}, "disconnect from "
-              , props.location
+          (React.createElement('p', { className: "ph6 f9 pb1 gray2"   , __self: this, __source: {fileName: _jsxFileName, lineNumber: 21}}, "Local")) :
+          (React.createElement('button', { className: "pointer ph6 f9 pb1 red2"    ,
+           onClick: this.onClickLeave.bind(this), __self: this, __source: {fileName: _jsxFileName, lineNumber: 22}}, "leave shared canvas"
+
           ))
         
       )

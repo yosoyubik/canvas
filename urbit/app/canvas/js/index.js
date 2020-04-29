@@ -48801,8 +48801,8 @@
                       )
                     )
                     ,  (props.location === ("~" + ship)) ?
-                      (react.createElement('p', { className: "ph6 f9 green3"  , __self: this, __source: {fileName: _jsxFileName$3, lineNumber: 21}}, "Local")) :
-                      (react.createElement('button', { className: "pointer ph6 f9 gray3"   ,
+                      (react.createElement('p', { className: "ph6 f9 pb1 gray2"   , __self: this, __source: {fileName: _jsxFileName$3, lineNumber: 21}}, "Local")) :
+                      (react.createElement('button', { className: "pointer ph6 f9 pb1 red2"    ,
                        onClick: this.onClickLeave.bind(this), __self: this, __source: {fileName: _jsxFileName$3, lineNumber: 22}}, "disconnect from "
                           , props.location
                       ))
