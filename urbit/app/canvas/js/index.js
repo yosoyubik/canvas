@@ -56760,8 +56760,8 @@
             //  Adapted from: https://bl.ocks.org/mbostock/5249328
 
 
-            const width = 960,
-                  height = 960,
+            const width = 1500,
+                  height = 1000,
                   radius = 10;
 
             const hexProjection = (radius) => {
@@ -57083,7 +57083,8 @@
                   selectedColor = 0;
 
               var legend = select(".legend")
-                  .attr("transform", "translate(" + ((width - 18 * 24) / 2) + ",10)")
+                  .attr("transform", "translate(25,25)")
+                  // .attr("transform", "translate(" + ((width - 18 * 24) / 2) + ",10)")
                   .style("cursor", "pointer");
 
                 legend.selectAll("rect")
@@ -57139,7 +57140,7 @@
                 // console.log("mounting");
                 drawHexCanvas(this.props);
                 initHexMesh();
-                createColorPicker(width);
+                createColorPicker();
               }
 
               onClickSave () {
@@ -57184,7 +57185,7 @@
                 }
 
                 return (
-                  react.createElement('div', { className: "h-100 w-100 pa3 pt4 bg-gray0-d white-d flex flex-column"       , __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 77}}
+                  react.createElement('div', { className: "h-100 w-100 bg-gray0-d white-d flex flex-column"     , __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 77}}
                     , react.createElement('div', { className: "w-100 dn-m dn-l dn-xl inter pt1 pb6 f8"       , __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 78}}
                       , react.createElement(Link, { to: "/~canvas/", __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 79}}, "⟵ Canvas")
                     )
@@ -57198,7 +57199,7 @@
 
                       )
                     )
-                    , react.createElement('div', { ref: "canvas", className: "w-100 mb4 pr6 pr0-l pr0-xl"    , __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 91}}
+                    , react.createElement('div', { ref: "canvas", className: "w-100 pr0-l pr0-xl"  , style: {overflow: "hidden"}, __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 91}}
                       , react.createElement('svg', { className: "db", id: "canvas", width: width, height: height, __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 92}}
                         , react.createElement('g', { className: "hexagon", __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 93}} )
                         , react.createElement('g', { className: "mesh-group", __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 94}} )
@@ -57357,7 +57358,7 @@
                 if (state.data) {
                   initMapCanvas(state.data);
                   drawMapCanvas(state.data, props);
-                  createColorPicker(width$1);
+                  createColorPicker();
                 }
 
                 return (

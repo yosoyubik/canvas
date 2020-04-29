@@ -4,8 +4,8 @@ import * as d3 from "d3";
 import * as topojson from "topojson";
 
 
-const width = 960,
-      height = 960,
+const width = 1500,
+      height = 1000,
       radius = 10;
 
 const hexProjection = (radius) => {

@@ -23,7 +23,8 @@ function createColorPicker(width) {
       dragColor;
 
   var legend = d3.select(".legend")
-      .attr("transform", "translate(" + ((width - 18 * 24) / 2) + ",10)")
+      .attr("transform", "translate(25,25)")
+      // .attr("transform", "translate(" + ((width - 18 * 24) / 2) + ",10)")
       .style("cursor", "pointer");
 
     legend.selectAll("rect")

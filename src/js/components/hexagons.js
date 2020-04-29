@@ -74,7 +74,7 @@ export class Hexagons extends Component {
     }
 
     return (
-      <div className="h-100 w-100 pa3 pt4 bg-gray0-d white-d flex flex-column">
+      <div className="h-100 w-100 bg-gray0-d white-d flex flex-column">
         <div className="w-100 dn-m dn-l dn-xl inter pt1 pb6 f8">
           <Link to="/~canvas/">{"⟵ Canvas"}</Link>
         </div>
@@ -88,7 +88,7 @@ export class Hexagons extends Component {
             Save Image
           </button>
         </div>
-        <div ref="canvas" className="w-100 mb4 pr6 pr0-l pr0-xl">
+        <div ref="canvas" className="w-100 pr0-l pr0-xl" style={{overflow: "hidden"}}>
           <svg className="db" id="canvas" width={width} height={height}>
             <g className="hexagon" />
             <g className="mesh-group" />
