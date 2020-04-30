@@ -48693,9 +48693,10 @@
                 this.action("canvas-view", "json", data);
               }
 
-              saveSVG(name, svgData, last) {
+              saveSVG(location, name, svgData, last) {
                 this.action("canvas-view", "canvas-view", {
                   save: {
+                    'location': location,
                     'canvas-name': name,
                     'svg': svgData,
                     'last': last
@@ -48746,7 +48747,8 @@
                   'metadata': {
                     'name': name,
                     'type': type,
-                    'location': location
+                    'location': location,
+                    'saved': false
                   }
                 };
                 return this.action("canvas-view", "canvas-view", {
@@ -48849,10 +48851,11 @@
                 let activeClasses = (this.props.activeDrawer === "canvas") ? "" : "dn-s";
                 let canvasItems = null;
                 if (!!props.canvasList) {
+                  console.log(props.canvasList);
                   canvasItems = Object.entries(props.canvasList).map((each, i) => {
-                    // console.log(each, i);
+                    console.log(each, i);
                     return (
-                      react.createElement(CanvasTitle, { key: i, id: each[0], location: each[1].metadata.location, __self: this, __source: {fileName: _jsxFileName$4, lineNumber: 47}} )
+                      react.createElement(CanvasTitle, { key: i, id: each[0], location: each[1].metadata.location, __self: this, __source: {fileName: _jsxFileName$4, lineNumber: 48}} )
                     )
                   });
                 }
@@ -48860,17 +48863,17 @@
                 return (
                   react.createElement('div', { className: "bn br-m br-l br-xl b--gray4 b--gray1-d lh-copy h-100 " +
                    "flex-basis-30-ns flex-shrink-0 mw5-m mw5-l mw5-xl flex-basis-100-s " +
-                    "relative overflow-hidden pt3 pt0-m pt0-l pt0-xl " + activeClasses, __self: this, __source: {fileName: _jsxFileName$4, lineNumber: 53}}
-                    , react.createElement('a', { className: "db dn-m dn-l dn-xl f8 pb6 pl3"      , href: "/", __self: this, __source: {fileName: _jsxFileName$4, lineNumber: 56}}, "⟵ Landscape" )
-                    , react.createElement('div', { className: "overflow-auto pb8 h-100"  , __self: this, __source: {fileName: _jsxFileName$4, lineNumber: 57}}
-                      , react.createElement(Link, { to: "/~canvas/new", className: "dib", __self: this, __source: {fileName: _jsxFileName$4, lineNumber: 58}}
-                        , react.createElement('p', { className: "f9 pt4 pl4 green2 bn"    , __self: this, __source: {fileName: _jsxFileName$4, lineNumber: 59}}, "Create Canvas" )
+                    "relative overflow-hidden pt3 pt0-m pt0-l pt0-xl " + activeClasses, __self: this, __source: {fileName: _jsxFileName$4, lineNumber: 54}}
+                    , react.createElement('a', { className: "db dn-m dn-l dn-xl f8 pb6 pl3"      , href: "/", __self: this, __source: {fileName: _jsxFileName$4, lineNumber: 57}}, "⟵ Landscape" )
+                    , react.createElement('div', { className: "overflow-auto pb8 h-100"  , __self: this, __source: {fileName: _jsxFileName$4, lineNumber: 58}}
+                      , react.createElement(Link, { to: "/~canvas/new", className: "dib", __self: this, __source: {fileName: _jsxFileName$4, lineNumber: 59}}
+                        , react.createElement('p', { className: "f9 pt4 pl4 green2 bn"    , __self: this, __source: {fileName: _jsxFileName$4, lineNumber: 60}}, "Create Canvas" )
                       )
-                      , react.createElement(Link, { to: "/~canvas/join", className: "dib", __self: this, __source: {fileName: _jsxFileName$4, lineNumber: 61}}
-                        , react.createElement('p', { className: "f9 pt4 pl4 green2 bn"    , __self: this, __source: {fileName: _jsxFileName$4, lineNumber: 62}}, "Join Canvas" )
+                      , react.createElement(Link, { to: "/~canvas/join", className: "dib", __self: this, __source: {fileName: _jsxFileName$4, lineNumber: 62}}
+                        , react.createElement('p', { className: "f9 pt4 pl4 green2 bn"    , __self: this, __source: {fileName: _jsxFileName$4, lineNumber: 63}}, "Join Canvas" )
                       )
-                      , react.createElement('div', { className: "pt1", __self: this, __source: {fileName: _jsxFileName$4, lineNumber: 64}}
-                        , react.createElement('h2', { className: "f9 pt4 pr4 pb2 pl4 gray2 c-default"      , __self: this, __source: {fileName: _jsxFileName$4, lineNumber: 65}}, "My Canvas" )
+                      , react.createElement('div', { className: "pt1", __self: this, __source: {fileName: _jsxFileName$4, lineNumber: 65}}
+                        , react.createElement('h2', { className: "f9 pt4 pr4 pb2 pl4 gray2 c-default"      , __self: this, __source: {fileName: _jsxFileName$4, lineNumber: 66}}, "My Canvas" )
                         ,  canvasItems 
                       )
                     )
@@ -56967,7 +56970,7 @@
               }
 
               onClickShare () {
-                if (this.state.chat){
+                if (this.state.chat && this.props.saved){
                   this.props.share(this.state.chat);
                 }
               }
@@ -56999,7 +57002,7 @@
                   ? "gray22 bg-gray0-d b--gray2" : "green2 bg-gray0-d b--green2";
 
                 let allowSend= "f9 ba pa2 pointer bg-transparent ml4 mb2 " +
-                (state.chat ? "b--green2 green2" : "b--gray4 gray4 b--gray2-d gray2-d");
+                ((state.chat && this.props.saved) ? "b--green2 green2" : "b--gray4 gray4 b--gray2-d gray2-d");
 
                 let dropdownClass = (state.open)
                   ? "absolute db z-2 bg-white bg-gray0-d white-d ba b--gray3 b--gray1-d"
@@ -57044,14 +57047,20 @@
                           ref: (el) => this.dropdown = el, __self: this, __source: {fileName: _jsxFileName$6, lineNumber: 113}}
                         )
                       )
+                      , (this.props.saved) ? null :
+                        react.createElement('div', { className: "f9 ph4 pt2 pb3"   , __self: this, __source: {fileName: _jsxFileName$6, lineNumber: 126}}
+                          , react.createElement('p', { className: "mono", __self: this, __source: {fileName: _jsxFileName$6, lineNumber: 127}}, "An svg files does not exist"     )
+                          , react.createElement('p', { className: "mono", __self: this, __source: {fileName: _jsxFileName$6, lineNumber: 128}}, "Click on \"Save Image\" before sharing."     )
+                        )
+                      
                       , react.createElement('button', {
                         onClick: this.onClickShare.bind(this),
-                        className: allowSend, __self: this, __source: {fileName: _jsxFileName$6, lineNumber: 125}}, "Send to "
+                        className: allowSend, __self: this, __source: {fileName: _jsxFileName$6, lineNumber: 131}}, "Send to "
                           , this.state.chatName
                       )
                       , react.createElement('div', { className: "db z-2 bg-white bg-gray0-d white-d ba b--gray3 b--gray1-d"       ,
                           style: { maxHeight: "24rem", width: 210 },
-                          ref: (el) => { this.dropdown = el; }, __self: this, __source: {fileName: _jsxFileName$6, lineNumber: 130}}
+                          ref: (el) => { this.dropdown = el; }, __self: this, __source: {fileName: _jsxFileName$6, lineNumber: 136}}
                         , chatList
                       )
                     )
@@ -57150,6 +57159,7 @@
                 let i = 0;
                 while (i < svgString.length) {
                   this.props.api.svg.save(
+                    this.props.location,
                     this.props.name,
                     svgString.slice(i, chunkSize + i),
                     ((i + chunkSize ) >= svgString.length) );
@@ -57185,26 +57195,26 @@
                 }
 
                 return (
-                  react.createElement('div', { className: "h-100 w-100 bg-gray0-d white-d flex flex-column"     , __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 77}}
-                    , react.createElement('div', { className: "w-100 dn-m dn-l dn-xl inter pt1 pb6 f8"       , __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 78}}
-                      , react.createElement(Link, { to: "/~canvas/", __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 79}}, "⟵ Canvas")
+                  react.createElement('div', { className: "h-100 w-100 bg-gray0-d white-d flex flex-column"     , __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 78}}
+                    , react.createElement('div', { className: "w-100 dn-m dn-l dn-xl inter pt1 pb6 f8"       , __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 79}}
+                      , react.createElement(Link, { to: "/~canvas/", __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 80}}, "⟵ Canvas")
                     )
                     , react.createElement('div', { className: "absolute mw5" ,
-                         style: {right: "20px", top: "20px"}, __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 81}}
+                         style: {right: "20px", top: "20px"}, __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 82}}
                       
-                      , react.createElement(ShareImage, { chats: this.props.chats, share: this.onClickShare, __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 84}})
+                      , react.createElement(ShareImage, { chats: this.props.chats, share: this.onClickShare, saved: this.props.saved, __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 85}})
                       , react.createElement('button', {
                         onClick: this.onClickSave.bind(this),
-                        className: "pointer ml6 f9 green2 bg-gray0-d ba pv3 ph4 b--green2"        , __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 85}}, "Save Image"
+                        className: "pointer ml6 f9 green2 bg-gray0-d ba pv3 ph4 b--green2"        , __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 86}}, "Save Image"
 
                       )
                     )
-                    , react.createElement('div', { ref: "canvas", className: "w-100 pr0-l pr0-xl"  , style: {overflow: "hidden"}, __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 91}}
-                      , react.createElement('svg', { className: "db", id: "canvas", width: width, height: height, __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 92}}
-                        , react.createElement('g', { className: "hexagon", __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 93}} )
-                        , react.createElement('g', { className: "mesh-group", __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 94}} )
-                        , react.createElement('g', { className: "border-group", __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 95}} )
-                        , react.createElement('g', { className: "legend", __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 96}} )
+                    , react.createElement('div', { ref: "canvas", className: "w-100 pr0-l pr0-xl"  , style: {overflow: "hidden"}, __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 92}}
+                      , react.createElement('svg', { className: "db", id: "canvas", width: width, height: height, __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 93}}
+                        , react.createElement('g', { className: "hexagon", __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 94}} )
+                        , react.createElement('g', { className: "mesh-group", __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 95}} )
+                        , react.createElement('g', { className: "border-group", __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 96}} )
+                        , react.createElement('g', { className: "legend", __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 97}} )
                       )
                     )
                   )
@@ -66480,21 +66490,22 @@ lyrtesmudnytbyrsenwegfyrmurtelreptegpecnelnevfes\
                 reduce(json, state) {
                     console.log("initial", json);
                     let data = lodash.get(json, 'init-frontend', false);
-                    if (data) { 
+                    if (data) {
                       state.chats = data.chats;
                       for (let canvas in data.canvas) {
                         console.log(canvas);
-                        if (data[canvas].metadata.type === 'draw') {
-                          data[canvas].data = reparseDrawForms(data[canvas].data);
+                        if (data.canvas[canvas].metadata.type === 'draw') {
+                          data.canvas[canvas].data = reparseDrawForms(data[canvas].data);
                         }
-                        state.canvasList[canvas] = data[canvas];
+                        console.log(data.canvas[canvas]);
+                        state.canvasList[canvas] = data.canvas[canvas];
                       }
                     }
                 }
             }
 
             class UpdateReducer {
-                reduce(json, state) {
+                canvas(json, state) {
                     let data = lodash.get(json, 'load', false);
                     if (data) {
                         if (data.type === 'draw') {
@@ -66505,10 +66516,19 @@ lyrtesmudnytbyrsenwegfyrmurtelreptegpecnelnevfes\
                           metadata: {
                             name: data.name,
                             type: data.type,
-                            location: data.location
+                            location: data.location,
+                            saved: false
                           },
                           data: data.data
                         };
+                    }
+                }
+
+                file(json, state) {
+                    let data = lodash.get(json, 'file', false);
+                    if (data) {
+                        console.log(data);
+                        state.canvasList[data].metadata.saved = true;
                     }
                 }
             }
@@ -66552,7 +66572,8 @@ lyrtesmudnytbyrsenwegfyrmurtelreptegpecnelnevfes\
                     let json = data.data;
 
                     this.initialReducer.reduce(json, this.state);
-                    this.updateReducer.reduce(json, this.state);
+                    this.updateReducer.canvas(json, this.state);
+                    this.updateReducer.file(json, this.state);
                     this.paintReducer.reduce(json, this.state);
                     if (!('paint' in json)) {
                       this.setState(this.state);
@@ -66626,19 +66647,20 @@ lyrtesmudnytbyrsenwegfyrmurtelreptegpecnelnevfes\
                               const chats = state.chats;
                               const canvasType = !!canvasList[name] ? canvasList[name].metadata.type : "";
                               const location = !!canvasList[name] ? canvasList[name].metadata.location : "";
+                              const saved = !!canvasList[name] ? canvasList[name].metadata.saved : false;
                               console.log(chats);
                               switch (canvasType) {
                                 case 'mesh':
                                   canvas = react.createElement(Hexagons, { api: api, canvas: data, chats: chats,
-                                                     name: name, location: location, __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 80}} );
+                                            saved: saved, name: name, location: location, __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 81}} );
                                   break;
                                 case 'map':
                                   canvas = react.createElement(MapCanvas, { api: api, canvas: data, chats: chats,
-                                                      name: name, location: location, __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 84}} );
+                                            saved: saved, name: name, location: location, __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 85}} );
                                   break;
                                 case 'draw':
                                   canvas = react.createElement(DrawCanvas, { api: api, canvas: data, chats: chats,
-                                                       name: name, location: location, __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 88}} );
+                                              saved: saved, name: name, location: location, __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 89}} );
                                   break;
                                 default: canvas = null;
                               }
@@ -66647,7 +66669,7 @@ lyrtesmudnytbyrsenwegfyrmurtelreptegpecnelnevfes\
                                 react.createElement(Skeleton, {
                                   history: props.history,
                                   canvasList: canvasList,
-                                  activeDrawer: "rightPanel", __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 95}}
+                                  activeDrawer: "rightPanel", __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 96}}
                                   , canvas
                                 )
                               );
@@ -66666,15 +66688,15 @@ lyrtesmudnytbyrsenwegfyrmurtelreptegpecnelnevfes\
                             react.createElement(Skeleton, {
                               history: props.history,
                               canvasList: canvasList,
-                              activeDrawer: "rightPanel", __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 114}}
+                              activeDrawer: "rightPanel", __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 115}}
                               , react.createElement(JoinScreen, {
                                 api: api,
                                 canvasList: canvasList,
                                 autoJoin: canvas,
-                                ...props, __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 118}} )
+                                ...props, __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 119}} )
                             )
                           );
-                        }, __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 104}}
+                        }, __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 105}}
                       )
                     )
                   )

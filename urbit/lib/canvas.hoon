@@ -35,6 +35,7 @@
           :~  ['name' so]
               ['type' (cu canvas-type so)]
               ['location' (su ;~(pfix sig fed:ag))]
+              ['saved' bo]
       ==  ==
     ::
     --
@@ -77,7 +78,12 @@
     (ot ~[['ship' (su ;~(pfix sig fed:ag))] ['canvas-name' so]])
   ::
   ++  save
-    (ot ~[['canvas-name' so] ['svg' so] ['last' bo]])
+    %-  ot
+    :~  ['location' (su ;~(pfix sig fed:ag))]
+        ['canvas-name' so]
+        ['svg' so]
+        ['last' bo]
+    ==
   ::
   ++  share
     (ot ~[['canvas-name' so] ['chat-path' pa]])
@@ -113,15 +119,19 @@
       (canvas-to-json canvas.act)
     (metadata-to-json metadata.canvas.act)
   ::
+      %file
+    :: FIXME: from the failed attempt of watching the image directory
+    :: a+(turn files.act path)
+    s+file.act
+  ::
       %paint
     %-  pairs
     ^-  (list [@t json])
     :~  ['name' s+name.act]
         ['location' s+(scot %p location.act)]
       ::
-        =;  strokes
-          ['strokes' a+strokes]
-        %+  turn  strokes.act
+        =;  pairs-of-strokes
+          ['strokes' a+(turn strokes.act pairs-of-strokes)]
         |=  =stroke
         ^-  json
         (pairs (stroke-to-json stroke))
@@ -166,6 +176,7 @@
     :~  ['name' s+name.metadata]
         ['location' s+(scot %p location.metadata)]
         ['type' s+type.metadata]
+        ['saved' b+saved.metadata]
     ==
   ::
   ++  arc-to-json

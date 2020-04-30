@@ -41,10 +41,11 @@ export class CanvasSidebar extends Component {
     let activeClasses = (this.props.activeDrawer === "canvas") ? "" : "dn-s";
     let canvasItems = null;
     if (!!props.canvasList) {
+      console.log(props.canvasList);
       canvasItems = Object.entries(props.canvasList).map((each, i) => {
-        // console.log(each, i);
+        console.log(each, i);
         return (
-          React.createElement(CanvasTitle, { key: i, id: each[0], location: each[1].metadata.location, __self: this, __source: {fileName: _jsxFileName, lineNumber: 47}} )
+          React.createElement(CanvasTitle, { key: i, id: each[0], location: each[1].metadata.location, __self: this, __source: {fileName: _jsxFileName, lineNumber: 48}} )
         )
       });
     }
@@ -52,17 +53,17 @@ export class CanvasSidebar extends Component {
     return (
       React.createElement('div', { className: "bn br-m br-l br-xl b--gray4 b--gray1-d lh-copy h-100 " +
        "flex-basis-30-ns flex-shrink-0 mw5-m mw5-l mw5-xl flex-basis-100-s " +
-        "relative overflow-hidden pt3 pt0-m pt0-l pt0-xl " + activeClasses, __self: this, __source: {fileName: _jsxFileName, lineNumber: 53}}
-        , React.createElement('a', { className: "db dn-m dn-l dn-xl f8 pb6 pl3"      , href: "/", __self: this, __source: {fileName: _jsxFileName, lineNumber: 56}}, "⟵ Landscape" )
-        , React.createElement('div', { className: "overflow-auto pb8 h-100"  , __self: this, __source: {fileName: _jsxFileName, lineNumber: 57}}
-          , React.createElement(Link, { to: "/~canvas/new", className: "dib", __self: this, __source: {fileName: _jsxFileName, lineNumber: 58}}
-            , React.createElement('p', { className: "f9 pt4 pl4 green2 bn"    , __self: this, __source: {fileName: _jsxFileName, lineNumber: 59}}, "Create Canvas" )
+        "relative overflow-hidden pt3 pt0-m pt0-l pt0-xl " + activeClasses, __self: this, __source: {fileName: _jsxFileName, lineNumber: 54}}
+        , React.createElement('a', { className: "db dn-m dn-l dn-xl f8 pb6 pl3"      , href: "/", __self: this, __source: {fileName: _jsxFileName, lineNumber: 57}}, "⟵ Landscape" )
+        , React.createElement('div', { className: "overflow-auto pb8 h-100"  , __self: this, __source: {fileName: _jsxFileName, lineNumber: 58}}
+          , React.createElement(Link, { to: "/~canvas/new", className: "dib", __self: this, __source: {fileName: _jsxFileName, lineNumber: 59}}
+            , React.createElement('p', { className: "f9 pt4 pl4 green2 bn"    , __self: this, __source: {fileName: _jsxFileName, lineNumber: 60}}, "Create Canvas" )
           )
-          , React.createElement(Link, { to: "/~canvas/join", className: "dib", __self: this, __source: {fileName: _jsxFileName, lineNumber: 61}}
-            , React.createElement('p', { className: "f9 pt4 pl4 green2 bn"    , __self: this, __source: {fileName: _jsxFileName, lineNumber: 62}}, "Join Canvas" )
+          , React.createElement(Link, { to: "/~canvas/join", className: "dib", __self: this, __source: {fileName: _jsxFileName, lineNumber: 62}}
+            , React.createElement('p', { className: "f9 pt4 pl4 green2 bn"    , __self: this, __source: {fileName: _jsxFileName, lineNumber: 63}}, "Join Canvas" )
           )
-          , React.createElement('div', { className: "pt1", __self: this, __source: {fileName: _jsxFileName, lineNumber: 64}}
-            , React.createElement('h2', { className: "f9 pt4 pr4 pb2 pl4 gray2 c-default"      , __self: this, __source: {fileName: _jsxFileName, lineNumber: 65}}, "My Canvas" )
+          , React.createElement('div', { className: "pt1", __self: this, __source: {fileName: _jsxFileName, lineNumber: 65}}
+            , React.createElement('h2', { className: "f9 pt4 pr4 pb2 pl4 gray2 c-default"      , __self: this, __source: {fileName: _jsxFileName, lineNumber: 66}}, "My Canvas" )
             ,  canvasItems 
           )
         )

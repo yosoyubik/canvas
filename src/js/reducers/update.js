@@ -3,7 +3,7 @@ import _ from 'lodash';
 import { reparseDrawForms } from '/lib/form-reparser';
 
 export class UpdateReducer {
-    reduce(json, state) {
+    canvas(json, state) {
         let data = _.get(json, 'load', false);
         if (data) {
             if (data.type === 'draw') {
@@ -14,10 +14,19 @@ export class UpdateReducer {
               metadata: {
                 name: data.name,
                 type: data.type,
-                location: data.location
+                location: data.location,
+                saved: false
               },
               data: data.data
             };
+        }
+    }
+
+    file(json, state) {
+        let data = _.get(json, 'file', false);
+        if (data) {
+            console.log(data);
+            state.canvasList[data].metadata.saved = true;
         }
     }
 }

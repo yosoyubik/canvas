@@ -41,8 +41,9 @@ export class CanvasSidebar extends Component {
     let activeClasses = (this.props.activeDrawer === "canvas") ? "" : "dn-s";
     let canvasItems = null;
     if (!!props.canvasList) {
+      console.log(props.canvasList);
       canvasItems = Object.entries(props.canvasList).map((each, i) => {
-        // console.log(each, i);
+        console.log(each, i);
         return (
           <CanvasTitle key={i} id={each[0]} location={each[1].metadata.location} />
         )

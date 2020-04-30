@@ -45,7 +45,7 @@ export class ShareImage extends Component {
   }
 
   onClickShare () {
-    if (this.state.chat){
+    if (this.state.chat && this.props.saved){
       this.props.share(this.state.chat);
     }
   }
@@ -77,7 +77,7 @@ export class ShareImage extends Component {
       ? "gray22 bg-gray0-d b--gray2" : "green2 bg-gray0-d b--green2";
 
     let allowSend= "f9 ba pa2 pointer bg-transparent ml4 mb2 " +
-    (state.chat ? "b--green2 green2" : "b--gray4 gray4 b--gray2-d gray2-d")
+    ((state.chat && this.props.saved) ? "b--green2 green2" : "b--gray4 gray4 b--gray2-d gray2-d")
 
     let dropdownClass = (state.open)
       ? "absolute db z-2 bg-white bg-gray0-d white-d ba b--gray3 b--gray1-d"
@@ -122,6 +122,12 @@ export class ShareImage extends Component {
               ref={(el) => this.dropdown = el}
             />
           </div>
+          {(this.props.saved) ? null :
+            <div className="f9 ph4 pt2 pb3">
+              <p className="mono">An svg files does not exist</p>
+              <p className="mono">Click on "Save Image" before sharing.</p>
+            </div>
+          }
           <button
             onClick={this.onClickShare.bind(this)}
             className={allowSend}>

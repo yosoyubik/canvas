@@ -24,7 +24,8 @@ class Store {
         let json = data.data;
 
         this.initialReducer.reduce(json, this.state);
-        this.updateReducer.reduce(json, this.state);
+        this.updateReducer.canvas(json, this.state);
+        this.updateReducer.file(json, this.state);
         this.paintReducer.reduce(json, this.state);
         if (!('paint' in json)) {
           this.setState(this.state);

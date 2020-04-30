@@ -4,7 +4,7 @@
 +$  form         [strokes=(list [@t @t]) line-width=@t style-stroke=@t]
 +$  mesh         (map @ud arc)
 +$  draw         (list form)
-+$  metadata     [name=@t type=canvas-type location=ship]
++$  metadata     [name=@t type=canvas-type location=ship saved=?]
 +$  location     [host=ship canvas=@t]
 +$  canvas
   $%  [%mesh =mesh =metadata]
@@ -25,15 +25,12 @@
 +$  canvas-action
   $%  [%paint location=@p name=@t strokes=(list stroke)]
       [%init gallery=(list canvas)]
-      :: [%init gallery=(list [@tas mesh metadata])]
       [%load name=@t =canvas]
       [%join =ship name=@t]
       [%leave =ship name=@t]
       [%create =canvas]
-      ::  TODO: add chat name
-      ::
       [%share name=@t =path]
-      [%save name=@t svg=@t last=?]
+      [%save =ship name=@t svg=@t last=?]
   ==
 ::
 +$  canvas-update
@@ -48,14 +45,14 @@
       [%join =ship name=@t]
       [%leave =ship name=@t]
       [%create =canvas]
-      ::  TODO: add chat name
-      ::
+      [%file file=@t]
       [%share name=@t =path]
-      [%save name=@t svg=@t last=?]
+      [%save =ship name=@t svg=@t last=?]
   ==
 ::
 +$  canvas-view-response
   $%  canvas-action
+      [%file file=@t]
       [%init-frontend gallery=(list canvas) chats=(list path)]
   ==
 --

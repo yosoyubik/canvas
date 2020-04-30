@@ -46,9 +46,10 @@ class UrbitApi {
     this.action("canvas-view", "json", data);
   }
 
-  saveSVG(name, svgData, last) {
+  saveSVG(location, name, svgData, last) {
     this.action("canvas-view", "canvas-view", {
       save: {
+        'location': location,
         'canvas-name': name,
         'svg': svgData,
         'last': last
@@ -99,7 +100,8 @@ class UrbitApi {
       'metadata': {
         'name': name,
         'type': type,
-        'location': location
+        'location': location,
+        'saved': false
       }
     };
     return this.action("canvas-view", "canvas-view", {

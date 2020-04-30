@@ -1,4 +1,3 @@
-
 ::  canvas-view: A Canvas app for Urbit
 ::
 /-  *canvas, *chat-store
@@ -37,7 +36,7 @@
   /:  /===/app/canvas/img  /_  /png/
 /=  canvas-svg
   /^  (map knot @)
-  /:  /===/app/canvas/svg  /_  /svg/
+  /:  /===/app/canvas/images  /_  /svg/
 /=  canvas-maps
   /^  (map knot @)
   /:  /===/app/canvas/map  /_  /atom/
@@ -159,7 +158,7 @@
     ++  on-fail   on-fail:def
     --
 ::
-|_  bowl=bowl:gall
+|_  =bowl:gall
 ++  gallery-scry
   ~&  "requesting gallery..."
   .^  (list canvas)
@@ -274,9 +273,9 @@
    [(send-canvas-action [%share name ~] [%share name path])]~
   ::
   ++  handle-save
-    |=  [name=@t svg=@t last=?]
+    |=  [=ship name=@t svg=@t last=?]
     ^-  (list card)
-    [(send-canvas-action [%save name ~] [%save name svg last])]~
+    [(send-canvas-action [%save name ~] [%save ship name svg last])]~
   --
 ::
 ++  handle-view-update
@@ -287,6 +286,7 @@
   ?+  -.act  !!
     %paint   (handle-paint +.act)
     %load    (handle-load +.act)
+    %file    (handle-file +.act)
   ==
   ::
   ++  handle-paint
@@ -301,13 +301,20 @@
     ^-  (list card)
     ~&  "update load"
     (send-frontend (canvas-view-response-to-json [%load name canvas]))
+  ::
+  ++  handle-file
+    |=  file=@t
+    ^-  (list card)
+    ~&  "file saved"
+    (send-frontend (canvas-view-response-to-json [%file file]))
   --
 ::
 ++  poke-handle-http-request
   |=  [=inbound-request:eyre url=(list @t)]
   ^-  simple-payload:http
+  ~&  url
   |^
-  ?:  ?=([%'~canvas' %svg ^] url)
+  ?:  ?=([%'~canvas' %images @t *] url)
     (handle-svg-call i.t.t.url)
   %+  require-authorization:app  inbound-request
   handle-auth-call

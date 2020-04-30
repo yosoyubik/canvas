@@ -1,3 +1,4 @@
+
 ::  canvas: A Canvas app for Urbit
 ::
 ::    data:            scry command:
@@ -53,7 +54,7 @@
     ::
     +$  state-zero
       $:  gallery=(map location canvas)
-          buffers=(map @t (list @t))
+          buffer=(map @t [chunks=(list @t) svg=(unit [@t path])])
       ==
     --
 ::
@@ -70,6 +71,12 @@
         def        ~(. (default-agent this %|) bowl)
     ::
     ++  on-init  on-init:def
+      ::  FIXME: attemp to have a watcher on the images folder
+      :: ^-  (quip card _this)
+      :: =/  rav  [%next %t [%da now.bowl] /=home=/app/canvas/images]
+      :: :_  this
+      :: [%pass /read/images %arvo %c %warp our.bowl q.byk.bowl `rav]~
+    ::
     ++  on-poke
       |=  [=mark =vase]
       ~&  mark
@@ -120,10 +127,21 @@
     ++  on-arvo
       |=  [=wire =sign-arvo]
       ^-  (quip card _this)
-      ~&  [wire sign-arvo]
       ?:  ?=(%bound +<.sign-arvo)
         [~ this]
-      (on-arvo:def wire sign-arvo)
+      ?+    wire  (on-arvo:def wire sign-arvo)
+        ::  FIXME: this should be called when a new image is created
+        ::   [%read %images ~]
+        :: ?>  ?=([?(%b %c) %writ *] sign-arvo)
+        :: =/  rot=riot:clay  +>.sign-arvo
+        :: ?>  ?=(^ rot)
+        :: [(send-updated-files u.rot) this]
+      ::
+          [%write @t @t ~]
+        =^  cards  state
+          (check-file i.t.wire i.t.t.wire (scot %da now.bowl))
+        [cards this]
+      ==
     ::
     ++  on-save  on-save:def
     ++  on-load  on-load:def
@@ -145,7 +163,12 @@
     ++  on-fail   on-fail:def
     --
 ::
-|_  bowl=bowl:gall
+|_  =bowl:gall
+++  our-beak
+  ::  doing (scot %da now.bowl) here consistently returned ~2000.1.1 (?)
+  ::
+  /(scot %p our.bowl)/[q.byk.bowl]/(scot %da now.bowl)
+::
 ++  extract-location
   |=  =path
   ^-  [ship @t]
@@ -193,6 +216,49 @@
       %canvas-update
       !>([%paint our.bowl name strokes])
   ==
+::
+++  check-file
+  |=  [host=@t file=@t time=@t]
+  ^-  (quip card _state)
+  ::  doing (scot %da now.bowl) here consistently produced ~2000.1.1 (?)
+  ::
+  =/  paths=(list path)
+    .^  (list path)
+        %ct
+        /=home/(same time)/app/canvas/images/(same file)/svg
+    ==
+  ~&  check-file+paths
+  ?~  paths
+    =/  location=wire  /write/(same host)/(same file)
+    ::  set up timer again
+    ::  (!) this could be dangerous (infinite loop...)
+    :_  state
+    [%pass location %arvo %b %wait (add now.bowl ~s10)]~
+  =/  =ship  (rash host ;~(pfix sig fed:ag))
+  =/  =canvas  (~(got by gallery) [ship file])
+  =.  saved.metadata.canvas  %.y
+  :_  state(gallery (~(put by gallery) [[ship file] canvas]))
+  [%give %fact [/updates]~ %canvas-view !>([%file file])]~
+::
+++  write-svg-file
+  |=  file=@t
+  ^-  (list card)
+  ~&  "writing file"
+  ~&  ~(key by buffer)
+  =/  buffer=[* (unit [svg=@t =path])]  (~(got by buffer) file)
+  =+  (need +.buffer)
+  =/  contents=cage  [%svg !>(svg)]
+  [%pass /write-file %arvo %c %info (foal:space:userlib path contents)]~
+::
+:: ++  send-updated-files
+::   |=  ran=rant:clay
+::   ^-  (list card)
+::   ~&  "send-updated-files"
+::   =/  rav  [%next %t [%da now.bowl] /=home=/app/canvas/images]
+::   =/  files  !>([%files !<((list path) q.r.ran)])
+::   :~  [%give %fact [/updates]~ %canvas-view files]
+::       [%pass /read/images %arvo %c %warp our.bowl q.byk.bowl `rav]
+::   ==
 ::
 ++  update-remote-canvas
   |=  [location=@p name=@t strokes=(list stroke)]
@@ -278,7 +344,7 @@
    =/  =letter
      :-  %url
      %-  crip
-     "{domain}:{((d-co:co 1) port)}/~canvas/svg/{(trip name)}.png"
+     "{domain}:{((d-co:co 1) port)}/~canvas/images/{(trip name)}.png"
    =/  =envelope  [serial *@ our.bowl now.bowl letter]
    :_  ~
    :*  %pass
@@ -291,30 +357,50 @@
    ==
   ::
   ++  handle-save
-    |=  [file=@t chunk=@t last=?]
+    |=  [=ship file=@t chunk=@t last=?]
     ^-  (quip card _state)
     ?>  (team:title our.bowl src.bowl)
-    =/  chunks=(unit (list @t))  (~(get by buffers) file)
+    =/  temp=(unit [chunks=(list @t) *])  (~(get by buffer) file)
     ?.  last
       ::  %eyre was crashing when the svg was ~1MB
       ::  solution: send chunks and assemble them later
       ::
       :-  ~
       %_    state
-          buffers
-        %-  ~(put by buffers)
+          buffer
+        %-  ~(put by buffer)
         :-  file
-        ?~  chunks  [chunk]~
-        (snoc u.chunks chunk)
+        :_  ~
+        ?~  temp  [chunk]~
+        (snoc chunks.u.temp chunk)
       ==
-    ?~  chunks  `state
-    =/  svg=@t  (crip (snoc u.chunks chunk))
-    =/  =path
-      ~[(scot %p our.bowl) %home (scot %da now.bowl) %app %canvas %svg file %svg]
-    ~&  path
+    ?~  temp  `state
+    =/  svg=@t  (crip (snoc chunks.u.temp chunk))
+    =/  =path  /=home=/app/canvas/images/(same file)/svg
+      :: ~[(scot %p our.bowl) %home (scot %da now.bowl) %app %canvas %svg file %svg]
+    ::  we wait up to 5 minutes for the file to be written
+    ::
+    :: =/  =moat:clay  [da+now.bowl da+(add now.bowl ~m5) path]
     =/  contents=cage  [%svg !>(svg)]
+    ~&  ~(key by buffer)
+    ::  the full svg file is temporarily stored in the buffer
+    ::
+    :: =.  buffer  (~(put by buffer) [file [~ `[svg path]]])
+    :: ~&  ~(key by buffer)
+    =/  location=wire  /write/(scot %p ship)/(same file)
     :_  state
-    [%pass /write-file %arvo %c %info (foal:space:userlib path contents)]~
+    :: :_  state(buffer (~(put by buffer) [file [~ `[svg path]]]))
+    :~  ::[%pass /file/(same file) %arvo %c %warp our.bowl %home ~ %many & moat]
+        ::  file is initialize empty
+        ::
+
+        [%pass /write-file %arvo %c %info (foal:space:userlib path contents)]
+        :: [%pass /write-file %arvo %c %info (foal:space:userlib path empty)]
+        ::  a quick timer will set the file creation, that will fire
+        ::  the file  watcher and send a notification to the browser
+        ::
+        [%pass location %arvo %b %wait (add now.bowl ~s2)]
+    ==
   --
 ::
 ++  handle-canvas-update
@@ -375,30 +461,6 @@
       [(send-paint-update name strokes)]~
     ~&  'remote canvas, poke owner'
     [(update-remote-canvas location name strokes)]~
-  ::
-  :: ++  handle-mesh
-  ::   |=  [=canvas strokes=(list stroke)]
-  ::   ^-  _state
-  ::   %_    state
-  ::       gallery
-  ::     %+  ~(put by gallery)
-  ::       [location name]
-  ::     :+  %mesh
-  ::       (update-canvas-mesh mesh.canvas strokes)
-  ::     metadata.canvas
-  ::   ==
-  :: ::
-  :: ++  handle-map
-  ::   |=  [=canvas strokes=(list stroke)]
-  ::   ^-  _state
-  ::   %_    state
-  ::       gallery
-  ::     %+  ~(put by gallery)
-  ::       [location name]
-  ::     :+  %map
-  ::       (update-canvas-mesh mesh.canvas strokes)
-  ::     metadata.canvas
-  ::   ==
   ::
   ++  update-mesh
     |=  [=mesh strokes=(list stroke)]

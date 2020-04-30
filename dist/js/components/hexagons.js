@@ -39,6 +39,7 @@ export class Hexagons extends Component {
     let chunks = [];
     while (i < svgString.length) {
       this.props.api.svg.save(
+        this.props.location,
         this.props.name,
         svgString.slice(i, chunkSize + i),
         ((i + chunkSize ) >= svgString.length) );
@@ -74,26 +75,26 @@ export class Hexagons extends Component {
     }
 
     return (
-      React.createElement('div', { className: "h-100 w-100 bg-gray0-d white-d flex flex-column"     , __self: this, __source: {fileName: _jsxFileName, lineNumber: 77}}
-        , React.createElement('div', { className: "w-100 dn-m dn-l dn-xl inter pt1 pb6 f8"       , __self: this, __source: {fileName: _jsxFileName, lineNumber: 78}}
-          , React.createElement(Link, { to: "/~canvas/", __self: this, __source: {fileName: _jsxFileName, lineNumber: 79}}, "⟵ Canvas")
+      React.createElement('div', { className: "h-100 w-100 bg-gray0-d white-d flex flex-column"     , __self: this, __source: {fileName: _jsxFileName, lineNumber: 78}}
+        , React.createElement('div', { className: "w-100 dn-m dn-l dn-xl inter pt1 pb6 f8"       , __self: this, __source: {fileName: _jsxFileName, lineNumber: 79}}
+          , React.createElement(Link, { to: "/~canvas/", __self: this, __source: {fileName: _jsxFileName, lineNumber: 80}}, "⟵ Canvas")
         )
         , React.createElement('div', { className: "absolute mw5" ,
-             style: {right: "20px", top: "20px"}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 81}}
+             style: {right: "20px", top: "20px"}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 82}}
           
-          , React.createElement(ShareImage, { chats: this.props.chats, share: this.onClickShare, __self: this, __source: {fileName: _jsxFileName, lineNumber: 84}})
+          , React.createElement(ShareImage, { chats: this.props.chats, share: this.onClickShare, saved: this.props.saved, __self: this, __source: {fileName: _jsxFileName, lineNumber: 85}})
           , React.createElement('button', {
             onClick: this.onClickSave.bind(this),
-            className: "pointer ml6 f9 green2 bg-gray0-d ba pv3 ph4 b--green2"        , __self: this, __source: {fileName: _jsxFileName, lineNumber: 85}}, "Save Image"
+            className: "pointer ml6 f9 green2 bg-gray0-d ba pv3 ph4 b--green2"        , __self: this, __source: {fileName: _jsxFileName, lineNumber: 86}}, "Save Image"
 
           )
         )
-        , React.createElement('div', { ref: "canvas", className: "w-100 pr0-l pr0-xl"  , style: {overflow: "hidden"}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 91}}
-          , React.createElement('svg', { className: "db", id: "canvas", width: width, height: height, __self: this, __source: {fileName: _jsxFileName, lineNumber: 92}}
-            , React.createElement('g', { className: "hexagon", __self: this, __source: {fileName: _jsxFileName, lineNumber: 93}} )
-            , React.createElement('g', { className: "mesh-group", __self: this, __source: {fileName: _jsxFileName, lineNumber: 94}} )
-            , React.createElement('g', { className: "border-group", __self: this, __source: {fileName: _jsxFileName, lineNumber: 95}} )
-            , React.createElement('g', { className: "legend", __self: this, __source: {fileName: _jsxFileName, lineNumber: 96}} )
+        , React.createElement('div', { ref: "canvas", className: "w-100 pr0-l pr0-xl"  , style: {overflow: "hidden"}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 92}}
+          , React.createElement('svg', { className: "db", id: "canvas", width: width, height: height, __self: this, __source: {fileName: _jsxFileName, lineNumber: 93}}
+            , React.createElement('g', { className: "hexagon", __self: this, __source: {fileName: _jsxFileName, lineNumber: 94}} )
+            , React.createElement('g', { className: "mesh-group", __self: this, __source: {fileName: _jsxFileName, lineNumber: 95}} )
+            , React.createElement('g', { className: "border-group", __self: this, __source: {fileName: _jsxFileName, lineNumber: 96}} )
+            , React.createElement('g', { className: "legend", __self: this, __source: {fileName: _jsxFileName, lineNumber: 97}} )
           )
         )
       )
