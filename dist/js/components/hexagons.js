@@ -32,7 +32,7 @@ export class Hexagons extends Component {
 
   onClickSave () {
     const canvas = d3.select("#canvas").clone(true).remove('.mesh-group').remove('.legend');
-    const svgString = simpleParseSVG(canvas.node());
+    const svgString = simpleParseSVG(canvas.node(), 'mesh');
     const chunkSize = Math.round(svgString.length / 4);
     let last = false;
     let i = 0;

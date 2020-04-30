@@ -47,7 +47,7 @@ const drawHexCanvas = (props) => {
   // console.log("drawing", props);
   const canvasName = props.name;
   const canvasData = props.canvas;
-  const location = props.location;
+  const location = props.metadata.location;
   const topology = hexTopology(radius, width, height, canvasData, canvasName);
 
   let mousing = 0;

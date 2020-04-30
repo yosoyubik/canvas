@@ -56808,7 +56808,7 @@
               // console.log("drawing", props);
               const canvasName = props.name;
               const canvasData = props.canvas;
-              const location = props.location;
+              const location = props.metadata.location;
               const topology = hexTopology(radius, width, height, canvasData, canvasName);
 
               let mousing = 0;
@@ -57156,7 +57156,7 @@
 
               onClickSave () {
                 const canvas = select("#canvas").clone(true).remove('.mesh-group').remove('.legend');
-                const svgString = simpleParseSVG(canvas.node());
+                const svgString = simpleParseSVG(canvas.node(), 'mesh');
                 const chunkSize = Math.round(svgString.length / 4);
                 let i = 0;
                 while (i < svgString.length) {
