@@ -344,6 +344,8 @@
    =/  =letter
      :-  %url
      %-  crip
+     ::  TODO: add svg preview option in chat
+     ::
      "{domain}:{((d-co:co 1) port)}/~canvas/images/{(trip name)}.png"
    =/  =envelope  [serial *@ our.bowl now.bowl letter]
    :_  ~
@@ -376,26 +378,26 @@
       ==
     ?~  temp  `state
     =/  svg=@t  (crip (snoc chunks.u.temp chunk))
-    =/  =path  /=home=/app/canvas/images/(same file)/svg
-      :: ~[(scot %p our.bowl) %home (scot %da now.bowl) %app %canvas %svg file %svg]
+    =/  =path  /=home/(scot %da now.bowl)/app/canvas/images/(same file)/svg
+    ~&  path
+    =/  contents=cage  [%svg !>(svg)]
+    =+  dir=.^(arch %cy path)
+    =/  create-or-replace=toro:clay
+      =,  space:userlib
+      ?~  fil.dir
+        (foal path contents)
+      (furl (fray path) (foal path contents))
     ::  we wait up to 5 minutes for the file to be written
     ::
     :: =/  =moat:clay  [da+now.bowl da+(add now.bowl ~m5) path]
-    =/  contents=cage  [%svg !>(svg)]
-    ~&  ~(key by buffer)
     ::  the full svg file is temporarily stored in the buffer
     ::
     :: =.  buffer  (~(put by buffer) [file [~ `[svg path]]])
-    :: ~&  ~(key by buffer)
     =/  location=wire  /write/(scot %p ship)/(same file)
-    :_  state
+    :_  state(buffer (~(del by buffer) file))
     :: :_  state(buffer (~(put by buffer) [file [~ `[svg path]]]))
     :~  ::[%pass /file/(same file) %arvo %c %warp our.bowl %home ~ %many & moat]
-        ::  file is initialize empty
-        ::
-
-        [%pass /write-file %arvo %c %info (foal:space:userlib path contents)]
-        :: [%pass /write-file %arvo %c %info (foal:space:userlib path empty)]
+        [%pass /write-file %arvo %c %info create-or-replace]
         ::  a quick timer will set the file creation, that will fire
         ::  the file  watcher and send a notification to the browser
         ::
@@ -451,14 +453,14 @@
     ?.  (team:title our.bowl src.bowl)
       ::  stroke from a remote ship
       ::
-      ~&  "foreign, udpate my frontend"
+      :: ~&  "foreign, udpate my frontend"
       [%give %fact [/updates]~ %canvas-view !>([%paint location name strokes])]~
     ::  stroke from frontend
     ::
     ?:  =(location our.bowl)
-      ~&  'local canvas, send to subscribers'
+      :: ~&  'local canvas, send to subscribers'
       [(send-paint-update name strokes)]~
-    ~&  'remote canvas, poke owner'
+    :: ~&  'remote canvas, poke owner'
     [(update-remote-canvas location name strokes)]~
   ::
   ++  update-mesh

@@ -35,7 +35,7 @@ export class MapCanvas extends Component {
   }
 
   onClickSave () {
-    const canvas = d3.select("#canvas").clone(true).remove('.legend');
+    const canvas = d3.select("#canvas");
     const type = this.props.metadata.type.split("-");
     const svgString = simpleParseSVG(canvas.node(), type[0]);
     const chunkSize = Math.round(svgString.length / 4);

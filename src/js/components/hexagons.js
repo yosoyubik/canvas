@@ -31,8 +31,9 @@ export class Hexagons extends Component {
   }
 
   onClickSave () {
-    const canvas = d3.select("#canvas").clone(true).remove('.mesh-group').remove('.legend');
+    const canvas = d3.select("#canvas");
     const svgString = simpleParseSVG(canvas.node(), 'mesh');
+    console.log("LENGTH", svgString.length);
     const chunkSize = Math.round(svgString.length / 4);
     let last = false;
     let i = 0;
@@ -93,7 +94,6 @@ export class Hexagons extends Component {
           <svg className="db" id="canvas" width={width} height={height}>
             <g className="hexagon" />
             <g className="mesh-group" />
-            <g className="border-group" />
             <g className="legend" />
           </svg>
         </div>

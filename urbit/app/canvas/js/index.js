@@ -57155,8 +57155,9 @@
               }
 
               onClickSave () {
-                const canvas = select("#canvas").clone(true).remove('.mesh-group').remove('.legend');
+                const canvas = select("#canvas");
                 const svgString = simpleParseSVG(canvas.node(), 'mesh');
+                console.log("LENGTH", svgString.length);
                 const chunkSize = Math.round(svgString.length / 4);
                 let i = 0;
                 while (i < svgString.length) {
@@ -57197,25 +57198,24 @@
                 }
 
                 return (
-                  react.createElement('div', { className: "h-100 w-100 bg-gray0-d white-d flex flex-column"     , __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 78}}
-                    , react.createElement('div', { className: "w-100 dn-m dn-l dn-xl inter pt1 pb6 f8"       , __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 79}}
-                      , react.createElement(Link, { to: "/~canvas/", __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 80}}, "⟵ Canvas")
+                  react.createElement('div', { className: "h-100 w-100 bg-gray0-d white-d flex flex-column"     , __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 79}}
+                    , react.createElement('div', { className: "w-100 dn-m dn-l dn-xl inter pt1 pb6 f8"       , __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 80}}
+                      , react.createElement(Link, { to: "/~canvas/", __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 81}}, "⟵ Canvas")
                     )
                     , react.createElement('div', { className: "absolute mw5" ,
-                         style: {right: "20px", top: "20px"}, __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 82}}
+                         style: {right: "20px", top: "20px"}, __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 83}}
                       
-                      , react.createElement(ShareImage, { chats: this.props.chats, share: this.onClickShare, saved: this.props.metadata.saved, __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 85}})
+                      , react.createElement(ShareImage, { chats: this.props.chats, share: this.onClickShare, saved: this.props.metadata.saved, __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 86}})
                       , react.createElement('button', {
                         onClick: this.onClickSave.bind(this),
-                        className: "pointer ml6 f9 green2 bg-gray0-d ba pv3 ph4 b--green2"        , __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 86}}, "Save Image"
+                        className: "pointer ml6 f9 green2 bg-gray0-d ba pv3 ph4 b--green2"        , __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 87}}, "Save Image"
 
                       )
                     )
-                    , react.createElement('div', { ref: "canvas", className: "w-100 pr0-l pr0-xl"  , style: {overflow: "hidden"}, __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 92}}
-                      , react.createElement('svg', { className: "db", id: "canvas", width: width, height: height, __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 93}}
-                        , react.createElement('g', { className: "hexagon", __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 94}} )
-                        , react.createElement('g', { className: "mesh-group", __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 95}} )
-                        , react.createElement('g', { className: "border-group", __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 96}} )
+                    , react.createElement('div', { ref: "canvas", className: "w-100 pr0-l pr0-xl"  , style: {overflow: "hidden"}, __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 93}}
+                      , react.createElement('svg', { className: "db", id: "canvas", width: width, height: height, __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 94}}
+                        , react.createElement('g', { className: "hexagon", __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 95}} )
+                        , react.createElement('g', { className: "mesh-group", __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 96}} )
                         , react.createElement('g', { className: "legend", __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 97}} )
                       )
                     )
@@ -57374,7 +57374,7 @@
               }
 
               onClickSave () {
-                const canvas = select("#canvas").clone(true).remove('.legend');
+                const canvas = select("#canvas");
                 const type = this.props.metadata.type.split("-");
                 const svgString = simpleParseSVG(canvas.node(), type[0]);
                 const chunkSize = Math.round(svgString.length / 4);
