@@ -2,14 +2,14 @@
 +$  canvas-type
   $?  %mesh
       %draw
-      %map-europe
+      %map-europe-europe
       %map-africa
       %map-us-counties
       %map-us-states
   ==
 +$  arc          [filled=? color=@t]
 +$  form         [strokes=(list [@t @t]) line-width=@t style-stroke=@t]
-+$  mesh         (map @ud arc)
++$  mesh         (map @t arc)
 +$  draw         (list form)
 +$  metadata     [name=@t type=canvas-type location=ship saved=?]
 +$  location     [host=ship canvas=@t]
@@ -19,7 +19,7 @@
   ==
 ::
 +$  stroke
-  $%  [%mesh id=@ud =arc]
+  $%  [%mesh id=@t =arc]
       [%draw =form]
   ==
 ::

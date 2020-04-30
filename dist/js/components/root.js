@@ -33,7 +33,6 @@ export class Root extends Component {
                   activeDrawer: "canvas",
                   history: props.history,
                   canvasList: canvasList, __self: this, __source: {fileName: _jsxFileName, lineNumber: 32}} 
-                  , React.createElement(Hexagons, { api: api, canvas: {}, name: 'test', location: 'test', __self: this, __source: {fileName: _jsxFileName, lineNumber: 36}} )
                   )
               )}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 29}} )
           , React.createElement(Route, { exact: true, path: "/~canvas/new",
@@ -42,28 +41,28 @@ export class Root extends Component {
                   React.createElement(Skeleton, {
                     history: props.history,
                     canvasList: canvasList,
-                    activeDrawer: "rightPanel", __self: this, __source: {fileName: _jsxFileName, lineNumber: 42}}
+                    activeDrawer: "rightPanel", __self: this, __source: {fileName: _jsxFileName, lineNumber: 41}}
                     , React.createElement(NewScreen, {
                       history: props.history,
-                      api: api, __self: this, __source: {fileName: _jsxFileName, lineNumber: 46}}
+                      api: api, __self: this, __source: {fileName: _jsxFileName, lineNumber: 45}}
                     )
                   )
                 );
-            }, __self: this, __source: {fileName: _jsxFileName, lineNumber: 39}} )
+            }, __self: this, __source: {fileName: _jsxFileName, lineNumber: 38}} )
           , React.createElement(Route, { exact: true, path: "/~canvas/draw",
                 render:  (props) => {
                   return (
                     React.createElement(Skeleton, {
                       history: props.history,
                       canvasList: canvasList,
-                      activeDrawer: "rightPanel", __self: this, __source: {fileName: _jsxFileName, lineNumber: 56}}
+                      activeDrawer: "rightPanel", __self: this, __source: {fileName: _jsxFileName, lineNumber: 55}}
                       , React.createElement(DrawCanvas, {
                         history: props.history,
-                        api: api, __self: this, __source: {fileName: _jsxFileName, lineNumber: 60}}
+                        api: api, __self: this, __source: {fileName: _jsxFileName, lineNumber: 59}}
                       )
                     )
                   );
-              }, __self: this, __source: {fileName: _jsxFileName, lineNumber: 53}} )
+              }, __self: this, __source: {fileName: _jsxFileName, lineNumber: 52}} )
           , React.createElement(Route, { exact: true, path: "/~canvas/item/:name",
               render:  (props) => {
                 const name =  props.match.params.name;
@@ -79,15 +78,15 @@ export class Root extends Component {
                   switch (subtypes[0]) {
                     case 'mesh':
                       canvas = React.createElement(Hexagons, { api: api, canvas: data, chats: chats,
-                                name: name, metadata: metadata, __self: this, __source: {fileName: _jsxFileName, lineNumber: 81}} );
+                                name: name, metadata: metadata, __self: this, __source: {fileName: _jsxFileName, lineNumber: 80}} );
                       break;
                     case 'map':
                       canvas = React.createElement(MapCanvas, { api: api, canvas: data, chats: chats,
-                                name: name, metadata: metadata, __self: this, __source: {fileName: _jsxFileName, lineNumber: 85}} );
+                                name: name, metadata: metadata, __self: this, __source: {fileName: _jsxFileName, lineNumber: 84}} );
                       break;
                     case 'draw':
                       canvas = React.createElement(DrawCanvas, { api: api, canvas: data, chats: chats,
-                                  name: name, metadata: metadata, __self: this, __source: {fileName: _jsxFileName, lineNumber: 89}} );
+                                  name: name, metadata: metadata, __self: this, __source: {fileName: _jsxFileName, lineNumber: 88}} );
                       break;
                     default: canvas = null;
                   }
@@ -96,12 +95,12 @@ export class Root extends Component {
                     React.createElement(Skeleton, {
                       history: props.history,
                       canvasList: canvasList,
-                      activeDrawer: "rightPanel", __self: this, __source: {fileName: _jsxFileName, lineNumber: 96}}
+                      activeDrawer: "rightPanel", __self: this, __source: {fileName: _jsxFileName, lineNumber: 95}}
                       , canvas
                     )
                   );
                 }
-            }, __self: this, __source: {fileName: _jsxFileName, lineNumber: 67}} )
+            }, __self: this, __source: {fileName: _jsxFileName, lineNumber: 66}} )
           , React.createElement(Route, { exact: true, path: "/~canvas/join/(~)?/:ship?/:canvas?",
             render: props => {
               let canvas =
@@ -115,15 +114,15 @@ export class Root extends Component {
                 React.createElement(Skeleton, {
                   history: props.history,
                   canvasList: canvasList,
-                  activeDrawer: "rightPanel", __self: this, __source: {fileName: _jsxFileName, lineNumber: 115}}
+                  activeDrawer: "rightPanel", __self: this, __source: {fileName: _jsxFileName, lineNumber: 114}}
                   , React.createElement(JoinScreen, {
                     api: api,
                     canvasList: canvasList,
                     autoJoin: canvas,
-                    ...props, __self: this, __source: {fileName: _jsxFileName, lineNumber: 119}} )
+                    ...props, __self: this, __source: {fileName: _jsxFileName, lineNumber: 118}} )
                 )
               );
-            }, __self: this, __source: {fileName: _jsxFileName, lineNumber: 105}}
+            }, __self: this, __source: {fileName: _jsxFileName, lineNumber: 104}}
           )
         )
       )

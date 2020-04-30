@@ -53108,9 +53108,12 @@
             var atan = Math.atan;
             var atan2 = Math.atan2;
             var cos = Math.cos;
+            var exp = Math.exp;
+            var log = Math.log;
             var sin = Math.sin;
             var sign = Math.sign || function(x) { return x > 0 ? 1 : x < 0 ? -1 : 0; };
             var sqrt = Math.sqrt;
+            var tan = Math.tan;
 
             function acos(x) {
               return x > 1 ? 0 : x < -1 ? pi$4 : Math.acos(x);
@@ -53299,6 +53302,22 @@
               };
 
               return rotation;
+            }
+
+            function rotation(rotate) {
+              rotate = rotateRadians(rotate[0] * radians, rotate[1] * radians, rotate.length > 2 ? rotate[2] * radians : 0);
+
+              function forward(coordinates) {
+                coordinates = rotate(coordinates[0] * radians, coordinates[1] * radians);
+                return coordinates[0] *= degrees$1, coordinates[1] *= degrees$1, coordinates;
+              }
+
+              forward.invert = function(coordinates) {
+                coordinates = rotate.invert(coordinates[0] * radians, coordinates[1] * radians);
+                return coordinates[0] *= degrees$1, coordinates[1] *= degrees$1, coordinates;
+              };
+
+              return forward;
             }
 
             // Generates a circle centered at [0°, 0°], with a given radius and precision.
@@ -54725,6 +54744,10 @@
               return transform;
             }
 
+            function projection(project) {
+              return projectionMutator(function() { return project; })();
+            }
+
             function projectionMutator(projectAt) {
               var project,
                   k = 150, // scale
@@ -54893,6 +54916,55 @@
                   .translate([480, 250])
                   .rotate([96, 0])
                   .center([-0.6, 38.7]);
+            }
+
+            function mercatorRaw(lambda, phi) {
+              return [lambda, log(tan((halfPi + phi) / 2))];
+            }
+
+            mercatorRaw.invert = function(x, y) {
+              return [x, 2 * atan(exp(y)) - halfPi];
+            };
+
+            function mercator() {
+              return mercatorProjection(mercatorRaw)
+                  .scale(961 / tau$1);
+            }
+
+            function mercatorProjection(project) {
+              var m = projection(project),
+                  center = m.center,
+                  scale = m.scale,
+                  translate = m.translate,
+                  clipExtent = m.clipExtent,
+                  x0 = null, y0, x1, y1; // clip extent
+
+              m.scale = function(_) {
+                return arguments.length ? (scale(_), reclip()) : scale();
+              };
+
+              m.translate = function(_) {
+                return arguments.length ? (translate(_), reclip()) : translate();
+              };
+
+              m.center = function(_) {
+                return arguments.length ? (center(_), reclip()) : center();
+              };
+
+              m.clipExtent = function(_) {
+                return arguments.length ? ((_ == null ? x0 = y0 = x1 = y1 = null : (x0 = +_[0][0], y0 = +_[0][1], x1 = +_[1][0], y1 = +_[1][1])), reclip()) : x0 == null ? null : [[x0, y0], [x1, y1]];
+              };
+
+              function reclip() {
+                var k = pi$4 * scale(),
+                    t = m(rotation(m.rotate()).invert([0, 0]));
+                return clipExtent(x0 == null
+                    ? [[t[0] - k, t[1] - k], [t[0] + k, t[1] + k]] : project === mercatorRaw
+                    ? [[Math.max(t[0] - k, x0), y0], [Math.min(t[0] + k, x1), y1]]
+                    : [[x0, Math.max(t[1] - k, y0)], [x1, Math.min(t[1] + k, y1)]]);
+              }
+
+              return reclip();
             }
 
             function initRange(domain, range) {
@@ -56785,8 +56857,8 @@
               };
             };
 
-            const projection = hexProjection(radius);
-            const path = index$1().projection(projection);
+            const projection$1 = hexProjection(radius);
+            const path = index$1().projection(projection$1);
 
             const selectedColor = (colors) => {
               return colors.find(color => {
@@ -57213,10 +57285,12 @@
                       )
                     )
                     , react.createElement('div', { ref: "canvas", className: "w-100 pr0-l pr0-xl"  , style: {overflow: "hidden"}, __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 93}}
-                      , react.createElement('svg', { className: "db", id: "canvas", width: width, height: height, __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 94}}
-                        , react.createElement('g', { className: "hexagon", __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 95}} )
-                        , react.createElement('g', { className: "mesh-group", __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 96}} )
-                        , react.createElement('g', { className: "legend", __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 97}} )
+                      , react.createElement('svg', { className: "db", id: "canvas", width: width, height: height,
+                           viewBox: `0 0 ${width} ${height}`,
+                           perserveaspectratio: "xMinYMid", __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 94}}
+                        , react.createElement('g', { className: "hexagon", __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 97}} )
+                        , react.createElement('g', { className: "mesh-group", __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 98}} )
+                        , react.createElement('g', { className: "legend", __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 99}} )
                       )
                     )
                   )
@@ -57225,13 +57299,7 @@
             }
 
             const width$1 = 960,
-                  height$1 = 660;
-
-            var projection$1 = albers()
-                .scale(1280)
-                .translate([width$1 / 2, height$1 / 2]);
-
-            var path$1 = index$1(projection$1);
+                  height$1 = 960;
 
             const selectedColor$1 = (colors) => {
               return colors.find(color => {
@@ -57246,7 +57314,25 @@
             };
 
             const initMapCanvas = (map, metadata) => {
+              console.log(map);
               const maps = metadata.type.split("-");
+              if (maps[1] === 'us') {
+                var projection = albers()
+                  .scale(1280)
+                  .translate([width$1 / 2, height$1 / 2]);
+              }else if (maps[1] === 'europe') {
+                var projection = mercator()
+                  .center([13, 52])
+                	.translate([width$1 / 2, (height$1 / 2) + 20])
+                	.scale([width$1 / 1.6]);
+                // var projection = d3.geoAlbers().center([11, 48.4])
+                //   .rotate([11.4, 0])
+                //   .scale(1280)
+                //   .parallels([50, 60])
+                //   .translate([width / 3, (height / 2) + 100]);
+              }
+              var path = index$1(projection);
+
               if (maps.length > 2) {
                 var data = map.objects[maps[2]];
               } else {
@@ -57255,10 +57341,11 @@
               select(".background").append("path")
                   .datum(mesh(map, data))
                   .attr("class", "background")
-                  .attr("d", path$1);
+                  .attr("d", path);
+              return path;
             };
 
-            const drawMapCanvas = (map, props) => {
+            const drawMapCanvas = (map, props, path) => {
               const svg = select("svg");
               let mousing = 0;
               let apiCalls = [];
@@ -57267,18 +57354,17 @@
               const location = props.metadata.location;
 
               const maps = props.metadata.type.split("-");
-
               const foreground = select(".foreground");
-
               var bisectId = bisector(function(d) { return d.id; }).left;
+
               if (maps.length > 2) {
                 var features = feature(map, map.objects[maps[2]]).features;
               } else {
                 var features = feature(map, map.objects).features;
               }
 
-
               features.forEach(function(item, index, array) {
+                console.log(item);
                 array[index].attr = (canvasData && canvasData[item.id]) ? canvasData[item.id] : {};
               });
 
@@ -57336,7 +57422,7 @@
 
               // enter
               countries.enter().append("path")
-                  .attr("d", function(d) { d.color = null; return path$1(d); })
+                  .attr("d", function(d) { d.color = null; return path(d); })
                   .style('fill', addStyle)
                   .on("mouseover", function() { this.style.stroke = "black"; })
                   .on("mouseout", function() { this.style.stroke = "none"; })
@@ -57414,8 +57500,8 @@
                 const { props, state, animationRef } = this;
                 select(".foreground").selectAll("path").remove();
                 if (state.data) {
-                  initMapCanvas(state.data, props.metadata);
-                  drawMapCanvas(state.data, props);
+                  const path = initMapCanvas(state.data, props.metadata);
+                  drawMapCanvas(state.data, props, path);
                   createColorPicker();
                 }
 
@@ -57672,7 +57758,7 @@
                 const templates = {
                   'mesh': 'Hexagon Mesh',
                   'draw': 'Free-hand Canvas',
-                  'map-europe': 'Western Europe',
+                  'map-europe-europe': 'Western Europe',
                   'map-africa': 'Africa',
                   'map-us-counties': 'U.S. Counties',
                   'map-us-states': 'U.S. States'
@@ -66651,7 +66737,6 @@ lyrtesmudnytbyrsenwegfyrmurtelreptegpecnelnevfes\
                               activeDrawer: "canvas",
                               history: props.history,
                               canvasList: canvasList, __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 32}} 
-                              , react.createElement(Hexagons, { api: api, canvas: {}, name: 'test', location: 'test', __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 36}} )
                               )
                           )}, __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 29}} )
                       , react.createElement(Route, { exact: true, path: "/~canvas/new",
@@ -66660,28 +66745,28 @@ lyrtesmudnytbyrsenwegfyrmurtelreptegpecnelnevfes\
                               react.createElement(Skeleton, {
                                 history: props.history,
                                 canvasList: canvasList,
-                                activeDrawer: "rightPanel", __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 42}}
+                                activeDrawer: "rightPanel", __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 41}}
                                 , react.createElement(NewScreen, {
                                   history: props.history,
-                                  api: api, __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 46}}
+                                  api: api, __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 45}}
                                 )
                               )
                             );
-                        }, __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 39}} )
+                        }, __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 38}} )
                       , react.createElement(Route, { exact: true, path: "/~canvas/draw",
                             render:  (props) => {
                               return (
                                 react.createElement(Skeleton, {
                                   history: props.history,
                                   canvasList: canvasList,
-                                  activeDrawer: "rightPanel", __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 56}}
+                                  activeDrawer: "rightPanel", __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 55}}
                                   , react.createElement(DrawCanvas, {
                                     history: props.history,
-                                    api: api, __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 60}}
+                                    api: api, __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 59}}
                                   )
                                 )
                               );
-                          }, __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 53}} )
+                          }, __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 52}} )
                       , react.createElement(Route, { exact: true, path: "/~canvas/item/:name",
                           render:  (props) => {
                             const name =  props.match.params.name;
@@ -66697,15 +66782,15 @@ lyrtesmudnytbyrsenwegfyrmurtelreptegpecnelnevfes\
                               switch (subtypes[0]) {
                                 case 'mesh':
                                   canvas = react.createElement(Hexagons, { api: api, canvas: data, chats: chats,
-                                            name: name, metadata: metadata, __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 81}} );
+                                            name: name, metadata: metadata, __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 80}} );
                                   break;
                                 case 'map':
                                   canvas = react.createElement(MapCanvas, { api: api, canvas: data, chats: chats,
-                                            name: name, metadata: metadata, __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 85}} );
+                                            name: name, metadata: metadata, __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 84}} );
                                   break;
                                 case 'draw':
                                   canvas = react.createElement(DrawCanvas, { api: api, canvas: data, chats: chats,
-                                              name: name, metadata: metadata, __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 89}} );
+                                              name: name, metadata: metadata, __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 88}} );
                                   break;
                                 default: canvas = null;
                               }
@@ -66714,12 +66799,12 @@ lyrtesmudnytbyrsenwegfyrmurtelreptegpecnelnevfes\
                                 react.createElement(Skeleton, {
                                   history: props.history,
                                   canvasList: canvasList,
-                                  activeDrawer: "rightPanel", __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 96}}
+                                  activeDrawer: "rightPanel", __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 95}}
                                   , canvas
                                 )
                               );
                             }
-                        }, __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 67}} )
+                        }, __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 66}} )
                       , react.createElement(Route, { exact: true, path: "/~canvas/join/(~)?/:ship?/:canvas?",
                         render: props => {
                           let canvas =
@@ -66733,15 +66818,15 @@ lyrtesmudnytbyrsenwegfyrmurtelreptegpecnelnevfes\
                             react.createElement(Skeleton, {
                               history: props.history,
                               canvasList: canvasList,
-                              activeDrawer: "rightPanel", __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 115}}
+                              activeDrawer: "rightPanel", __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 114}}
                               , react.createElement(JoinScreen, {
                                 api: api,
                                 canvasList: canvasList,
                                 autoJoin: canvas,
-                                ...props, __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 119}} )
+                                ...props, __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 118}} )
                             )
                           );
-                        }, __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 105}}
+                        }, __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 104}}
                       )
                     )
                   )

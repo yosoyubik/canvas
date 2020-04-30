@@ -33,7 +33,6 @@ export class Root extends Component {
                   activeDrawer="canvas"
                   history={props.history}
                   canvasList={canvasList} >
-                  <Hexagons api={api} canvas={{}} name={'test'} location={'test'} />
                   </Skeleton>
               )}} />
           <Route exact path="/~canvas/new"

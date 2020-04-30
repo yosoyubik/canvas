@@ -53,7 +53,7 @@
     ==  ==
     ::
     ++  arc-data
-      (ot ~[['id' ni] ['filled' bo] ['color' so]])
+      (ot ~[['id' so] ['filled' bo] ['color' so]])
     ::
     ++  form-data
       %-  ot
@@ -173,10 +173,10 @@
     ==
   ::
   ++  arc-to-json
-    |=  [id=@ud =arc]
+    |=  [id=@t =arc]
     ^-  (list [@t json])
     :_  ~
-    :-  (crip ((d-co:co 1) id))
+    :-  id
     %-  pairs:enjs:format
     ^-  (list [@t json])
     ~[['fill' b+filled.arc] ['color' s+color.arc]]
@@ -187,7 +187,7 @@
     =,  enjs:format
     ?-    -.stroke
         %mesh
-      :~  ['id' (numb id.stroke)]
+      :~  ['id' s+id.stroke]
           ['fill' b+filled.arc.stroke]
           ['color' s+color.arc.stroke]
       ==

@@ -2,13 +2,7 @@ import * as d3 from "d3";
 import * as topojson from "topojson";
 
 const width = 960,
-      height = 660;
-
-var projection = d3.geoAlbers()
-    .scale(1280)
-    .translate([width / 2, height / 2]);
-
-var path = d3.geoPath(projection);
+      height = 960;
 
 const selectedColor = (colors) => {
   return colors.find(color => {
@@ -23,7 +17,25 @@ const addStyle = function(d) {
 }
 
 const initMapCanvas = (map, metadata) => {
+  console.log(map);
   const maps = metadata.type.split("-");
+  if (maps[1] === 'us') {
+    var projection = d3.geoAlbers()
+      .scale(1280)
+      .translate([width / 2, height / 2]);
+  }else if (maps[1] === 'europe') {
+    var projection = d3.geoMercator()
+      .center([13, 52])
+    	.translate([width / 2, (height / 2) + 20])
+    	.scale([width / 1.6]);
+    // var projection = d3.geoAlbers().center([11, 48.4])
+    //   .rotate([11.4, 0])
+    //   .scale(1280)
+    //   .parallels([50, 60])
+    //   .translate([width / 3, (height / 2) + 100]);
+  }
+  var path = d3.geoPath(projection);
+
   if (maps.length > 2) {
     var data = map.objects[maps[2]];
   } else {
@@ -33,9 +45,10 @@ const initMapCanvas = (map, metadata) => {
       .datum(topojson.mesh(map, data))
       .attr("class", "background")
       .attr("d", path);
+  return path;
 }
 
-const drawMapCanvas = (map, props) => {
+const drawMapCanvas = (map, props, path) => {
   const svg = d3.select("svg");
   let mousing = 0;
   let apiCalls = [];
@@ -44,18 +57,17 @@ const drawMapCanvas = (map, props) => {
   const location = props.metadata.location;
 
   const maps = props.metadata.type.split("-");
-
   const foreground = d3.select(".foreground");
-
   var bisectId = d3.bisector(function(d) { return d.id; }).left;
+
   if (maps.length > 2) {
     var features = topojson.feature(map, map.objects[maps[2]]).features;
   } else {
     var features = topojson.feature(map, map.objects).features;
   }
 
-
   features.forEach(function(item, index, array) {
+    console.log(item);
     array[index].attr = (canvasData && canvasData[item.id]) ? canvasData[item.id] : {};
   });
 

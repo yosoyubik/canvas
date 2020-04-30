@@ -77,8 +77,8 @@ export class MapCanvas extends Component {
     const { props, state, animationRef } = this;
     d3.select(".foreground").selectAll("path").remove();
     if (state.data) {
-      initMapCanvas(state.data, props.metadata);
-      drawMapCanvas(state.data, props);
+      const path = initMapCanvas(state.data, props.metadata);
+      drawMapCanvas(state.data, props, path);
       createColorPicker(width);
     }
 

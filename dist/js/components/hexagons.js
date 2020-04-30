@@ -91,10 +91,12 @@ export class Hexagons extends Component {
           )
         )
         , React.createElement('div', { ref: "canvas", className: "w-100 pr0-l pr0-xl"  , style: {overflow: "hidden"}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 93}}
-          , React.createElement('svg', { className: "db", id: "canvas", width: width, height: height, __self: this, __source: {fileName: _jsxFileName, lineNumber: 94}}
-            , React.createElement('g', { className: "hexagon", __self: this, __source: {fileName: _jsxFileName, lineNumber: 95}} )
-            , React.createElement('g', { className: "mesh-group", __self: this, __source: {fileName: _jsxFileName, lineNumber: 96}} )
-            , React.createElement('g', { className: "legend", __self: this, __source: {fileName: _jsxFileName, lineNumber: 97}} )
+          , React.createElement('svg', { className: "db", id: "canvas", width: width, height: height,
+               viewBox: `0 0 ${width} ${height}`,
+               perserveaspectratio: "xMinYMid", __self: this, __source: {fileName: _jsxFileName, lineNumber: 94}}
+            , React.createElement('g', { className: "hexagon", __self: this, __source: {fileName: _jsxFileName, lineNumber: 97}} )
+            , React.createElement('g', { className: "mesh-group", __self: this, __source: {fileName: _jsxFileName, lineNumber: 98}} )
+            , React.createElement('g', { className: "legend", __self: this, __source: {fileName: _jsxFileName, lineNumber: 99}} )
           )
         )
       )

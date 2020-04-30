@@ -468,7 +468,7 @@
     ^-  ^mesh
     |-
     ?~  strokes  mesh
-    ?>  ?=([%mesh @ud =arc] i.strokes)
+    ?>  ?=([%mesh @t =arc] i.strokes)
     %_    $
         strokes
       t.strokes

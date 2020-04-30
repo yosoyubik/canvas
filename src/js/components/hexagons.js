@@ -91,7 +91,9 @@ export class Hexagons extends Component {
           </button>
         </div>
         <div ref="canvas" className="w-100 pr0-l pr0-xl" style={{overflow: "hidden"}}>
-          <svg className="db" id="canvas" width={width} height={height}>
+          <svg className="db" id="canvas" width={width} height={height}
+               viewBox={`0 0 ${width} ${height}`}
+               perserveaspectratio="xMinYMid">
             <g className="hexagon" />
             <g className="mesh-group" />
             <g className="legend" />
