@@ -73,21 +73,21 @@ export class Root extends Component {
                   const data = !!canvasList[name] ? canvasList[name].data : {};
                   const chats = state.chats;
                   const canvasType = !!canvasList[name] ? canvasList[name].metadata.type : "";
-                  const location = !!canvasList[name] ? canvasList[name].metadata.location : "";
-                  const saved = !!canvasList[name] ? canvasList[name].metadata.saved : false;
-                  console.log(chats)
-                  switch (canvasType) {
+                  const metadata = !!canvasList[name] ? canvasList[name].metadata : {};
+                  console.log(chats, canvasType);
+                  const subtypes = canvasType.split("-");
+                  switch (subtypes[0]) {
                     case 'mesh':
                       canvas = <Hexagons api={api} canvas={data} chats={chats}
-                                saved={saved} name={name} location={location} />;
+                                name={name} metadata={metadata} />;
                       break;
                     case 'map':
                       canvas = <MapCanvas api={api} canvas={data} chats={chats}
-                                saved={saved} name={name} location={location} />;
+                                name={name} metadata={metadata} />;
                       break;
                     case 'draw':
                       canvas = <DrawCanvas api={api} canvas={data} chats={chats}
-                                  saved={saved} name={name} location={location} />;
+                                  name={name} metadata={metadata} />;
                       break;
                     default: canvas = null;
                   }

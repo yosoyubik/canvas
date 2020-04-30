@@ -441,7 +441,6 @@
     ^-  ^canvas
     ?-  -.u.canvas
       %mesh  [%mesh (update-mesh mesh.u.canvas strokes) meta]
-      %map   [%map (update-mesh mesh.u.canvas strokes) meta]
       %draw  [%draw (update-draw draw.u.canvas strokes) meta]
     ==
   ==
@@ -467,7 +466,7 @@
     ^-  ^mesh
     |-
     ?~  strokes  mesh
-    ?>  ?=([?(%map %mesh) @ud =arc] i.strokes)
+    ?>  ?=([%mesh @ud =arc] i.strokes)
     %_    $
         strokes
       t.strokes

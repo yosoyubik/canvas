@@ -22,26 +22,38 @@ const addStyle = function(d) {
   return d.attr ? d.attr.color : undefined;
 }
 
-const initMapCanvas = (us) => {
-  // console.log(us);
+const initMapCanvas = (map, metadata) => {
+  const maps = metadata.type.split("-");
+  if (maps.length > 2) {
+    var data = map.objects[maps[2]];
+  } else {
+    var data = map.objects;
+  }
   d3.select(".background").append("path")
-      .datum(topojson.mesh(us, us.objects.states))
+      .datum(topojson.mesh(map, data))
       .attr("class", "background")
       .attr("d", path);
 }
 
-const drawMapCanvas = (us, props) => {
+const drawMapCanvas = (map, props) => {
   const svg = d3.select("svg");
   let mousing = 0;
   let apiCalls = [];
   const canvasName = props.name;
   const canvasData = props.canvas;
-  const location = props.location;
+  const location = props.metadata.location;
+
+  const maps = props.metadata.type.split("-");
 
   const foreground = d3.select(".foreground");
 
   var bisectId = d3.bisector(function(d) { return d.id; }).left;
-  var features = topojson.feature(us, us.objects.states).features;
+  if (maps.length > 2) {
+    var features = topojson.feature(map, map.objects[maps[2]]).features;
+  } else {
+    var features = topojson.feature(map, map.objects).features;
+  }
+
 
   features.forEach(function(item, index, array) {
     array[index].attr = (canvasData && canvasData[item.id]) ? canvasData[item.id] : {};

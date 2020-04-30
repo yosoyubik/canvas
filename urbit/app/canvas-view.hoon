@@ -264,7 +264,6 @@
    ?-  -.canvas
      %draw  [%draw ~ metadata.canvas]
      %mesh  [%mesh ~ metadata.canvas]
-     %map   [%map ~ metadata.canvas]
    ==
   ::
   ++  handle-share

@@ -92,14 +92,14 @@ class UrbitApi {
     });
   }
 
-  create(name, type, location) {
+  create(name, type, location, subtype) {
     console.log("creating");
     let create = {};
     create[type] = {
       'canvas': null,
       'metadata': {
         'name': name,
-        'type': type,
+        'type': subtype,
         'location': location,
         'saved': false
       }

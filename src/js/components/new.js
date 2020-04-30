@@ -9,10 +9,10 @@ export class NewScreen extends Component {
     const templates = {
       'mesh': 'Hexagon Mesh',
       'draw': 'Free-hand Canvas',
-      'europe': 'Western Europe',
-      'africa': 'Africa',
-      'us-counties': 'U.S. Counties',
-      'us-states': 'U.S. States'
+      'map-europe': 'Western Europe',
+      'map-africa': 'Africa',
+      'map-us-counties': 'U.S. Counties',
+      'map-us-states': 'U.S. States'
     };
     this.state = {
       open: false,
@@ -93,8 +93,9 @@ export class NewScreen extends Component {
     }, () => {
       props.api.canvas.create(
         state.canvasName,
-        state.template,
-        '~' + ship
+        (state.template.includes("map")) ? "mesh" : state.template,
+        '~' + ship,
+        state.template
       ).then(() => {
         this.setState({
           awaiting: false

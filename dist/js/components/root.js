@@ -73,21 +73,21 @@ export class Root extends Component {
                   const data = !!canvasList[name] ? canvasList[name].data : {};
                   const chats = state.chats;
                   const canvasType = !!canvasList[name] ? canvasList[name].metadata.type : "";
-                  const location = !!canvasList[name] ? canvasList[name].metadata.location : "";
-                  const saved = !!canvasList[name] ? canvasList[name].metadata.saved : false;
-                  console.log(chats)
-                  switch (canvasType) {
+                  const metadata = !!canvasList[name] ? canvasList[name].metadata : {};
+                  console.log(chats, canvasType);
+                  const subtypes = canvasType.split("-");
+                  switch (subtypes[0]) {
                     case 'mesh':
                       canvas = React.createElement(Hexagons, { api: api, canvas: data, chats: chats,
-                                saved: saved, name: name, location: location, __self: this, __source: {fileName: _jsxFileName, lineNumber: 81}} );
+                                name: name, metadata: metadata, __self: this, __source: {fileName: _jsxFileName, lineNumber: 81}} );
                       break;
                     case 'map':
                       canvas = React.createElement(MapCanvas, { api: api, canvas: data, chats: chats,
-                                saved: saved, name: name, location: location, __self: this, __source: {fileName: _jsxFileName, lineNumber: 85}} );
+                                name: name, metadata: metadata, __self: this, __source: {fileName: _jsxFileName, lineNumber: 85}} );
                       break;
                     case 'draw':
                       canvas = React.createElement(DrawCanvas, { api: api, canvas: data, chats: chats,
-                                  saved: saved, name: name, location: location, __self: this, __source: {fileName: _jsxFileName, lineNumber: 89}} );
+                                  name: name, metadata: metadata, __self: this, __source: {fileName: _jsxFileName, lineNumber: 89}} );
                       break;
                     default: canvas = null;
                   }

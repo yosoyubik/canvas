@@ -39,7 +39,7 @@ export class Hexagons extends Component {
     let chunks = [];
     while (i < svgString.length) {
       this.props.api.svg.save(
-        this.props.location,
+        this.props.metadata.location,
         this.props.name,
         svgString.slice(i, chunkSize + i),
         ((i + chunkSize ) >= svgString.length) );
@@ -82,7 +82,7 @@ export class Hexagons extends Component {
         <div className="absolute mw5"
              style={{right: "20px", top: "20px"}}
           >
-          <ShareImage chats={this.props.chats} share={this.onClickShare} saved={this.props.saved}/>
+          <ShareImage chats={this.props.chats} share={this.onClickShare} saved={this.props.metadata.saved}/>
           <button
             onClick={this.onClickSave.bind(this)}
             className="pointer ml6 f9 green2 bg-gray0-d ba pv3 ph4 b--green2">

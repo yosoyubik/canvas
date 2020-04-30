@@ -39,7 +39,7 @@ export class Hexagons extends Component {
     let chunks = [];
     while (i < svgString.length) {
       this.props.api.svg.save(
-        this.props.location,
+        this.props.metadata.location,
         this.props.name,
         svgString.slice(i, chunkSize + i),
         ((i + chunkSize ) >= svgString.length) );
@@ -82,7 +82,7 @@ export class Hexagons extends Component {
         , React.createElement('div', { className: "absolute mw5" ,
              style: {right: "20px", top: "20px"}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 82}}
           
-          , React.createElement(ShareImage, { chats: this.props.chats, share: this.onClickShare, saved: this.props.saved, __self: this, __source: {fileName: _jsxFileName, lineNumber: 85}})
+          , React.createElement(ShareImage, { chats: this.props.chats, share: this.onClickShare, saved: this.props.metadata.saved, __self: this, __source: {fileName: _jsxFileName, lineNumber: 85}})
           , React.createElement('button', {
             onClick: this.onClickSave.bind(this),
             className: "pointer ml6 f9 green2 bg-gray0-d ba pv3 ph4 b--green2"        , __self: this, __source: {fileName: _jsxFileName, lineNumber: 86}}, "Save Image"

@@ -2,15 +2,16 @@
 
 import { sigil, stringRenderer } from 'urbit-sigil-js'
 
-const hexClasses = [
-  ".hexagon",
-  ".hexagon path",
-  ".hexagon :hover",
-  ".hexagon .fill",
-  ".border, .mesh",
-  ".mesh",
-  ".border"
-];
+const hexClasses = {
+  mesh: [".hexagon",
+         ".hexagon path",
+         ".hexagon :hover",
+         ".hexagon .fill",
+         ".border, .mesh",
+         ".mesh",
+         ".border"],
+  map: [".background", ".foreground", ".background path", ".foreground path"]
+};
 
 const parseSVG = ( svgNode ) => {
 	const compiledSVG = appendCSS( cssStyleText, svgNode );
@@ -27,13 +28,14 @@ const contains = (str, arr) => {
   return arr.indexOf( str ) === -1 ? false : true;
 }
 
-const getCSSStyles = ( parentElement ) => {
+const getCSSStyles = ( parentElement, map ) => {
+  console.log(map);
   let extractedCSSText = '';
   const s = document.styleSheets[0];
   // console.log(s);
   var cssRules = s.cssRules;
   for (let r = 0; r < cssRules.length; r++) {
-    if ( contains( cssRules[r].selectorText, hexClasses ) )
+    if ( contains( cssRules[r].selectorText, hexClasses[map] ) )
       extractedCSSText += cssRules[r].cssText;
     }
 
@@ -49,7 +51,7 @@ const appendCSS = ( element, css ) => {
   return element;
 }
 
-const simpleParseSVG = (svgNode) => {
+const simpleParseSVG = (svgNode, mapType) => {
 
   // const svgString =
   // `<svg viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg">
@@ -73,7 +75,7 @@ const simpleParseSVG = (svgNode) => {
   // const svgDocument = new DOMParser().parseFromString(svgString, 'image/svg+xml')
   // svgDocument.documentElement.width.baseVal.valueAsString = `40px`
   // svgDocument.documentElement.height.baseVal.valueAsString = `40px`
-  const svgNodePlusCSS = appendCSS(svgNode, getCSSStyles(svgNode));
+  const svgNodePlusCSS = appendCSS(svgNode, getCSSStyles(svgNode, mapType));
   let serializedXML = new XMLSerializer().serializeToString(svgNode);
   // Fix root xlink without namespace
   serializedXML = serializedXML.replace(/(\w+)?:?xlink=/g, 'xmlns:xlink=');

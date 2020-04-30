@@ -21,8 +21,7 @@
   ++  create
     |^
     %-  of
-    :~  [%map metadata]
-        [%mesh metadata]
+    :~  [%mesh metadata]
         [%draw metadata]
     ==
     ::
@@ -50,7 +49,6 @@
         %-  ar
         %-  of
         :~  [%mesh arc-data]
-            [%map arc-data]
             [%draw form-data]
     ==  ==
     ::
@@ -150,11 +148,6 @@
       %-  zing
       (turn ~(tap by mesh.canvas) arc-to-json)
     ::
-        %map
-      %-  pairs
-      %-  zing
-      (turn ~(tap by mesh.canvas) arc-to-json)
-    ::
         %draw
       :-  %a
       %+  turn  draw.canvas
@@ -194,12 +187,6 @@
     =,  enjs:format
     ?-    -.stroke
         %mesh
-      :~  ['id' (numb id.stroke)]
-          ['fill' b+filled.arc.stroke]
-          ['color' s+color.arc.stroke]
-      ==
-    ::
-        %map
       :~  ['id' (numb id.stroke)]
           ['fill' b+filled.arc.stroke]
           ['color' s+color.arc.stroke]
