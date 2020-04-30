@@ -48806,7 +48806,7 @@
                     )
                     ,  (props.location === ("~" + ship)) ?
                       (react.createElement('p', { className: "ph6 f9 pb1 gray2"   , __self: this, __source: {fileName: _jsxFileName$3, lineNumber: 21}}, "Local")) :
-                      (react.createElement('button', { className: "pointer ph6 f9 pb1 red2"    ,
+                      (react.createElement('button', { className: "pointer ph6 f9 pb1 red2 bg-gray0-d b--red2"      ,
                        onClick: this.onClickLeave.bind(this), __self: this, __source: {fileName: _jsxFileName$3, lineNumber: 22}}, "leave shared canvas"
 
                       ))
@@ -56972,7 +56972,7 @@
               for (var j = 0, q = 3; j < m; ++j, q += 6) {
                 for (var i = 0; i < n; ++i, q += 3) {
                   geometries.push({
-                    id: total,
+                    id: total.toString(),
                     name: canvasName,
                     type: "Polygon",
                     arcs: [[q, q + 1, q + 2, ~(q + (n + 2 - (j & 1)) * 3), ~(q - 2), ~(q - (n + 2 + (j & 1)) * 3 + 2)]],
@@ -56989,7 +56989,7 @@
               };
             };
 
-            const updateCanvas = (arc, canvas) => {
+            const updateHexCanvas = (arc, canvas) => {
               selectAll(".point")
                 .style('fill', function (d) {
                 if (arc.id === d.id && canvas === d.name) {
@@ -57309,43 +57309,40 @@
               });
             };
 
+            let path$1;
+
             const addStyle = function(d) {
               return d.attr ? d.attr.color : undefined;
             };
 
             const initMapCanvas = (map, metadata) => {
-              console.log(map);
-              const maps = metadata.type.split("-");
-              if (maps[1] === 'us') {
-                var projection = albers()
-                  .scale(1280)
-                  .translate([width$1 / 2, height$1 / 2]);
-              }else if (maps[1] === 'europe') {
-                var projection = mercator()
-                  .center([13, 52])
-                	.translate([width$1 / 2, (height$1 / 2) + 20])
-                	.scale([width$1 / 1.6]);
-                // var projection = d3.geoAlbers().center([11, 48.4])
-                //   .rotate([11.4, 0])
-                //   .scale(1280)
-                //   .parallels([50, 60])
-                //   .translate([width / 3, (height / 2) + 100]);
+              if (metadata.type) {
+                const maps = metadata.type.split("-");
+                if (maps[1] === 'us') {
+                  var projection = albers()
+                    .scale(1280)
+                    .translate([width$1 / 2, height$1 / 2.5]);
+                }else if (maps[1] === 'europe') {
+                  var projection = mercator()
+                    .center([13, 52])
+                  	.translate([width$1 / 2, (height$1 / 2) + 20])
+                  	.scale([width$1 / 1.6]);
+                }
+                path$1 = index$1(projection);
+                console.log(map, maps);
+                if (maps.length > 2) {
+                  var data = map.objects[maps[2]];
+                } else {
+                  var data = map.objects;
+                }
+                select(".background").append("path")
+                    .datum(mesh(map, data))
+                    .attr("class", "background")
+                    .attr("d", path$1);
               }
-              var path = index$1(projection);
-
-              if (maps.length > 2) {
-                var data = map.objects[maps[2]];
-              } else {
-                var data = map.objects;
-              }
-              select(".background").append("path")
-                  .datum(mesh(map, data))
-                  .attr("class", "background")
-                  .attr("d", path);
-              return path;
             };
 
-            const drawMapCanvas = (map, props, path) => {
+            const drawMapCanvas = (map, props) => {
               const svg = select("svg");
               let mousing = 0;
               let apiCalls = [];
@@ -57358,6 +57355,7 @@
               var bisectId = bisector(function(d) { return d.id; }).left;
 
               if (maps.length > 2) {
+                console.log(maps[2], maps, map.objects[maps[2]]);
                 var features = feature(map, map.objects[maps[2]]).features;
               } else {
                 var features = feature(map, map.objects).features;
@@ -57365,6 +57363,8 @@
 
               features.forEach(function(item, index, array) {
                 console.log(item);
+                item.id = (Number.isInteger(item.id)) ? item.id.toString() : item.id;
+                item.name = canvasName;
                 array[index].attr = (canvasData && canvasData[item.id]) ? canvasData[item.id] : {};
               });
 
@@ -57422,8 +57422,12 @@
 
               // enter
               countries.enter().append("path")
-                  .attr("d", function(d) { d.color = null; return path(d); })
+                  .attr("d", function(d) {
+                    d.id = d.id.toString();
+                    d.color = null; return path$1(d);
+                  })
                   .style('fill', addStyle)
+                  .attr("class", "point")
                   .on("mouseover", function() { this.style.stroke = "black"; })
                   .on("mouseout", function() { this.style.stroke = "none"; })
                   .on("mousedown", mousedown)
@@ -57431,8 +57435,154 @@
                   .on("mouseup", mouseup);
             };
 
-            const _jsxFileName$8 = "/Users/jose/urbit/canvas/src/js/components/map.js";
+            const updateMapCanvas = (arc, canvas) => {
+              selectAll(".point")
+                .style('fill', function (d) {
+                if (arc.id === d.id && canvas === d.name) {
+                  d.attr.fill = arc.fill;
+                  d.attr.color = arc.color;
+                }
+                return d.attr.color;
+               });
+            };
 
+            function reparseDrawForms(data) {
+              console.log(data);
+              data.forEach(function (item, i, array) {
+                const properties = item[item.length - 1];
+                array[i].strokeStyle = properties.strokeStyle;
+                array[i].lineWidth = parseFloat(properties.lineWidth);
+                array[i].pop();
+                array[i].forEach(function (item, i, array) {
+                  array[i][0] = parseFloat(item[0]),
+                  array[i][1] = parseFloat(item[1]);
+                });
+              });
+              console.log(data);
+              return data;
+            }
+
+            class InitialReducer {
+                reduce(json, state) {
+                    console.log("initial", json);
+                    let data = lodash.get(json, 'init-frontend', false);
+                    if (data) {
+                      state.chats = data.chats;
+                      for (let canvas in data.canvas) {
+                        console.log(canvas);
+                        if (data.canvas[canvas].metadata.type === 'draw') {
+                          data.canvas[canvas].data = reparseDrawForms(data[canvas].data);
+                        }
+                        console.log(data.canvas[canvas]);
+                        state.canvasList[canvas] = data.canvas[canvas];
+                      }
+                    }
+                }
+            }
+
+            class UpdateReducer {
+                canvas(json, state) {
+                    let data = lodash.get(json, 'load', false);
+                    if (data) {
+                        if (data.type === 'draw') {
+                          data.data = reparseDrawForms(data.data);
+                        }
+                        state.canvasList[data.name] = {
+                          type: data.type,
+                          metadata: {
+                            name: data.name,
+                            type: data.type,
+                            location: data.location,
+                            saved: false
+                          },
+                          data: data.data
+                        };
+                    }
+                }
+
+                file(json, state) {
+                    let data = lodash.get(json, 'file', false);
+                    if (data) {
+                        console.log(data);
+                        state.canvasList[data].metadata.saved = true;
+                    }
+                }
+            }
+
+            const updaters = {
+              map: updateMapCanvas,
+              mesh: updateHexCanvas
+            };
+
+            class PaintReducer {
+                reduce(json, state) {
+                  let data = lodash.get(json, 'paint', false);
+                  if (data) {
+                    console.log(data, state.canvasList);
+                    if (data.name in state.canvasList) {
+                      data.strokes.forEach((stroke, i) => {
+                          const type = state.canvasList[data.name].metadata.type.split("-")[0];
+                          console.log(type);
+                          if (type === 'map' || type === 'mesh'){
+                            state.canvasList[data.name].data[stroke.id] = {
+                              fill: stroke.fill,
+                              color: stroke.color
+                            };
+                          }
+                          console.log(updaters[type]);
+                          updaters[type](stroke, data.name);
+                      });
+                    }
+                  }
+                }
+            }
+
+            class Store {
+                constructor() {
+                    this.state = {
+                        canvasList: {},
+                        chats: [],
+                        maps: {}
+                    };
+
+                    this.initialReducer = new InitialReducer();
+                    this.updateReducer = new UpdateReducer();
+                    this.paintReducer = new PaintReducer();
+                    this.setState = () => { };
+
+                    fetch("/~canvas/map/us.json")
+                      .then((response) => response.json())
+                      .then((json) => {
+                        this.state.maps.us = json;
+                      });
+                    fetch("/~canvas/map/europe.json")
+                      .then((response) => response.json())
+                      .then((json) => {
+                        this.state.maps.europe = json;
+                      });
+                }
+
+                setStateHandler(setState) {
+                    this.setState = setState;
+                }
+
+                handleEvent(data) {
+                    let json = data.data;
+
+                    this.initialReducer.reduce(json, this.state);
+                    this.updateReducer.canvas(json, this.state);
+                    this.updateReducer.file(json, this.state);
+                    this.paintReducer.reduce(json, this.state);
+                    if (!('paint' in json)) {
+                      this.setState(this.state);
+                    }
+                }
+            }
+
+            let store = new Store();
+            window.store = store;
+
+            const _jsxFileName$8 = "/Users/jose/urbit/canvas/src/js/components/map.js";
             class MapCanvas extends react_1 {
               constructor(props) {
                 super(props);
@@ -57444,18 +57594,25 @@
               }
 
               componentDidMount() {
-                // console.log("mounting");
+                console.log("mounting");
                 const { props, state, animationRef } = this;
                 const maps = props.metadata.type.split("-");
                 if (maps.length > 1) {
-                  fetch("/~canvas/map/" + maps[1] + ".json")
-                    .then((response) => response.json())
-                    .then((json) => {
-                      // console.log(json);
-                      this.setState({
-                        data: json
-                      });
-                    });
+                  const json = store.state.maps[maps[1]];
+                  initMapCanvas(json, props.metadata);
+                  drawMapCanvas(json, props);
+                  createColorPicker();
+                  // fetch("/~canvas/map/" + maps[1] + ".json")
+                  //   .then((response) => response.json())
+                  //   .then((json) => {
+                  //     const path = initMapCanvas(json, props.metadata);
+                  //     drawMapCanvas(json, props, path);
+                  //     createColorPicker(width);
+                  //     this.setState({
+                  //       data: json,
+                  //       path: path
+                  //     });
+                  //   });
                   }
               }
 
@@ -57499,32 +57656,35 @@
               render() {
                 const { props, state, animationRef } = this;
                 select(".foreground").selectAll("path").remove();
-                if (state.data) {
-                  const path = initMapCanvas(state.data, props.metadata);
-                  drawMapCanvas(state.data, props, path);
-                  createColorPicker();
+                select(".background").selectAll("path").remove();
+                if (props.metadata) {
+                  const maps = props.metadata.type.split("-");
+                  console.log(store);
+                  const json = store.state.maps[maps[1]];
+                  initMapCanvas(json, props.metadata);
+                  drawMapCanvas(json, props);
                 }
 
                 return (
-                  react.createElement('div', { className: "h-100 w-100 pa3 pt4 bg-gray0-d white-d flex flex-column"       , __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 86}}
-                    , react.createElement('div', { className: "w-100 dn-m dn-l dn-xl inter pt1 pb6 f8"       , __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 87}}
-                      , react.createElement(Link, { to: "/~canvas/", __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 88}}, "⟵ Canvas")
+                  react.createElement('div', { className: "h-100 w-100 pa3 pt4 bg-gray0-d white-d flex flex-column"       , __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 97}}
+                    , react.createElement('div', { className: "w-100 dn-m dn-l dn-xl inter pt1 pb6 f8"       , __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 98}}
+                      , react.createElement(Link, { to: "/~canvas/", __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 99}}, "⟵ Canvas")
                     )
                     , react.createElement('div', { className: "absolute mw5" ,
-                         style: {right: "20px", top: "20px"}, __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 90}}
+                         style: {right: "20px", top: "20px"}, __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 101}}
                       
-                      , react.createElement(ShareImage, { chats: this.props.chats, share: this.onClickShare, saved: this.props.metadata.saved, __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 93}})
+                      , react.createElement(ShareImage, { chats: this.props.chats, share: this.onClickShare, saved: this.props.metadata.saved, __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 104}})
                       , react.createElement('button', {
                         onClick: this.onClickSave.bind(this),
-                        className: "pointer ml6 f9 green2 bg-gray0-d ba pv3 ph4 b--green2"        , __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 94}}, "Save Image"
+                        className: "pointer ml6 f9 green2 bg-gray0-d ba pv3 ph4 b--green2"        , __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 105}}, "Save Image"
 
                       )
                     )
-                    , react.createElement('div', { ref: "canvas", className: "w-100 mb4 pr6 pr0-l pr0-xl"    , __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 100}}
-                      , react.createElement('svg', { className: "db", id: "canvas", width:  width$1 , height:  height$1 , __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 101}}
-                        , react.createElement('g', { transform: "translate(25,25)", className: "foreground", style: { cursor: "pointer", strokeOpacity: .5 }, __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 102}})
-                        , react.createElement('g', { transform: "translate(25,25)", className: "background", __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 103}} )
-                        , react.createElement('g', { className: "legend", __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 104}} )
+                    , react.createElement('div', { ref: "canvas", className: "w-100 mb4 pr6 pr0-l pr0-xl"    , __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 111}}
+                      , react.createElement('svg', { className: "db", id: "canvas", width:  width$1 , height:  height$1 , __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 112}}
+                        , react.createElement('g', { transform: "translate(25,25)", className: "foreground", style: { cursor: "pointer", strokeOpacity: .5 }, __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 113}})
+                        , react.createElement('g', { transform: "translate(25,25)", className: "background", __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 114}} )
+                        , react.createElement('g', { className: "legend", __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 115}} )
                       )
                     )
                   )
@@ -66600,120 +66760,6 @@ lyrtesmudnytbyrsenwegfyrmurtelreptegpecnelnevfes\
                 );
               }
             }
-
-            function reparseDrawForms(data) {
-              console.log(data);
-              data.forEach(function (item, i, array) {
-                const properties = item[item.length - 1];
-                array[i].strokeStyle = properties.strokeStyle;
-                array[i].lineWidth = parseFloat(properties.lineWidth);
-                array[i].pop();
-                array[i].forEach(function (item, i, array) {
-                  array[i][0] = parseFloat(item[0]),
-                  array[i][1] = parseFloat(item[1]);
-                });
-              });
-              console.log(data);
-              return data;
-            }
-
-            class InitialReducer {
-                reduce(json, state) {
-                    console.log("initial", json);
-                    let data = lodash.get(json, 'init-frontend', false);
-                    if (data) {
-                      state.chats = data.chats;
-                      for (let canvas in data.canvas) {
-                        console.log(canvas);
-                        if (data.canvas[canvas].metadata.type === 'draw') {
-                          data.canvas[canvas].data = reparseDrawForms(data[canvas].data);
-                        }
-                        console.log(data.canvas[canvas]);
-                        state.canvasList[canvas] = data.canvas[canvas];
-                      }
-                    }
-                }
-            }
-
-            class UpdateReducer {
-                canvas(json, state) {
-                    let data = lodash.get(json, 'load', false);
-                    if (data) {
-                        if (data.type === 'draw') {
-                          data.data = reparseDrawForms(data.data);
-                        }
-                        state.canvasList[data.name] = {
-                          type: data.type,
-                          metadata: {
-                            name: data.name,
-                            type: data.type,
-                            location: data.location,
-                            saved: false
-                          },
-                          data: data.data
-                        };
-                    }
-                }
-
-                file(json, state) {
-                    let data = lodash.get(json, 'file', false);
-                    if (data) {
-                        console.log(data);
-                        state.canvasList[data].metadata.saved = true;
-                    }
-                }
-            }
-
-            class PaintReducer {
-                reduce(json, state) {
-                  let data = lodash.get(json, 'paint', false);
-                  if (data) {
-                    console.log(data, state.canvasList);
-                    if (data.name in state.canvasList) {
-                      data.strokes.forEach((stroke, i) => {
-                          state.canvasList[data.name].data[stroke.id] = {
-                            fill: stroke.fill,
-                            color: stroke.color
-                          };
-                          updateCanvas(stroke, data.name);
-                      });
-                    }
-                  }
-                }
-            }
-
-            class Store {
-                constructor() {
-                    this.state = {
-                        canvasList: {},
-                        chats: []
-                    };
-
-                    this.initialReducer = new InitialReducer();
-                    this.updateReducer = new UpdateReducer();
-                    this.paintReducer = new PaintReducer();
-                    this.setState = () => { };
-                }
-
-                setStateHandler(setState) {
-                    this.setState = setState;
-                }
-
-                handleEvent(data) {
-                    let json = data.data;
-
-                    this.initialReducer.reduce(json, this.state);
-                    this.updateReducer.canvas(json, this.state);
-                    this.updateReducer.file(json, this.state);
-                    this.paintReducer.reduce(json, this.state);
-                    if (!('paint' in json)) {
-                      this.setState(this.state);
-                    }
-                }
-            }
-
-            let store = new Store();
-            window.store = store;
 
             const _jsxFileName$c = "/Users/jose/urbit/canvas/src/js/components/root.js";
 

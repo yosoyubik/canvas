@@ -19,7 +19,7 @@ export class CanvasTitle extends Component {
         </Link>
         { (props.location === ("~" + ship)) ?
           (<p className="ph6 f9 pb1 gray2">Local</p>) :
-          (<button className="pointer ph6 f9 pb1 red2"
+          (<button className="pointer ph6 f9 pb1 red2 bg-gray0-d b--red2"
            onClick={this.onClickLeave.bind(this)}>
             leave shared canvas
           </button>)

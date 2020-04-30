@@ -12,43 +12,40 @@ const selectedColor = (colors) => {
   });
 }
 
+let path;
+
 const addStyle = function(d) {
   return d.attr ? d.attr.color : undefined;
 }
 
 const initMapCanvas = (map, metadata) => {
-  console.log(map);
-  const maps = metadata.type.split("-");
-  if (maps[1] === 'us') {
-    var projection = d3.geoAlbers()
-      .scale(1280)
-      .translate([width / 2, height / 2]);
-  }else if (maps[1] === 'europe') {
-    var projection = d3.geoMercator()
-      .center([13, 52])
-    	.translate([width / 2, (height / 2) + 20])
-    	.scale([width / 1.6]);
-    // var projection = d3.geoAlbers().center([11, 48.4])
-    //   .rotate([11.4, 0])
-    //   .scale(1280)
-    //   .parallels([50, 60])
-    //   .translate([width / 3, (height / 2) + 100]);
+  if (metadata.type) {
+    const maps = metadata.type.split("-");
+    if (maps[1] === 'us') {
+      var projection = d3.geoAlbers()
+        .scale(1280)
+        .translate([width / 2, height / 2.5]);
+    }else if (maps[1] === 'europe') {
+      var projection = d3.geoMercator()
+        .center([13, 52])
+      	.translate([width / 2, (height / 2) + 20])
+      	.scale([width / 1.6]);
+    }
+    path = d3.geoPath(projection);
+    console.log(map, maps);
+    if (maps.length > 2) {
+      var data = map.objects[maps[2]];
+    } else {
+      var data = map.objects;
+    }
+    d3.select(".background").append("path")
+        .datum(topojson.mesh(map, data))
+        .attr("class", "background")
+        .attr("d", path);
   }
-  var path = d3.geoPath(projection);
-
-  if (maps.length > 2) {
-    var data = map.objects[maps[2]];
-  } else {
-    var data = map.objects;
-  }
-  d3.select(".background").append("path")
-      .datum(topojson.mesh(map, data))
-      .attr("class", "background")
-      .attr("d", path);
-  return path;
 }
 
-const drawMapCanvas = (map, props, path) => {
+const drawMapCanvas = (map, props) => {
   const svg = d3.select("svg");
   let mousing = 0;
   let apiCalls = [];
@@ -61,6 +58,7 @@ const drawMapCanvas = (map, props, path) => {
   var bisectId = d3.bisector(function(d) { return d.id; }).left;
 
   if (maps.length > 2) {
+    console.log(maps[2], maps, map.objects[maps[2]]);
     var features = topojson.feature(map, map.objects[maps[2]]).features;
   } else {
     var features = topojson.feature(map, map.objects).features;
@@ -68,6 +66,8 @@ const drawMapCanvas = (map, props, path) => {
 
   features.forEach(function(item, index, array) {
     console.log(item);
+    item.id = (Number.isInteger(item.id)) ? item.id.toString() : item.id;
+    item.name = canvasName;
     array[index].attr = (canvasData && canvasData[item.id]) ? canvasData[item.id] : {};
   });
 
@@ -125,8 +125,12 @@ const drawMapCanvas = (map, props, path) => {
 
   // enter
   countries.enter().append("path")
-      .attr("d", function(d) { d.color = null; return path(d); })
+      .attr("d", function(d) {
+        d.id = d.id.toString();
+        d.color = null; return path(d);
+      })
       .style('fill', addStyle)
+      .attr("class", "point")
       .on("mouseover", function() { this.style.stroke = "black"; })
       .on("mouseout", function() { this.style.stroke = "none"; })
       .on("mousedown", mousedown)
@@ -134,4 +138,15 @@ const drawMapCanvas = (map, props, path) => {
       .on("mouseup", mouseup);
 }
 
-export { initMapCanvas, drawMapCanvas, width, height };
+const updateMapCanvas = (arc, canvas) => {
+  d3.selectAll(".point")
+    .style('fill', function (d) {
+    if (arc.id === d.id && canvas === d.name) {
+      d.attr.fill = arc.fill;
+      d.attr.color = arc.color;
+    }
+    return d.attr.color;
+   });
+}
+
+export { initMapCanvas, drawMapCanvas, updateMapCanvas, width, height };

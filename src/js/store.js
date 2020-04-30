@@ -7,13 +7,25 @@ class Store {
     constructor() {
         this.state = {
             canvasList: {},
-            chats: []
+            chats: [],
+            maps: {}
         };
 
         this.initialReducer = new InitialReducer();
         this.updateReducer = new UpdateReducer();
         this.paintReducer = new PaintReducer();
         this.setState = () => { };
+
+        fetch("/~canvas/map/us.json")
+          .then((response) => response.json())
+          .then((json) => {
+            this.state.maps.us = json;
+          });
+        fetch("/~canvas/map/europe.json")
+          .then((response) => response.json())
+          .then((json) => {
+            this.state.maps.europe = json;
+          });
     }
 
     setStateHandler(setState) {

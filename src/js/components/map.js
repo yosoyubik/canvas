@@ -7,6 +7,7 @@ import { initMapCanvas, drawMapCanvas, width, height } from "./lib/map-canvas";
 import { createColorPicker } from "./lib/color";
 import { ShareImage } from "./lib/share-image";
 
+import { store } from '/store';
 
 export class MapCanvas extends Component {
   constructor(props) {
@@ -19,18 +20,25 @@ export class MapCanvas extends Component {
   }
 
   componentDidMount() {
-    // console.log("mounting");
+    console.log("mounting");
     const { props, state, animationRef } = this;
     const maps = props.metadata.type.split("-");
     if (maps.length > 1) {
-      fetch("/~canvas/map/" + maps[1] + ".json")
-        .then((response) => response.json())
-        .then((json) => {
-          // console.log(json);
-          this.setState({
-            data: json
-          });
-        });
+      const json = store.state.maps[maps[1]];
+      initMapCanvas(json, props.metadata);
+      drawMapCanvas(json, props, path);
+      createColorPicker(width);
+      // fetch("/~canvas/map/" + maps[1] + ".json")
+      //   .then((response) => response.json())
+      //   .then((json) => {
+      //     const path = initMapCanvas(json, props.metadata);
+      //     drawMapCanvas(json, props, path);
+      //     createColorPicker(width);
+      //     this.setState({
+      //       data: json,
+      //       path: path
+      //     });
+      //   });
       }
   }
 
@@ -76,10 +84,13 @@ export class MapCanvas extends Component {
   render() {
     const { props, state, animationRef } = this;
     d3.select(".foreground").selectAll("path").remove();
-    if (state.data) {
-      const path = initMapCanvas(state.data, props.metadata);
-      drawMapCanvas(state.data, props, path);
-      createColorPicker(width);
+    d3.select(".background").selectAll("path").remove();
+    if (props.metadata) {
+      const maps = props.metadata.type.split("-");
+      console.log(store);
+      const json = store.state.maps[maps[1]];
+      initMapCanvas(json, props.metadata);
+      drawMapCanvas(json, props);
     }
 
     return (

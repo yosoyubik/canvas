@@ -1,5 +1,12 @@
 import _ from 'lodash';
-import { updateCanvas } from "/components/lib/hex-canvas";
+import { updateHexCanvas } from "/components/lib/hex-canvas";
+import { updateMapCanvas } from "/components/lib/map-canvas";
+
+
+const updaters = {
+  map: updateMapCanvas,
+  mesh: updateHexCanvas
+}
 
 export class PaintReducer {
     reduce(json, state) {
@@ -8,11 +15,16 @@ export class PaintReducer {
         console.log(data, state.canvasList);
         if (data.name in state.canvasList) {
           data.strokes.forEach((stroke, i) => {
-              state.canvasList[data.name].data[stroke.id] = {
-                fill: stroke.fill,
-                color: stroke.color
-              };
-              updateCanvas(stroke, data.name);
+              const type = state.canvasList[data.name].metadata.type.split("-")[0];
+              console.log(type);
+              if (type === 'map' || type === 'mesh'){
+                state.canvasList[data.name].data[stroke.id] = {
+                  fill: stroke.fill,
+                  color: stroke.color
+                };
+              }
+              console.log(updaters[type]);
+              updaters[type](stroke, data.name);
           });
         }
       }

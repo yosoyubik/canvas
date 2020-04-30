@@ -139,7 +139,7 @@ const hexTopology = (radius, width, height, hexagons, canvasName) => {
   for (var j = 0, q = 3; j < m; ++j, q += 6) {
     for (var i = 0; i < n; ++i, q += 3) {
       geometries.push({
-        id: total,
+        id: total.toString(),
         name: canvasName,
         type: "Polygon",
         arcs: [[q, q + 1, q + 2, ~(q + (n + 2 - (j & 1)) * 3), ~(q - 2), ~(q - (n + 2 + (j & 1)) * 3 + 2)]],
@@ -156,7 +156,7 @@ const hexTopology = (radius, width, height, hexagons, canvasName) => {
   };
 }
 
-const updateCanvas = (arc, canvas) => {
+const updateHexCanvas = (arc, canvas) => {
   d3.selectAll(".point")
     .style('fill', function (d) {
     if (arc.id === d.id && canvas === d.name) {
@@ -167,4 +167,4 @@ const updateCanvas = (arc, canvas) => {
    });
 }
 
-export { initHexMesh, drawHexCanvas, updateCanvas, width, height, radius };
+export { initHexMesh, drawHexCanvas, updateHexCanvas, width, height, radius };
