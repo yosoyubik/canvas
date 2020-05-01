@@ -10,6 +10,7 @@ import { initHexMesh,
          radius }
 from "./lib/hex-canvas";
 import { ShareImage } from "./lib/share-image";
+import { SaveImage } from "./lib/save-image";
 import { createColorPicker } from "./lib/color";
 
 
@@ -84,11 +85,7 @@ export class Hexagons extends Component {
              style={{right: "20px", top: "20px"}}
           >
           <ShareImage chats={this.props.chats} share={this.onClickShare} saved={this.props.metadata.saved}/>
-          <button
-            onClick={this.onClickSave.bind(this)}
-            className="pointer ml6 f9 green2 bg-gray0-d ba pv3 ph4 b--green2">
-            Save Image
-          </button>
+          <SaveImage save={this.onClickSave} hasMesh={true}/>
         </div>
         <div ref="canvas" className="w-100 pr0-l pr0-xl" style={{overflow: "hidden"}}>
           <svg className="db" id="canvas" width={width} height={height}

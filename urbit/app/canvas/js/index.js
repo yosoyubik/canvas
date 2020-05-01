@@ -57147,6 +57147,165 @@
               }
             }
 
+            const _jsxFileName$7 = "/Users/jose/urbit/canvas/src/js/components/lib/icons/icon-spinner.js";
+            class Spinner extends react_1 {
+              render() {
+
+                let classes = !!this.props.classes ? this.props.classes : "";
+                let text = !!this.props.text ? this.props.text : "";
+                let awaiting = !!this.props.awaiting ? this.props.awaiting : false;
+
+                if (awaiting) {
+                  return (
+                    react.createElement('div', { className: classes + " z-2 bg-white bg-gray0-d white-d", __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 12}}
+                      , react.createElement('img', { className: "invert-d spin-active v-mid"  ,
+                        src: "/~canvas/img/Spinner.png",
+                        width: 16,
+                        height: 16, __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 13}} )
+                      , react.createElement('p', { className: "dib f9 ml2 v-mid inter"    , __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 17}}, text)
+                    )
+                  );
+                }
+                else {
+                  return null;
+                }
+              }
+            }
+
+            const _jsxFileName$8 = "/Users/jose/urbit/canvas/src/js/components/lib/save-image.js";
+
+            class SaveImage extends react_1 {
+              constructor(props) {
+                super(props);
+                this.state = {
+                  open: false,
+                  removeColor: false,
+                  removeMesh: false,
+                  awaiting: false
+                };
+                this.removeColorPalette = this.removeColorPalette.bind(this);
+                this.removeMesh = this.removeMesh.bind(this);
+                this.toggleOpen = this.toggleOpen.bind(this);
+                this.handleClickOutside = this.handleClickOutside.bind(this);
+              }
+
+              componentDidMount() {
+                document.addEventListener('mousedown', this.handleClickOutside);
+                this.setState({ results: this.props.chats });
+              }
+
+              componentWillUnmount() {
+                document.removeEventListener('mousedown', this.handleClickOutside);
+              }
+
+              toggleOpen() {
+                this.setState({open: !this.state.open});
+              }
+
+              handleClickOutside(evt) {
+                if ((this.dropdown && !this.dropdown.contains(evt.target))
+                && (this.toggleButton && !this.toggleButton.contains(evt.target))) {
+                  this.setState({ open: false });
+                }
+              }
+
+              removeColorPalette(event) {
+                this.setState({
+                  removeColor: !!event.target.checked
+                });
+              }
+
+              removeMesh(event) {
+                this.setState({
+                  removeMesh: !!event.target.checked
+                });
+              }
+
+              onClickSave () {
+                this.setState({
+                  error: false,
+                  success: true,
+                  awaiting: true
+                }, () => {
+                  let save = props.save(this.state.chat);
+                  save.then(() => {
+                    this.setState({awaiting: false});
+                  });
+                });
+              }
+
+              render() {
+                const { props, state } = this;
+
+                let buttonOpened = (state.open)
+                  ? "gray22 bg-gray0-d b--gray2" : "green2 bg-gray0-d b--green2";
+
+                let saveClasses= "f9 ba pa2 pointer bg-transparent mt2 b--green2 green2";
+
+                let dropdownClass = (state.open)
+                  ? "absolute pa3 db z-2 bg-white bg-gray0-d white-d ba b--gray3 b--gray1-d"
+                  : "dn";
+
+                let removeColorPaletteClasses = state.removeColor
+                  ? "relative checked bg-green2 br3 h1 toggle v-mid z-0"
+                  : "relative bg-gray4 bg-gray1-d br3 h1 toggle v-mid z-0";
+
+                let removeMeshClasses = state.removeMesh
+                  ? "relative checked bg-green2 br3 h1 toggle v-mid z-0"
+                  : "relative bg-gray4 bg-gray1-d br3 h1 toggle v-mid z-0";
+
+                let removeMesh = react.createElement('div', {__self: this, __source: {fileName: _jsxFileName$8, lineNumber: 86}} );
+                if (props.hasMesh) {
+                  removeMesh = (react.createElement('div', { className: "mv1", __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 88}}
+                    , react.createElement('input', {
+                      type: "checkbox",
+                      style: { WebkitAppearance: "none", width: 28 },
+                      className: removeMeshClasses,
+                      onChange: this.removeMeshPalette, __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 89}}
+                    )
+                    , react.createElement('span', { className: "dib f9 white-d inter ml3"    , __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 95}}, "Hexagonal Mesh" )
+                    , react.createElement('p', { className: "f9 gray2 pt1"  , style: { paddingLeft: 40 }, __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 96}}, "The final image won't have the hexagonal mesh"
+
+                    )
+                  ));
+                }
+
+                return (
+                  react.createElement('div', { className: "ml1 dib" , __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 103}}
+                    , react.createElement('div', { className: buttonOpened,
+                    onClick: () => this.toggleOpen(),
+                    ref: (el) => this.toggleButton = el, __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 104}}
+                      , react.createElement('p', { className: "pointer f9 ba pv3 ph4 "     , __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 107}}, "Save as File"  )
+                    )
+                    , react.createElement('div', { className: dropdownClass,
+                      style: { maxHeight: "24rem", width: 210, right: "0px" },
+                      ref: (el) => { this.dropdown = el; }, __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 109}}
+                      , react.createElement('div', { className: "mv1", __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 112}}
+                        , react.createElement('input', {
+                          type: "checkbox",
+                          style: { WebkitAppearance: "none", width: 28 },
+                          className: removeColorPaletteClasses,
+                          onChange: this.removeColorPalette, __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 113}}
+                        )
+                        , react.createElement('span', { className: "dib f9 white-d inter ml3"    , __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 119}}, "Color Palette" )
+                        , react.createElement('p', { className: "f9 gray2 pt1"  , style: { paddingLeft: 40 }, __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 120}}, "The final image won't have the color palette"
+
+                        )
+                      )
+                      ,  removeMesh 
+                      , react.createElement('button', {
+                        onClick: this.onClickSave.bind(this),
+                        className: saveClasses, __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 125}}, "Save Image as File"
+
+                      )
+                      , react.createElement(Spinner, { awaiting: this.state.awaiting, classes: "mt4", text: "Saving image..." , __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 130}} )
+                    )
+                  )
+
+                );
+              }
+            }
+
             //  Adapted from: https://bl.ocks.org/mbostock/debaad4fcce9bcee14cf
 
 
@@ -57210,7 +57369,7 @@
                 }
             }
 
-            const _jsxFileName$7 = "/Users/jose/urbit/canvas/src/js/components/hexagons.js";
+            const _jsxFileName$9 = "/Users/jose/urbit/canvas/src/js/components/hexagons.js";
 
             class Hexagons extends react_1 {
               constructor(props) {
@@ -57273,27 +57432,23 @@
                   drawHexCanvas(this.props);
                 }
                 return (
-                  react.createElement('div', { className: "h-100 w-100 bg-gray0-d white-d flex flex-column"     , __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 79}}
-                    , react.createElement('div', { className: "w-100 dn-m dn-l dn-xl inter pt1 pb6 f8"       , __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 80}}
-                      , react.createElement(Link, { to: "/~canvas/", __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 81}}, "⟵ Canvas")
+                  react.createElement('div', { className: "h-100 w-100 bg-gray0-d white-d flex flex-column"     , __self: this, __source: {fileName: _jsxFileName$9, lineNumber: 80}}
+                    , react.createElement('div', { className: "w-100 dn-m dn-l dn-xl inter pt1 pb6 f8"       , __self: this, __source: {fileName: _jsxFileName$9, lineNumber: 81}}
+                      , react.createElement(Link, { to: "/~canvas/", __self: this, __source: {fileName: _jsxFileName$9, lineNumber: 82}}, "⟵ Canvas")
                     )
                     , react.createElement('div', { className: "absolute mw5" ,
-                         style: {right: "20px", top: "20px"}, __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 83}}
+                         style: {right: "20px", top: "20px"}, __self: this, __source: {fileName: _jsxFileName$9, lineNumber: 84}}
                       
-                      , react.createElement(ShareImage, { chats: this.props.chats, share: this.onClickShare, saved: this.props.metadata.saved, __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 86}})
-                      , react.createElement('button', {
-                        onClick: this.onClickSave.bind(this),
-                        className: "pointer ml6 f9 green2 bg-gray0-d ba pv3 ph4 b--green2"        , __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 87}}, "Save Image"
-
-                      )
+                      , react.createElement(ShareImage, { chats: this.props.chats, share: this.onClickShare, saved: this.props.metadata.saved, __self: this, __source: {fileName: _jsxFileName$9, lineNumber: 87}})
+                      , react.createElement(SaveImage, { save: this.onClickSave, hasMesh: true, __self: this, __source: {fileName: _jsxFileName$9, lineNumber: 88}})
                     )
-                    , react.createElement('div', { ref: "canvas", className: "w-100 pr0-l pr0-xl"  , style: {overflow: "hidden"}, __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 93}}
+                    , react.createElement('div', { ref: "canvas", className: "w-100 pr0-l pr0-xl"  , style: {overflow: "hidden"}, __self: this, __source: {fileName: _jsxFileName$9, lineNumber: 90}}
                       , react.createElement('svg', { className: "db", id: "canvas", width: width, height: height,
                            viewBox: `0 0 ${width} ${height}`,
-                           perserveaspectratio: "xMinYMid", __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 94}}
-                        , react.createElement('g', { className: "hexagon", __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 97}} )
-                        , react.createElement('g', { className: "mesh-group", __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 98}} )
-                        , react.createElement('g', { className: "legend", __self: this, __source: {fileName: _jsxFileName$7, lineNumber: 99}} )
+                           perserveaspectratio: "xMinYMid", __self: this, __source: {fileName: _jsxFileName$9, lineNumber: 91}}
+                        , react.createElement('g', { className: "hexagon", __self: this, __source: {fileName: _jsxFileName$9, lineNumber: 94}} )
+                        , react.createElement('g', { className: "mesh-group", __self: this, __source: {fileName: _jsxFileName$9, lineNumber: 95}} )
+                        , react.createElement('g', { className: "legend", __self: this, __source: {fileName: _jsxFileName$9, lineNumber: 96}} )
                       )
                     )
                   )
@@ -57699,7 +57854,7 @@
             let store = new Store();
             window.store = store;
 
-            const _jsxFileName$8 = "/Users/jose/urbit/canvas/src/js/components/map.js";
+            const _jsxFileName$a = "/Users/jose/urbit/canvas/src/js/components/map.js";
             class MapCanvas extends react_1 {
               constructor(props) {
                 super(props);
@@ -57784,25 +57939,25 @@
                 }
 
                 return (
-                  react.createElement('div', { className: "h-100 w-100 pa3 pt4 bg-gray0-d white-d flex flex-column"       , __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 98}}
-                    , react.createElement('div', { className: "w-100 dn-m dn-l dn-xl inter pt1 pb6 f8"       , __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 99}}
-                      , react.createElement(Link, { to: "/~canvas/", __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 100}}, "⟵ Canvas")
+                  react.createElement('div', { className: "h-100 w-100 pa3 pt4 bg-gray0-d white-d flex flex-column"       , __self: this, __source: {fileName: _jsxFileName$a, lineNumber: 98}}
+                    , react.createElement('div', { className: "w-100 dn-m dn-l dn-xl inter pt1 pb6 f8"       , __self: this, __source: {fileName: _jsxFileName$a, lineNumber: 99}}
+                      , react.createElement(Link, { to: "/~canvas/", __self: this, __source: {fileName: _jsxFileName$a, lineNumber: 100}}, "⟵ Canvas")
                     )
                     , react.createElement('div', { className: "absolute mw5" ,
-                         style: {right: "20px", top: "20px"}, __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 102}}
+                         style: {right: "20px", top: "20px"}, __self: this, __source: {fileName: _jsxFileName$a, lineNumber: 102}}
                       
-                      , react.createElement(ShareImage, { chats: this.props.chats, share: this.onClickShare, saved: this.props.metadata.saved, __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 105}})
+                      , react.createElement(ShareImage, { chats: this.props.chats, share: this.onClickShare, saved: this.props.metadata.saved, __self: this, __source: {fileName: _jsxFileName$a, lineNumber: 105}})
                       , react.createElement('button', {
                         onClick: this.onClickSave.bind(this),
-                        className: "pointer ml6 f9 green2 bg-gray0-d ba pv3 ph4 b--green2"        , __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 106}}, "Save Image"
+                        className: "pointer ml6 f9 green2 bg-gray0-d ba pv3 ph4 b--green2"        , __self: this, __source: {fileName: _jsxFileName$a, lineNumber: 106}}, "Save Image"
 
                       )
                     )
-                    , react.createElement('div', { ref: "canvas", className: "w-100 mb4 pr6 pr0-l pr0-xl"    , __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 112}}
-                      , react.createElement('svg', { className: "db", id: "canvas", width:  width$1 , height:  height$1 , __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 113}}
-                        , react.createElement('g', { transform: "translate(25,25)", className: "foreground", style: { cursor: "pointer", strokeOpacity: .5 }, __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 114}})
-                        , react.createElement('g', { transform: "translate(25,25)", className: "background", __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 115}} )
-                        , react.createElement('g', { className: "legend", __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 116}} )
+                    , react.createElement('div', { ref: "canvas", className: "w-100 mb4 pr6 pr0-l pr0-xl"    , __self: this, __source: {fileName: _jsxFileName$a, lineNumber: 112}}
+                      , react.createElement('svg', { className: "db", id: "canvas", width:  width$1 , height:  height$1 , __self: this, __source: {fileName: _jsxFileName$a, lineNumber: 113}}
+                        , react.createElement('g', { transform: "translate(25,25)", className: "foreground", style: { cursor: "pointer", strokeOpacity: .5 }, __self: this, __source: {fileName: _jsxFileName$a, lineNumber: 114}})
+                        , react.createElement('g', { transform: "translate(25,25)", className: "background", __self: this, __source: {fileName: _jsxFileName$a, lineNumber: 115}} )
+                        , react.createElement('g', { className: "legend", __self: this, __source: {fileName: _jsxFileName$a, lineNumber: 116}} )
                       )
                     )
                   )
@@ -57810,7 +57965,7 @@
               }
             }
 
-            const _jsxFileName$9 = "/Users/jose/urbit/canvas/src/js/components/draw.js";// import { Runtime, Inspector } from "@observablehq/runtime";
+            const _jsxFileName$b = "/Users/jose/urbit/canvas/src/js/components/draw.js";// import { Runtime, Inspector } from "@observablehq/runtime";
             // import notebook from "@yosoyubik/draw-me";
 
 
@@ -57916,58 +58071,33 @@
                 const { props, state, onChangeLine, onChangeColor } = this;
 
                 return (
-                  react.createElement('div', { className: "h-100 w-100 pa3 pt4 bg-gray0-d white-d flex flex-column"       , __self: this, __source: {fileName: _jsxFileName$9, lineNumber: 132}}
+                  react.createElement('div', { className: "h-100 w-100 pa3 pt4 bg-gray0-d white-d flex flex-column"       , __self: this, __source: {fileName: _jsxFileName$b, lineNumber: 132}}
                     , react.createElement('div', { className: "absolute mw5" ,
-                         style: {right: "20px", top: "20px"}, __self: this, __source: {fileName: _jsxFileName$9, lineNumber: 133}}
+                         style: {right: "20px", top: "20px"}, __self: this, __source: {fileName: _jsxFileName$b, lineNumber: 133}}
                       
-                      , react.createElement(ShareImage, { chats: this.props.chats, share: this.onClickShare, saved: this.props.metadata.saved, __self: this, __source: {fileName: _jsxFileName$9, lineNumber: 136}})
+                      , react.createElement(ShareImage, { chats: this.props.chats, share: this.onClickShare, saved: this.props.metadata.saved, __self: this, __source: {fileName: _jsxFileName$b, lineNumber: 136}})
                       , react.createElement('button', {
                         onClick: this.onClickSave.bind(this),
-                        className: "pointer ml6 f9 green2 bg-gray0-d ba pv3 ph4 b--green2"        , __self: this, __source: {fileName: _jsxFileName$9, lineNumber: 137}}, "Save Image"
+                        className: "pointer ml6 f9 green2 bg-gray0-d ba pv3 ph4 b--green2"        , __self: this, __source: {fileName: _jsxFileName$b, lineNumber: 137}}, "Save Image"
 
                       )
                     )
-                    , react.createElement('div', { ref: this.lineWidthRef, __self: this, __source: {fileName: _jsxFileName$9, lineNumber: 143}}
+                    , react.createElement('div', { ref: this.lineWidthRef, __self: this, __source: {fileName: _jsxFileName$b, lineNumber: 143}}
                       , react.createElement('input', { id: "line", type: "range", min: "0.5", max: "20", value: this.state.line,
-                             step: "0.5", style: {width:"120px"}, onChange: onChangeLine, __self: this, __source: {fileName: _jsxFileName$9, lineNumber: 144}} )
+                             step: "0.5", style: {width:"120px"}, onChange: onChangeLine, __self: this, __source: {fileName: _jsxFileName$b, lineNumber: 144}} )
                     )
-                    , react.createElement('div', { ref: this.strokeStyleRef, __self: this, __source: {fileName: _jsxFileName$9, lineNumber: 147}}
-                      , react.createElement('input', { id: "color", type: "color", style: {width:"120px"}, onChange: onChangeColor, __self: this, __source: {fileName: _jsxFileName$9, lineNumber: 148}} )
+                    , react.createElement('div', { ref: this.strokeStyleRef, __self: this, __source: {fileName: _jsxFileName$b, lineNumber: 147}}
+                      , react.createElement('input', { id: "color", type: "color", style: {width:"120px"}, onChange: onChangeColor, __self: this, __source: {fileName: _jsxFileName$b, lineNumber: 148}} )
                     )
-                    , react.createElement('div', { ref: this.drawRef, __self: this, __source: {fileName: _jsxFileName$9, lineNumber: 150}}
-                      , react.createElement('canvas', { id: "canvas", width: width$2, height: height$2, __self: this, __source: {fileName: _jsxFileName$9, lineNumber: 151}})
+                    , react.createElement('div', { ref: this.drawRef, __self: this, __source: {fileName: _jsxFileName$b, lineNumber: 150}}
+                      , react.createElement('canvas', { id: "canvas", width: width$2, height: height$2, __self: this, __source: {fileName: _jsxFileName$b, lineNumber: 151}})
                     )
                   )
                 )
               }
             }
 
-            const _jsxFileName$a = "/Users/jose/urbit/canvas/src/js/components/lib/icons/icon-spinner.js";
-            class Spinner extends react_1 {
-              render() {
-
-                let classes = !!this.props.classes ? this.props.classes : "";
-                let text = !!this.props.text ? this.props.text : "";
-                let awaiting = !!this.props.awaiting ? this.props.awaiting : false;
-
-                if (awaiting) {
-                  return (
-                    react.createElement('div', { className: classes + " z-2 bg-white bg-gray0-d white-d", __self: this, __source: {fileName: _jsxFileName$a, lineNumber: 12}}
-                      , react.createElement('img', { className: "invert-d spin-active v-mid"  ,
-                        src: "/~canvas/img/Spinner.png",
-                        width: 16,
-                        height: 16, __self: this, __source: {fileName: _jsxFileName$a, lineNumber: 13}} )
-                      , react.createElement('p', { className: "dib f9 ml2 v-mid inter"    , __self: this, __source: {fileName: _jsxFileName$a, lineNumber: 17}}, text)
-                    )
-                  );
-                }
-                else {
-                  return null;
-                }
-              }
-            }
-
-            const _jsxFileName$b = "/Users/jose/urbit/canvas/src/js/components/new.js";
+            const _jsxFileName$c = "/Users/jose/urbit/canvas/src/js/components/new.js";
 
             class NewScreen extends react_1 {
               constructor(props) {
@@ -58102,30 +58232,30 @@
                   return (
                     react.createElement('li', { key: each[0],
                         className: "tl list white-d f9 pv2 ph3 pointer hover-bg-gray4 hover-bg-gray1-d inter"         ,
-                        onClick: () => this.selectTemplate(each[0]), __self: this, __source: {fileName: _jsxFileName$b, lineNumber: 138}}
-                      , react.createElement('span', { className: "mix-blend-diff white" , __self: this, __source: {fileName: _jsxFileName$b, lineNumber: 141}}, each[1])
+                        onClick: () => this.selectTemplate(each[0]), __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 138}}
+                      , react.createElement('span', { className: "mix-blend-diff white" , __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 141}}, each[1])
                     ))
                 });
 
-                let displayNameErrElem = (react.createElement('span', {__self: this, __source: {fileName: _jsxFileName$b, lineNumber: 145}} ));
+                let displayNameErrElem = (react.createElement('span', {__self: this, __source: {fileName: _jsxFileName$c, lineNumber: 145}} ));
                 if (this.state.displayNameError) {
                   displayNameErrElem = (
-                    react.createElement('span', { className: "f9 inter red2 ml3 mt1 db"     , __self: this, __source: {fileName: _jsxFileName$b, lineNumber: 148}}, "Canvas must have a title."
+                    react.createElement('span', { className: "f9 inter red2 ml3 mt1 db"     , __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 148}}, "Canvas must have a title."
 
                     )
                     );
                 }
 
                 return (
-                  react.createElement('div', { className: "h-100 w-100 mw6 pa3 pt4 overflow-x-hidden bg-gray0-d white-d flex flex-column"         , __self: this, __source: {fileName: _jsxFileName$b, lineNumber: 155}}
-                    , react.createElement('div', { className: "w-100 dn-m dn-l dn-xl inter pt1 pb6 f8"       , __self: this, __source: {fileName: _jsxFileName$b, lineNumber: 156}}
-                      , react.createElement(Link, { to: "/~canvas/", __self: this, __source: {fileName: _jsxFileName$b, lineNumber: 157}}, "⟵ All Groups")
+                  react.createElement('div', { className: "h-100 w-100 mw6 pa3 pt4 overflow-x-hidden bg-gray0-d white-d flex flex-column"         , __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 155}}
+                    , react.createElement('div', { className: "w-100 dn-m dn-l dn-xl inter pt1 pb6 f8"       , __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 156}}
+                      , react.createElement(Link, { to: "/~canvas/", __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 157}}, "⟵ All Groups")
                     )
-                    , react.createElement('div', { className: "w-100 mb4 pr6 pr0-l pr0-xl"    , __self: this, __source: {fileName: _jsxFileName$b, lineNumber: 159}}
+                    , react.createElement('div', { className: "w-100 mb4 pr6 pr0-l pr0-xl"    , __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 159}}
 
-                      , react.createElement('h2', { className: "f8 pt6" , __self: this, __source: {fileName: _jsxFileName$b, lineNumber: 161}}, "Create Canvas" )
+                      , react.createElement('h2', { className: "f8 pt6" , __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 161}}, "Create Canvas" )
 
-                      , react.createElement('h2', { className: "f8", __self: this, __source: {fileName: _jsxFileName$b, lineNumber: 163}}, "Name")
+                      , react.createElement('h2', { className: "f8", __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 163}}, "Name")
                       , react.createElement('textarea', {
                         className: 
                           "f7 ba b--gray3 b--gray2-d bg-gray0-d white-d pa3 db w-100 mt2 " +
@@ -58138,12 +58268,12 @@
                           height: 48,
                           paddingTop: 14
                         },
-                        onChange: this.canvasNameChange, __self: this, __source: {fileName: _jsxFileName$b, lineNumber: 164}}
+                        onChange: this.canvasNameChange, __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 164}}
                       )
                       , displayNameErrElem
 
-                      , react.createElement('h2', { className: "f8", __self: this, __source: {fileName: _jsxFileName$b, lineNumber: 180}}, "Template")
-                      , react.createElement('div', { className: "w-100 pb4" , __self: this, __source: {fileName: _jsxFileName$b, lineNumber: 181}}
+                      , react.createElement('h2', { className: "f8", __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 180}}, "Template")
+                      , react.createElement('div', { className: "w-100 pb4" , __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 181}}
                         , react.createElement('textarea', {
                           className: 
                             "f7 ba b--gray3 b--gray2-d bg-gray0-d white-d pa3 db w-100 mt2 " +
@@ -58158,24 +58288,24 @@
                           },
                           onChange: this.search,
                           onClick: () => this.toggleOpen(),
-                          ref: (el) => this.toggleButton = el, __self: this, __source: {fileName: _jsxFileName$b, lineNumber: 182}}
+                          ref: (el) => this.toggleButton = el, __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 182}}
                         )
                       )
                       , react.createElement('div', { className: dropdownClass,
                           style: { maxHeight: "24rem", width: 285 },
-                          ref: (el) => { this.dropdown = el; }, __self: this, __source: {fileName: _jsxFileName$b, lineNumber: 199}}
+                          ref: (el) => { this.dropdown = el; }, __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 199}}
                         , templateList
                       )
 
                       , react.createElement('button', {
                         onClick: this.onClickCreate.bind(this),
-                        className: allowCreate, __self: this, __source: {fileName: _jsxFileName$b, lineNumber: 205}}, "Create Canvas"
+                        className: allowCreate, __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 205}}, "Create Canvas"
 
                       )
-                      , react.createElement(Link, { to: "/~canvas", __self: this, __source: {fileName: _jsxFileName$b, lineNumber: 210}}
-                        , react.createElement('button', { className: "f9 ml3 ba pa2 b--black pointer bg-transparent b--white-d white-d"        , __self: this, __source: {fileName: _jsxFileName$b, lineNumber: 211}}, "Cancel")
+                      , react.createElement(Link, { to: "/~canvas", __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 210}}
+                        , react.createElement('button', { className: "f9 ml3 ba pa2 b--black pointer bg-transparent b--white-d white-d"        , __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 211}}, "Cancel")
                       )
-                      , react.createElement(Spinner, { awaiting: this.state.awaiting, classes: "mt4", text: "Creating canvas..." , __self: this, __source: {fileName: _jsxFileName$b, lineNumber: 213}} )
+                      , react.createElement(Spinner, { awaiting: this.state.awaiting, classes: "mt4", text: "Creating canvas..." , __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 213}} )
                     )
                   )
                 );
@@ -66673,7 +66803,7 @@ lyrtesmudnytbyrsenwegfyrmurtelreptegpecnelnevfes\
               ob$1
             );
 
-            const _jsxFileName$c = "/Users/jose/urbit/canvas/src/js/components/join.js";
+            const _jsxFileName$d = "/Users/jose/urbit/canvas/src/js/components/join.js";
 
             class JoinScreen extends react_1 {
 
@@ -66772,10 +66902,10 @@ lyrtesmudnytbyrsenwegfyrmurtelreptegpecnelnevfes\
                   joinClasses = 'db f9 gray2 ba pa2 b--gray3 bg-gray0-d pointer';
                 }
 
-                let errElem = (react.createElement('span', {__self: this, __source: {fileName: _jsxFileName$c, lineNumber: 104}} ));
+                let errElem = (react.createElement('span', {__self: this, __source: {fileName: _jsxFileName$d, lineNumber: 104}} ));
                 if (state.error) {
                   errElem = (
-                    react.createElement('span', { className: "f9 inter red2 db"   , __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 107}}, "Canvas must have a valid name."
+                    react.createElement('span', { className: "f9 inter red2 db"   , __self: this, __source: {fileName: _jsxFileName$d, lineNumber: 107}}, "Canvas must have a valid name."
 
                     )
                   );
@@ -66783,15 +66913,15 @@ lyrtesmudnytbyrsenwegfyrmurtelreptegpecnelnevfes\
 
                 return (
                   react.createElement('div', { className: `h-100 w-100 pa3 pt2 overflow-x-hidden flex flex-column
-      bg-gray0-d white-d`, __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 114}}
+      bg-gray0-d white-d`, __self: this, __source: {fileName: _jsxFileName$d, lineNumber: 114}}
                     , react.createElement('div', {
-                      className: "w-100 dn-m dn-l dn-xl inter pt1 pb6 f8"       , __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 116}}
-                      , react.createElement(Link, { to: "/~canvas/", __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 118}}, "⟵ All Chats")
+                      className: "w-100 dn-m dn-l dn-xl inter pt1 pb6 f8"       , __self: this, __source: {fileName: _jsxFileName$d, lineNumber: 116}}
+                      , react.createElement(Link, { to: "/~canvas/", __self: this, __source: {fileName: _jsxFileName$d, lineNumber: 118}}, "⟵ All Chats")
                     )
-                    , react.createElement('h2', { className: "mb3 f8" , __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 120}}, "Join Existing Canvas"  )
-                    , react.createElement('div', { className: "w-100", __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 121}}
-                      , react.createElement('p', { className: "f8 lh-copy mt3 db"   , __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 122}}, "Enter a "  , react.createElement('span', { className: "mono", __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 122}}, "~ship/canvas-name"), " or "  , react.createElement('span', { className: "mono", __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 122}}, "~/~ship/canvas-name"))
-                      , react.createElement('p', { className: "f9 gray2 mb4"  , __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 123}}, "Canvas names use lowercase, hyphens, and slashes."      )
+                    , react.createElement('h2', { className: "mb3 f8" , __self: this, __source: {fileName: _jsxFileName$d, lineNumber: 120}}, "Join Existing Canvas"  )
+                    , react.createElement('div', { className: "w-100", __self: this, __source: {fileName: _jsxFileName$d, lineNumber: 121}}
+                      , react.createElement('p', { className: "f8 lh-copy mt3 db"   , __self: this, __source: {fileName: _jsxFileName$d, lineNumber: 122}}, "Enter a "  , react.createElement('span', { className: "mono", __self: this, __source: {fileName: _jsxFileName$d, lineNumber: 122}}, "~ship/canvas-name"), " or "  , react.createElement('span', { className: "mono", __self: this, __source: {fileName: _jsxFileName$d, lineNumber: 122}}, "~/~ship/canvas-name"))
+                      , react.createElement('p', { className: "f9 gray2 mb4"  , __self: this, __source: {fileName: _jsxFileName$d, lineNumber: 123}}, "Canvas names use lowercase, hyphens, and slashes."      )
                       , react.createElement('textarea', {
                         ref:  e => { this.textarea = e; } ,
                         className: "f7 mono ba bg-gray0-d white-d pa3 mb2 db " +
@@ -66807,12 +66937,12 @@ lyrtesmudnytbyrsenwegfyrmurtelreptegpecnelnevfes\
                         style: {
                           resize: 'none',
                         },
-                        onChange: this.canvasChange, __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 124}} )
+                        onChange: this.canvasChange, __self: this, __source: {fileName: _jsxFileName$d, lineNumber: 124}} )
                       , errElem
-                      , react.createElement('br', {__self: this, __source: {fileName: _jsxFileName$c, lineNumber: 141}} )
+                      , react.createElement('br', {__self: this, __source: {fileName: _jsxFileName$d, lineNumber: 141}} )
                       , react.createElement('button', {
                         onClick: this.onClickJoin.bind(this),
-                        className: joinClasses, __self: this, __source: {fileName: _jsxFileName$c, lineNumber: 142}}
+                        className: joinClasses, __self: this, __source: {fileName: _jsxFileName$d, lineNumber: 142}}
                       , "Join Canvas" )
                     )
                   )
@@ -66820,7 +66950,7 @@ lyrtesmudnytbyrsenwegfyrmurtelreptegpecnelnevfes\
               }
             }
 
-            const _jsxFileName$d = "/Users/jose/urbit/canvas/src/js/components/root.js";
+            const _jsxFileName$e = "/Users/jose/urbit/canvas/src/js/components/root.js";
 
             class Root extends react_1 {
               constructor(props) {
@@ -66833,45 +66963,45 @@ lyrtesmudnytbyrsenwegfyrmurtelreptegpecnelnevfes\
                 const { props, state } = this;
                 let canvasList = !!state.canvasList ? state.canvasList : {};
                 return (
-                  react.createElement(BrowserRouter, {__self: this, __source: {fileName: _jsxFileName$d, lineNumber: 27}}
-                    , react.createElement('div', { className: "absolute h-100 w-100 bg-gray0-d ph4-m ph4-l ph4-xl pb4-m pb4-l pb4-xl"         , __self: this, __source: {fileName: _jsxFileName$d, lineNumber: 28}}
+                  react.createElement(BrowserRouter, {__self: this, __source: {fileName: _jsxFileName$e, lineNumber: 27}}
+                    , react.createElement('div', { className: "absolute h-100 w-100 bg-gray0-d ph4-m ph4-l ph4-xl pb4-m pb4-l pb4-xl"         , __self: this, __source: {fileName: _jsxFileName$e, lineNumber: 28}}
                       , react.createElement(Route, { exact: true, path: "/~canvas",
                         render:  () => {
                           return (
                             react.createElement(Skeleton, {
                               activeDrawer: "canvas",
                               history: props.history,
-                              canvasList: canvasList, __self: this, __source: {fileName: _jsxFileName$d, lineNumber: 32}} 
+                              canvasList: canvasList, __self: this, __source: {fileName: _jsxFileName$e, lineNumber: 32}} 
                               )
-                          )}, __self: this, __source: {fileName: _jsxFileName$d, lineNumber: 29}} )
+                          )}, __self: this, __source: {fileName: _jsxFileName$e, lineNumber: 29}} )
                       , react.createElement(Route, { exact: true, path: "/~canvas/new",
                           render:  (props) => {
                             return (
                               react.createElement(Skeleton, {
                                 history: props.history,
                                 canvasList: canvasList,
-                                activeDrawer: "rightPanel", __self: this, __source: {fileName: _jsxFileName$d, lineNumber: 41}}
+                                activeDrawer: "rightPanel", __self: this, __source: {fileName: _jsxFileName$e, lineNumber: 41}}
                                 , react.createElement(NewScreen, {
                                   history: props.history,
-                                  api: api, __self: this, __source: {fileName: _jsxFileName$d, lineNumber: 45}}
+                                  api: api, __self: this, __source: {fileName: _jsxFileName$e, lineNumber: 45}}
                                 )
                               )
                             );
-                        }, __self: this, __source: {fileName: _jsxFileName$d, lineNumber: 38}} )
+                        }, __self: this, __source: {fileName: _jsxFileName$e, lineNumber: 38}} )
                       , react.createElement(Route, { exact: true, path: "/~canvas/draw",
                             render:  (props) => {
                               return (
                                 react.createElement(Skeleton, {
                                   history: props.history,
                                   canvasList: canvasList,
-                                  activeDrawer: "rightPanel", __self: this, __source: {fileName: _jsxFileName$d, lineNumber: 55}}
+                                  activeDrawer: "rightPanel", __self: this, __source: {fileName: _jsxFileName$e, lineNumber: 55}}
                                   , react.createElement(DrawCanvas, {
                                     history: props.history,
-                                    api: api, __self: this, __source: {fileName: _jsxFileName$d, lineNumber: 59}}
+                                    api: api, __self: this, __source: {fileName: _jsxFileName$e, lineNumber: 59}}
                                   )
                                 )
                               );
-                          }, __self: this, __source: {fileName: _jsxFileName$d, lineNumber: 52}} )
+                          }, __self: this, __source: {fileName: _jsxFileName$e, lineNumber: 52}} )
                       , react.createElement(Route, { exact: true, path: "/~canvas/item/:name",
                           render:  (props) => {
                             const name =  props.match.params.name;
@@ -66887,15 +67017,15 @@ lyrtesmudnytbyrsenwegfyrmurtelreptegpecnelnevfes\
                               switch (subtypes[0]) {
                                 case 'mesh':
                                   canvas = react.createElement(Hexagons, { api: api, canvas: data, chats: chats,
-                                            name: name, metadata: metadata, __self: this, __source: {fileName: _jsxFileName$d, lineNumber: 80}} );
+                                            name: name, metadata: metadata, __self: this, __source: {fileName: _jsxFileName$e, lineNumber: 80}} );
                                   break;
                                 case 'map':
                                   canvas = react.createElement(MapCanvas, { api: api, canvas: data, chats: chats,
-                                            name: name, metadata: metadata, __self: this, __source: {fileName: _jsxFileName$d, lineNumber: 84}} );
+                                            name: name, metadata: metadata, __self: this, __source: {fileName: _jsxFileName$e, lineNumber: 84}} );
                                   break;
                                 case 'draw':
                                   canvas = react.createElement(DrawCanvas, { api: api, canvas: data, chats: chats,
-                                              name: name, metadata: metadata, __self: this, __source: {fileName: _jsxFileName$d, lineNumber: 88}} );
+                                              name: name, metadata: metadata, __self: this, __source: {fileName: _jsxFileName$e, lineNumber: 88}} );
                                   break;
                                 default: canvas = null;
                               }
@@ -66904,12 +67034,12 @@ lyrtesmudnytbyrsenwegfyrmurtelreptegpecnelnevfes\
                                 react.createElement(Skeleton, {
                                   history: props.history,
                                   canvasList: canvasList,
-                                  activeDrawer: "rightPanel", __self: this, __source: {fileName: _jsxFileName$d, lineNumber: 95}}
+                                  activeDrawer: "rightPanel", __self: this, __source: {fileName: _jsxFileName$e, lineNumber: 95}}
                                   , canvas
                                 )
                               );
                             }
-                        }, __self: this, __source: {fileName: _jsxFileName$d, lineNumber: 66}} )
+                        }, __self: this, __source: {fileName: _jsxFileName$e, lineNumber: 66}} )
                       , react.createElement(Route, { exact: true, path: "/~canvas/join/(~)?/:ship?/:canvas?",
                         render: props => {
                           let canvas =
@@ -66923,15 +67053,15 @@ lyrtesmudnytbyrsenwegfyrmurtelreptegpecnelnevfes\
                             react.createElement(Skeleton, {
                               history: props.history,
                               canvasList: canvasList,
-                              activeDrawer: "rightPanel", __self: this, __source: {fileName: _jsxFileName$d, lineNumber: 114}}
+                              activeDrawer: "rightPanel", __self: this, __source: {fileName: _jsxFileName$e, lineNumber: 114}}
                               , react.createElement(JoinScreen, {
                                 api: api,
                                 canvasList: canvasList,
                                 autoJoin: canvas,
-                                ...props, __self: this, __source: {fileName: _jsxFileName$d, lineNumber: 118}} )
+                                ...props, __self: this, __source: {fileName: _jsxFileName$e, lineNumber: 118}} )
                             )
                           );
-                        }, __self: this, __source: {fileName: _jsxFileName$d, lineNumber: 104}}
+                        }, __self: this, __source: {fileName: _jsxFileName$e, lineNumber: 104}}
                       )
                     )
                   )
@@ -66968,7 +67098,7 @@ lyrtesmudnytbyrsenwegfyrmurtelreptegpecnelnevfes\
 
             let subscription = new Subscription();
 
-            const _jsxFileName$e = "/Users/jose/urbit/canvas/src/index.js";
+            const _jsxFileName$f = "/Users/jose/urbit/canvas/src/index.js";
             api.setAuthTokens({
               ship: window.ship
             });
@@ -66976,7 +67106,7 @@ lyrtesmudnytbyrsenwegfyrmurtelreptegpecnelnevfes\
             subscription.start();
 
             reactDom.render((
-              react.createElement(Root, {__self: undefined, __source: {fileName: _jsxFileName$e, lineNumber: 15}} )
+              react.createElement(Root, {__self: undefined, __source: {fileName: _jsxFileName$f, lineNumber: 15}} )
             ), document.querySelectorAll("#root")[0]);
 
 }));
