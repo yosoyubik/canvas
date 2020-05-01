@@ -48802,15 +48802,16 @@
                     , react.createElement(Link, { to: `/~canvas/item/${props.id}`, key: props.id, __self: this, __source: {fileName: _jsxFileName$3, lineNumber: 15}}
                       , react.createElement('div', { className: "w-100 v-mid f7 ph2 z1 pv1"     , __self: this, __source: {fileName: _jsxFileName$3, lineNumber: 16}}
                         , react.createElement('p', { className: "f8 dib" , __self: this, __source: {fileName: _jsxFileName$3, lineNumber: 17}}, props.id)
+                        ,  (props.location === ("~" + ship)) ?
+                          (react.createElement('span', { className: "ph3 f9 pb1 gray2"   , __self: this, __source: {fileName: _jsxFileName$3, lineNumber: 19}}, "(local)")) :
+                          (react.createElement('button', { className: "ph3 f9 pb1 red2 bg-gray0-d b--red2"     ,
+                           onClick: this.onClickLeave.bind(this), __self: this, __source: {fileName: _jsxFileName$3, lineNumber: 20}}, "leave"
+
+                            , react.createElement('span', { className: "ml1 pointer" , __self: this, __source: {fileName: _jsxFileName$3, lineNumber: 23}}, "x")
+                          ))
+                        
                       )
                     )
-                    ,  (props.location === ("~" + ship)) ?
-                      (react.createElement('p', { className: "ph6 f9 pb1 gray2"   , __self: this, __source: {fileName: _jsxFileName$3, lineNumber: 21}}, "Local")) :
-                      (react.createElement('button', { className: "pointer ph6 f9 pb1 red2 bg-gray0-d b--red2"      ,
-                       onClick: this.onClickLeave.bind(this), __self: this, __source: {fileName: _jsxFileName$3, lineNumber: 22}}, "leave shared canvas"
-
-                      ))
-                    
                   )
                 );
               }
@@ -57462,6 +57463,13 @@
               return data;
             }
 
+            function parseForm(form) {
+              const stroke = [...form.strokes];
+              stroke.lineWidth = form.lineWidth;
+              stroke.strokeStyle = form.styleStroke;
+              return stroke;
+            }
+
             class InitialReducer {
                 reduce(json, state) {
                     console.log("initial", json);
@@ -57471,7 +57479,7 @@
                       for (let canvas in data.canvas) {
                         console.log(canvas);
                         if (data.canvas[canvas].metadata.type === 'draw') {
-                          data.canvas[canvas].data = reparseDrawForms(data[canvas].data);
+                          data.canvas[canvas].data = reparseDrawForms(data.canvas[canvas].data);
                         }
                         console.log(data.canvas[canvas]);
                         state.canvasList[canvas] = data.canvas[canvas];
@@ -57509,9 +57517,114 @@
                 }
             }
 
+            // Forked of https://observablehq.com/@d3/draw-me
+
+            const width$2 = 960,
+                  height$2 = 960;
+
+            let context$1;
+            let curve;
+            let strokes;
+
+            const redo = [];
+
+            const initDrawCanvas = () => {
+              const canvas = document.getElementById('canvas');
+              context$1 = canvas.getContext('2d');
+              context$1.lineJoin = "round";
+              context$1.lineCap = "round";
+              curve = basis$2(context$1);
+            };
+
+            const drawHexCanvas$1 = (props, line, color) => {
+              strokes = (props.canvas) ? props.canvas : [];
+              context$1.canvas.value = strokes;
+
+              select("canvas").call(drag()
+                  .container(context$1.canvas)
+                  .subject(dragsubject)
+                  .on("start drag", dragged)
+                  .on("start.render drag.render", render)
+                  .on("end.drag", mouseEnds));
+
+              render();
+
+              context$1.canvas.undo = () => {
+                if (strokes.length === 0) return;
+                redo.push(strokes.pop());
+                render();
+              };
+
+              context$1.canvas.redo = stroke => {
+                if (redo.length === 0) return;
+                strokes.push(redo.pop());
+                render();
+              };
+
+              function mouseEnds() {
+                const stroke = strokes[strokes.length - 1];
+                console.log("finished", stroke);
+                const lineWidth = stroke.lineWidth;
+                const strokeStyle = stroke.strokeStyle;
+                props.api.canvas.paint({
+                  "canvas-name": props.name,
+                  "location": props.metadata.location,
+                  "strokes": [{
+                    draw: {
+                      coords: stroke,
+                      lineWidth: lineWidth,
+                      strokeStyle: strokeStyle
+                    }
+                  }]
+                });
+              }
+
+              // Create a new empty stroke at the start of a drag gesture.
+              function dragsubject() {
+                const stroke = [];
+                stroke.lineWidth = line;
+                stroke.strokeStyle = color;
+                strokes.push(stroke);
+                redo.length = 0;
+                return stroke;
+              }
+
+              // Add to the stroke when dragging.
+              function dragged() {
+                event.subject.push([event.x, event.y]);
+              }
+
+            };
+
+            // Render and report the new value.
+            const render = () => {
+              context$1.clearRect(0, 0, width$2, height$2);
+              for (const stroke of strokes) {
+                context$1.beginPath();
+                curve.lineStart();
+                for (const point of stroke) {
+                  curve.point(...point);
+                }
+                if (stroke.length === 1) curve.point(...stroke[0]);
+                curve.lineEnd();
+                // context.lineWidth = line;
+                // context.strokeStyle = color;
+                context$1.lineWidth = stroke.lineWidth;
+                context$1.strokeStyle = stroke.strokeStyle;
+                context$1.stroke();
+              }
+              context$1.canvas.value = strokes;
+              context$1.canvas.dispatchEvent(new CustomEvent("input"));
+            };
+
+            const updateDrawCanvas = () => {
+              render();
+            };
+
             const updaters = {
               map: updateMapCanvas,
-              mesh: updateHexCanvas
+              mesh: updateHexCanvas,
+              draw: updateDrawCanvas
             };
 
             class PaintReducer {
@@ -57528,9 +57641,11 @@
                               fill: stroke.fill,
                               color: stroke.color
                             };
+                            updaters[type](stroke, data.name);
+                          } else if (type === 'draw') {
+                            state.canvasList[data.name].data.push(parseForm(stroke));
+                            updateDrawCanvas();
                           }
-                          console.log(updaters[type]);
-                          updaters[type](stroke, data.name);
                       });
                     }
                   }
@@ -57691,105 +57806,6 @@
                 )
               }
             }
-
-            // Forked of https://observablehq.com/@d3/draw-me
-
-            const width$2 = 960,
-                  height$2 = 960;
-
-            let context$1;
-            let curve;
-
-            const redo = [];
-
-            const initDrawCanvas = () => {
-              const canvas = document.getElementById('canvas');
-              context$1 = canvas.getContext('2d');
-              context$1.lineJoin = "round";
-              context$1.lineCap = "round";
-              curve = basis$2(context$1);
-            };
-
-            const drawHexCanvas$1 = (props, line, color) => {
-              const strokes = (props.canvas) ? props.canvas : [];
-              context$1.canvas.value = strokes;
-
-              select("canvas").call(drag()
-                  .container(context$1.canvas)
-                  .subject(dragsubject)
-                  .on("start drag", dragged)
-                  .on("start.render drag.render", render)
-                  .on("end.drag", mouseEnds));
-
-              render();
-
-              context$1.canvas.undo = () => {
-                if (strokes.length === 0) return;
-                redo.push(strokes.pop());
-                render();
-              };
-
-              context$1.canvas.redo = stroke => {
-                if (redo.length === 0) return;
-                strokes.push(redo.pop());
-                render();
-              };
-
-              function mouseEnds() {
-                const stroke = strokes[strokes.length - 1];
-                console.log("finished", stroke);
-                const lineWidth = stroke.lineWidth;
-                const strokeStyle = stroke.strokeStyle;
-                props.api.canvas.paint({
-                  "canvas-name": props.name,
-                  "location": props.location,
-                  "strokes": [{
-                    draw: {
-                      coords: stroke,
-                      lineWidth: lineWidth,
-                      strokeStyle: strokeStyle
-                    }
-                  }]
-                });
-              }
-
-              // Render and report the new value.
-              function render() {
-                context$1.clearRect(0, 0, width$2, height$2);
-                for (const stroke of strokes) {
-                  context$1.beginPath();
-                  curve.lineStart();
-                  for (const point of stroke) {
-                    curve.point(...point);
-                  }
-                  if (stroke.length === 1) curve.point(...stroke[0]);
-                  curve.lineEnd();
-                  // context.lineWidth = line;
-                  // context.strokeStyle = color;
-                  context$1.lineWidth = stroke.lineWidth;
-                  context$1.strokeStyle = stroke.strokeStyle;
-                  context$1.stroke();
-                }
-                context$1.canvas.value = strokes;
-                context$1.canvas.dispatchEvent(new CustomEvent("input"));
-              }
-
-              // Create a new empty stroke at the start of a drag gesture.
-              function dragsubject() {
-                const stroke = [];
-                stroke.lineWidth = line;
-                stroke.strokeStyle = color;
-                strokes.push(stroke);
-                redo.length = 0;
-                return stroke;
-              }
-
-              // Add to the stroke when dragging.
-              function dragged() {
-                event.subject.push([event.x, event.y]);
-              }
-
-            };
 
             const _jsxFileName$9 = "/Users/jose/urbit/canvas/src/js/components/draw.js";
 

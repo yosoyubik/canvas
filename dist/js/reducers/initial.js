@@ -11,7 +11,7 @@ export class InitialReducer {
           for (let canvas in data.canvas) {
             console.log(canvas)
             if (data.canvas[canvas].metadata.type === 'draw') {
-              data.canvas[canvas].data = reparseDrawForms(data[canvas].data);
+              data.canvas[canvas].data = reparseDrawForms(data.canvas[canvas].data);
             }
             console.log(data.canvas[canvas]);
             state.canvasList[canvas] = data.canvas[canvas];

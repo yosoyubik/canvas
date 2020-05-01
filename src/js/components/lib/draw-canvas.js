@@ -8,6 +8,7 @@ const width = 960,
 
 let context;
 let curve;
+let strokes;
 
 const redo = [];
 
@@ -20,7 +21,7 @@ const initDrawCanvas = () => {
 }
 
 const drawHexCanvas = (props, line, color) => {
-  const strokes = (props.canvas) ? props.canvas : [];
+  strokes = (props.canvas) ? props.canvas : [];
   context.canvas.value = strokes;
 
   d3.select("canvas").call(d3.drag()
@@ -51,7 +52,7 @@ const drawHexCanvas = (props, line, color) => {
     const strokeStyle = stroke.strokeStyle;
     props.api.canvas.paint({
       "canvas-name": props.name,
-      "location": props.location,
+      "location": props.metadata.location,
       "strokes": [{
         draw: {
           coords: stroke,
@@ -60,27 +61,6 @@ const drawHexCanvas = (props, line, color) => {
         }
       }]
     });
-  }
-
-  // Render and report the new value.
-  function render() {
-    context.clearRect(0, 0, width, height);
-    for (const stroke of strokes) {
-      context.beginPath();
-      curve.lineStart();
-      for (const point of stroke) {
-        curve.point(...point);
-      }
-      if (stroke.length === 1) curve.point(...stroke[0]);
-      curve.lineEnd();
-      // context.lineWidth = line;
-      // context.strokeStyle = color;
-      context.lineWidth = stroke.lineWidth;
-      context.strokeStyle = stroke.strokeStyle;
-      context.stroke();
-    }
-    context.canvas.value = strokes;
-    context.canvas.dispatchEvent(new CustomEvent("input"));
   }
 
   // Create a new empty stroke at the start of a drag gesture.
@@ -100,5 +80,29 @@ const drawHexCanvas = (props, line, color) => {
 
 }
 
+// Render and report the new value.
+const render = () => {
+  context.clearRect(0, 0, width, height);
+  for (const stroke of strokes) {
+    context.beginPath();
+    curve.lineStart();
+    for (const point of stroke) {
+      curve.point(...point);
+    }
+    if (stroke.length === 1) curve.point(...stroke[0]);
+    curve.lineEnd();
+    // context.lineWidth = line;
+    // context.strokeStyle = color;
+    context.lineWidth = stroke.lineWidth;
+    context.strokeStyle = stroke.strokeStyle;
+    context.stroke();
+  }
+  context.canvas.value = strokes;
+  context.canvas.dispatchEvent(new CustomEvent("input"));
+}
 
-export { initDrawCanvas, drawHexCanvas, width, height };
+const updateDrawCanvas = () => {
+  render();
+}
+
+export { initDrawCanvas, drawHexCanvas, updateDrawCanvas, width, height };

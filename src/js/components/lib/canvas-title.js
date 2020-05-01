@@ -15,15 +15,16 @@ export class CanvasTitle extends Component {
         <Link to={`/~canvas/item/${props.id}`} key={props.id}>
           <div className="w-100 v-mid f7 ph2 z1 pv1">
             <p className="f8 dib">{props.id}</p>
+            { (props.location === ("~" + ship)) ?
+              (<span className="ph3 f9 pb1 gray2">(local)</span>) :
+              (<button className="ph3 f9 pb1 red2 bg-gray0-d b--red2"
+               onClick={this.onClickLeave.bind(this)}>
+                leave
+                <span className="ml1 pointer">x</span>
+              </button>)
+            }
           </div>
         </Link>
-        { (props.location === ("~" + ship)) ?
-          (<p className="ph6 f9 pb1 gray2">Local</p>) :
-          (<button className="pointer ph6 f9 pb1 red2 bg-gray0-d b--red2"
-           onClick={this.onClickLeave.bind(this)}>
-            leave shared canvas
-          </button>)
-        }
       </div>
     );
   }

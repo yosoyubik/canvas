@@ -14,3 +14,10 @@ export function reparseDrawForms(data) {
   console.log(data);
   return data;
 }
+
+export function parseForm(form) {
+  const stroke = [...form.strokes];
+  stroke.lineWidth = form.lineWidth;
+  stroke.strokeStyle = form.styleStroke;
+  return stroke;
+}
