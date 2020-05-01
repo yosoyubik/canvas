@@ -22,6 +22,7 @@ export class Hexagons extends Component {
       data: {}
     }
     this.onClickShare = this.onClickShare.bind(this);
+    this.onClickSave = this.onClickSave.bind(this);
   }
 
   componentDidMount() {
@@ -31,9 +32,17 @@ export class Hexagons extends Component {
     createColorPicker(width);
   }
 
-  onClickSave () {
-    const canvas = d3.select("#canvas");
-    const svgString = simpleParseSVG(canvas.node(), 'mesh');
+  onClickSave (removeColor, removeMesh) {
+    const canvas = d3.select("#canvas").node().cloneNode(true);
+    console.log(canvas);
+    if (removeColor) {
+      d3.select(canvas).select(".legend").selectAll("*").remove();
+    }
+    if (removeMesh) {
+      d3.select(canvas).select(".mesh-group").selectAll("*").remove();
+    }
+    console.log(canvas);
+    const svgString = simpleParseSVG(d3.select(canvas).node(), 'mesh');
     console.log("LENGTH", svgString.length);
     const chunkSize = Math.round(svgString.length / 4);
     let last = false;
@@ -71,29 +80,30 @@ export class Hexagons extends Component {
   }
 
   render() {
+    const { props, state } = this;
     d3.select(".hexagon").selectAll("path").remove();
     if (this.props.canvas) {
       // console.log("rendering", this.props.name);
       drawHexCanvas(this.props);
     }
     return (
-      React.createElement('div', { className: "h-100 w-100 bg-gray0-d white-d flex flex-column"     , __self: this, __source: {fileName: _jsxFileName, lineNumber: 80}}
-        , React.createElement('div', { className: "w-100 dn-m dn-l dn-xl inter pt1 pb6 f8"       , __self: this, __source: {fileName: _jsxFileName, lineNumber: 81}}
-          , React.createElement(Link, { to: "/~canvas/", __self: this, __source: {fileName: _jsxFileName, lineNumber: 82}}, "⟵ Canvas")
+      React.createElement('div', { className: "h-100 w-100 bg-gray0-d white-d flex flex-column"     , __self: this, __source: {fileName: _jsxFileName, lineNumber: 90}}
+        , React.createElement('div', { className: "w-100 dn-m dn-l dn-xl inter pt1 pb6 f8"       , __self: this, __source: {fileName: _jsxFileName, lineNumber: 91}}
+          , React.createElement(Link, { to: "/~canvas/", __self: this, __source: {fileName: _jsxFileName, lineNumber: 92}}, "⟵ Canvas")
         )
         , React.createElement('div', { className: "absolute mw5" ,
-             style: {right: "20px", top: "20px"}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 84}}
+             style: {right: "20px", top: "20px"}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 94}}
           
-          , React.createElement(ShareImage, { chats: this.props.chats, share: this.onClickShare, saved: this.props.metadata.saved, __self: this, __source: {fileName: _jsxFileName, lineNumber: 87}})
-          , React.createElement(SaveImage, { save: this.onClickSave, hasMesh: true, __self: this, __source: {fileName: _jsxFileName, lineNumber: 88}})
+          , React.createElement(ShareImage, { chats: this.props.chats, share: this.onClickShare, saved: props.metadata.saved, __self: this, __source: {fileName: _jsxFileName, lineNumber: 97}})
+          , React.createElement(SaveImage, { save: this.onClickSave, hasMesh: true, saved: props.metadata.saved, __self: this, __source: {fileName: _jsxFileName, lineNumber: 98}} )
         )
-        , React.createElement('div', { ref: "canvas", className: "w-100 pr0-l pr0-xl"  , style: {overflow: "hidden"}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 90}}
+        , React.createElement('div', { ref: "canvas", className: "w-100 pr0-l pr0-xl"  , style: {overflow: "hidden"}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 100}}
           , React.createElement('svg', { className: "db", id: "canvas", width: width, height: height,
                viewBox: `0 0 ${width} ${height}`,
-               perserveaspectratio: "xMinYMid", __self: this, __source: {fileName: _jsxFileName, lineNumber: 91}}
-            , React.createElement('g', { className: "hexagon", __self: this, __source: {fileName: _jsxFileName, lineNumber: 94}} )
-            , React.createElement('g', { className: "mesh-group", __self: this, __source: {fileName: _jsxFileName, lineNumber: 95}} )
-            , React.createElement('g', { className: "legend", __self: this, __source: {fileName: _jsxFileName, lineNumber: 96}} )
+               perserveaspectratio: "xMinYMid", __self: this, __source: {fileName: _jsxFileName, lineNumber: 101}}
+            , React.createElement('g', { className: "hexagon", __self: this, __source: {fileName: _jsxFileName, lineNumber: 104}} )
+            , React.createElement('g', { className: "mesh-group", __self: this, __source: {fileName: _jsxFileName, lineNumber: 105}} )
+            , React.createElement('g', { className: "legend", __self: this, __source: {fileName: _jsxFileName, lineNumber: 106}} )
           )
         )
       )

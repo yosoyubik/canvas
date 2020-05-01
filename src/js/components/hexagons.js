@@ -22,6 +22,7 @@ export class Hexagons extends Component {
       data: {}
     }
     this.onClickShare = this.onClickShare.bind(this);
+    this.onClickSave = this.onClickSave.bind(this);
   }
 
   componentDidMount() {
@@ -31,9 +32,17 @@ export class Hexagons extends Component {
     createColorPicker(width);
   }
 
-  onClickSave () {
-    const canvas = d3.select("#canvas");
-    const svgString = simpleParseSVG(canvas.node(), 'mesh');
+  onClickSave (removeColor, removeMesh) {
+    const canvas = d3.select("#canvas").node().cloneNode(true);
+    console.log(canvas);
+    if (removeColor) {
+      d3.select(canvas).select(".legend").selectAll("*").remove();
+    }
+    if (removeMesh) {
+      d3.select(canvas).select(".mesh-group").selectAll("*").remove();
+    }
+    console.log(canvas);
+    const svgString = simpleParseSVG(d3.select(canvas).node(), 'mesh');
     console.log("LENGTH", svgString.length);
     const chunkSize = Math.round(svgString.length / 4);
     let last = false;
@@ -71,6 +80,7 @@ export class Hexagons extends Component {
   }
 
   render() {
+    const { props, state } = this;
     d3.select(".hexagon").selectAll("path").remove();
     if (this.props.canvas) {
       // console.log("rendering", this.props.name);
@@ -84,8 +94,8 @@ export class Hexagons extends Component {
         <div className="absolute mw5"
              style={{right: "20px", top: "20px"}}
           >
-          <ShareImage chats={this.props.chats} share={this.onClickShare} saved={this.props.metadata.saved}/>
-          <SaveImage save={this.onClickSave} hasMesh={true}/>
+          <ShareImage chats={this.props.chats} share={this.onClickShare} saved={props.metadata.saved}/>
+          <SaveImage save={this.onClickSave} hasMesh={true} saved={props.metadata.saved} />
         </div>
         <div ref="canvas" className="w-100 pr0-l pr0-xl" style={{overflow: "hidden"}}>
           <svg className="db" id="canvas" width={width} height={height}

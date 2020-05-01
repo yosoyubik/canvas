@@ -75,6 +75,29 @@ h2 {
   mix-blend-mode: difference;
 }
 
+/* toggler checkbox */
+.toggle::after {
+  content: "";
+  height: 12px;
+  width: 12px;
+  background: white;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  border-radius: 100%;
+}
+
+.toggle.checked::after {
+  content: "";
+  height: 12px;
+  width: 12px;
+  background: white;
+  position: absolute;
+  top: 2px;
+  left: 14px;
+  border-radius: 100%;
+}
+
 /* dark */
 
 @media (prefers-color-scheme: dark) {

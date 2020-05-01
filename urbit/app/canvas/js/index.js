@@ -57181,17 +57181,28 @@
                   open: false,
                   removeColor: false,
                   removeMesh: false,
-                  awaiting: false
+                  awaiting: false,
+                  saved: false
                 };
                 this.removeColorPalette = this.removeColorPalette.bind(this);
-                this.removeMesh = this.removeMesh.bind(this);
+                this.removeMeshPalette = this.removeMeshPalette.bind(this);
                 this.toggleOpen = this.toggleOpen.bind(this);
                 this.handleClickOutside = this.handleClickOutside.bind(this);
               }
 
               componentDidMount() {
                 document.addEventListener('mousedown', this.handleClickOutside);
-                this.setState({ results: this.props.chats });
+                this.setState({
+                  results: this.props.chats,
+                });
+              }
+
+              componentDidUpdate() {
+                if (this.state.awaiting && this.props.saved) {
+                  this.setState({
+                    awaiting: false
+                  });
+                }
               }
 
               componentWillUnmount() {
@@ -57215,27 +57226,26 @@
                 });
               }
 
-              removeMesh(event) {
+              removeMeshPalette(event) {
                 this.setState({
                   removeMesh: !!event.target.checked
                 });
               }
 
               onClickSave () {
+                const { props, state } = this;
                 this.setState({
                   error: false,
                   success: true,
                   awaiting: true
                 }, () => {
-                  let save = props.save(this.state.chat);
-                  save.then(() => {
-                    this.setState({awaiting: false});
-                  });
+                  let save = props.save(state.removeColor, state.removeMesh);
                 });
               }
 
               render() {
                 const { props, state } = this;
+                console.log("saved", this.props.saved);
 
                 let buttonOpened = (state.open)
                   ? "gray22 bg-gray0-d b--gray2" : "green2 bg-gray0-d b--green2";
@@ -57246,59 +57256,54 @@
                   ? "absolute pa3 db z-2 bg-white bg-gray0-d white-d ba b--gray3 b--gray1-d"
                   : "dn";
 
-                let removeColorPaletteClasses = state.removeColor
+                let removeColorPaletteClass = state.removeColor
                   ? "relative checked bg-green2 br3 h1 toggle v-mid z-0"
                   : "relative bg-gray4 bg-gray1-d br3 h1 toggle v-mid z-0";
 
-                let removeMeshClasses = state.removeMesh
+                let removeMeshClass = state.removeMesh
                   ? "relative checked bg-green2 br3 h1 toggle v-mid z-0"
                   : "relative bg-gray4 bg-gray1-d br3 h1 toggle v-mid z-0";
-
-                let removeMesh = react.createElement('div', {__self: this, __source: {fileName: _jsxFileName$8, lineNumber: 86}} );
-                if (props.hasMesh) {
-                  removeMesh = (react.createElement('div', { className: "mv1", __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 88}}
-                    , react.createElement('input', {
-                      type: "checkbox",
-                      style: { WebkitAppearance: "none", width: 28 },
-                      className: removeMeshClasses,
-                      onChange: this.removeMeshPalette, __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 89}}
-                    )
-                    , react.createElement('span', { className: "dib f9 white-d inter ml3"    , __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 95}}, "Hexagonal Mesh" )
-                    , react.createElement('p', { className: "f9 gray2 pt1"  , style: { paddingLeft: 40 }, __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 96}}, "The final image won't have the hexagonal mesh"
-
-                    )
-                  ));
-                }
 
                 return (
-                  react.createElement('div', { className: "ml1 dib" , __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 103}}
+                  react.createElement('div', { className: "ml1 dib" , __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 97}}
                     , react.createElement('div', { className: buttonOpened,
                     onClick: () => this.toggleOpen(),
-                    ref: (el) => this.toggleButton = el, __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 104}}
-                      , react.createElement('p', { className: "pointer f9 ba pv3 ph4 "     , __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 107}}, "Save as File"  )
+                    ref: (el) => this.toggleButton = el, __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 98}}
+                      , react.createElement('p', { className: "pointer f9 ba pv3 ph4 "     , __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 101}}, "Save as File"  )
                     )
                     , react.createElement('div', { className: dropdownClass,
                       style: { maxHeight: "24rem", width: 210, right: "0px" },
-                      ref: (el) => { this.dropdown = el; }, __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 109}}
-                      , react.createElement('div', { className: "mv1", __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 112}}
+                      ref: (el) => { this.dropdown = el; }, __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 103}}
+                      ,  (props.hasMesh) ?
+                          (react.createElement('div', { className: "mv1", __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 107}}
+                            , react.createElement('input', {
+                              type: "checkbox",
+                              style: { WebkitAppearance: "none", width: 28 },
+                              className: removeMeshClass,
+                              onChange: this.removeMeshPalette, __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 108}}
+                            )
+                            , react.createElement('span', { className: "dib f9 white-d inter ml3"    , __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 114}}, "Remove Hexagonal Mesh"  )
+                            , react.createElement('p', { className: "f9 gray2 pt1"  , style: { paddingLeft: 40 }, __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 115}}, "Keeping the hexagonal mesh increases the file size"
+
+                            )
+                          )
+                        ) : null
+                      
+                      , react.createElement('div', { className: "mv1", __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 121}}
                         , react.createElement('input', {
                           type: "checkbox",
                           style: { WebkitAppearance: "none", width: 28 },
-                          className: removeColorPaletteClasses,
-                          onChange: this.removeColorPalette, __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 113}}
+                          className: removeColorPaletteClass,
+                          onChange: this.removeColorPalette, __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 122}}
                         )
-                        , react.createElement('span', { className: "dib f9 white-d inter ml3"    , __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 119}}, "Color Palette" )
-                        , react.createElement('p', { className: "f9 gray2 pt1"  , style: { paddingLeft: 40 }, __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 120}}, "The final image won't have the color palette"
-
-                        )
+                        , react.createElement('span', { className: "dib f9 white-d inter ml3"    , __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 128}}, "Removes Color Palette"  )
                       )
-                      ,  removeMesh 
                       , react.createElement('button', {
                         onClick: this.onClickSave.bind(this),
-                        className: saveClasses, __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 125}}, "Save Image as File"
+                        className: saveClasses, __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 130}}, "Save Image as File"
 
                       )
-                      , react.createElement(Spinner, { awaiting: this.state.awaiting, classes: "mt4", text: "Saving image..." , __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 130}} )
+                      , react.createElement(Spinner, { awaiting: this.state.awaiting, classes: "mt4", text: "Saving image..." , __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 135}} )
                     )
                   )
 
@@ -57379,6 +57384,7 @@
                   data: {}
                 };
                 this.onClickShare = this.onClickShare.bind(this);
+                this.onClickSave = this.onClickSave.bind(this);
               }
 
               componentDidMount() {
@@ -57388,9 +57394,17 @@
                 createColorPicker();
               }
 
-              onClickSave () {
-                const canvas = select("#canvas");
-                const svgString = simpleParseSVG(canvas.node(), 'mesh');
+              onClickSave (removeColor, removeMesh) {
+                const canvas = select("#canvas").node().cloneNode(true);
+                console.log(canvas);
+                if (removeColor) {
+                  select(canvas).select(".legend").selectAll("*").remove();
+                }
+                if (removeMesh) {
+                  select(canvas).select(".mesh-group").selectAll("*").remove();
+                }
+                console.log(canvas);
+                const svgString = simpleParseSVG(select(canvas).node(), 'mesh');
                 console.log("LENGTH", svgString.length);
                 const chunkSize = Math.round(svgString.length / 4);
                 let i = 0;
@@ -57426,29 +57440,30 @@
               }
 
               render() {
+                const { props, state } = this;
                 select(".hexagon").selectAll("path").remove();
                 if (this.props.canvas) {
                   // console.log("rendering", this.props.name);
                   drawHexCanvas(this.props);
                 }
                 return (
-                  react.createElement('div', { className: "h-100 w-100 bg-gray0-d white-d flex flex-column"     , __self: this, __source: {fileName: _jsxFileName$9, lineNumber: 80}}
-                    , react.createElement('div', { className: "w-100 dn-m dn-l dn-xl inter pt1 pb6 f8"       , __self: this, __source: {fileName: _jsxFileName$9, lineNumber: 81}}
-                      , react.createElement(Link, { to: "/~canvas/", __self: this, __source: {fileName: _jsxFileName$9, lineNumber: 82}}, "⟵ Canvas")
+                  react.createElement('div', { className: "h-100 w-100 bg-gray0-d white-d flex flex-column"     , __self: this, __source: {fileName: _jsxFileName$9, lineNumber: 90}}
+                    , react.createElement('div', { className: "w-100 dn-m dn-l dn-xl inter pt1 pb6 f8"       , __self: this, __source: {fileName: _jsxFileName$9, lineNumber: 91}}
+                      , react.createElement(Link, { to: "/~canvas/", __self: this, __source: {fileName: _jsxFileName$9, lineNumber: 92}}, "⟵ Canvas")
                     )
                     , react.createElement('div', { className: "absolute mw5" ,
-                         style: {right: "20px", top: "20px"}, __self: this, __source: {fileName: _jsxFileName$9, lineNumber: 84}}
+                         style: {right: "20px", top: "20px"}, __self: this, __source: {fileName: _jsxFileName$9, lineNumber: 94}}
                       
-                      , react.createElement(ShareImage, { chats: this.props.chats, share: this.onClickShare, saved: this.props.metadata.saved, __self: this, __source: {fileName: _jsxFileName$9, lineNumber: 87}})
-                      , react.createElement(SaveImage, { save: this.onClickSave, hasMesh: true, __self: this, __source: {fileName: _jsxFileName$9, lineNumber: 88}})
+                      , react.createElement(ShareImage, { chats: this.props.chats, share: this.onClickShare, saved: props.metadata.saved, __self: this, __source: {fileName: _jsxFileName$9, lineNumber: 97}})
+                      , react.createElement(SaveImage, { save: this.onClickSave, hasMesh: true, saved: props.metadata.saved, __self: this, __source: {fileName: _jsxFileName$9, lineNumber: 98}} )
                     )
-                    , react.createElement('div', { ref: "canvas", className: "w-100 pr0-l pr0-xl"  , style: {overflow: "hidden"}, __self: this, __source: {fileName: _jsxFileName$9, lineNumber: 90}}
+                    , react.createElement('div', { ref: "canvas", className: "w-100 pr0-l pr0-xl"  , style: {overflow: "hidden"}, __self: this, __source: {fileName: _jsxFileName$9, lineNumber: 100}}
                       , react.createElement('svg', { className: "db", id: "canvas", width: width, height: height,
                            viewBox: `0 0 ${width} ${height}`,
-                           perserveaspectratio: "xMinYMid", __self: this, __source: {fileName: _jsxFileName$9, lineNumber: 91}}
-                        , react.createElement('g', { className: "hexagon", __self: this, __source: {fileName: _jsxFileName$9, lineNumber: 94}} )
-                        , react.createElement('g', { className: "mesh-group", __self: this, __source: {fileName: _jsxFileName$9, lineNumber: 95}} )
-                        , react.createElement('g', { className: "legend", __self: this, __source: {fileName: _jsxFileName$9, lineNumber: 96}} )
+                           perserveaspectratio: "xMinYMid", __self: this, __source: {fileName: _jsxFileName$9, lineNumber: 101}}
+                        , react.createElement('g', { className: "hexagon", __self: this, __source: {fileName: _jsxFileName$9, lineNumber: 104}} )
+                        , react.createElement('g', { className: "mesh-group", __self: this, __source: {fileName: _jsxFileName$9, lineNumber: 105}} )
+                        , react.createElement('g', { className: "legend", __self: this, __source: {fileName: _jsxFileName$9, lineNumber: 106}} )
                       )
                     )
                   )
