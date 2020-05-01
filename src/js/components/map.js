@@ -42,10 +42,16 @@ export class MapCanvas extends Component {
       }
   }
 
-  onClickSave () {
-    const canvas = d3.select("#canvas");
+    onClickSave (removeColor) {
     const type = this.props.metadata.type.split("-");
-    const svgString = simpleParseSVG(canvas.node(), type[0]);
+    const canvas = d3.select("#canvas").node().cloneNode(true);
+    if (removeColor) {
+      d3.select(canvas).select(".legend").selectAll("*").remove();
+    }
+    if (removeMesh) {
+      d3.select(canvas).select(".mesh-group").selectAll("*").remove();
+    }
+    const svgString = simpleParseSVG(d3.select(canvas).node(), 'mesh');
     const chunkSize = Math.round(svgString.length / 4);
     let last = false;
     let i = 0;
@@ -102,12 +108,8 @@ export class MapCanvas extends Component {
         <div className="absolute mw5"
              style={{right: "20px", top: "20px"}}
           >
-          <ShareImage chats={this.props.chats} share={this.onClickShare} saved={this.props.metadata.saved}/>
-          <button
-            onClick={this.onClickSave.bind(this)}
-            className="pointer ml6 f9 green2 bg-gray0-d ba pv3 ph4 b--green2">
-            Save Image
-          </button>
+          <ShareImage chats={this.props.chats} share={this.onClickShare} saved={props.metadata.saved}/>
+          <SaveImage save={this.onClickSave} hasMesh={false} saved={props.metadata.saved} />
         </div>
         <div ref="canvas" className="w-100 mb4 pr6 pr0-l pr0-xl">
           <svg className="db" id="canvas" width={ width } height={ height }>

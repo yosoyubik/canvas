@@ -34,14 +34,12 @@ export class Hexagons extends Component {
 
   onClickSave (removeColor, removeMesh) {
     const canvas = d3.select("#canvas").node().cloneNode(true);
-    console.log(canvas);
     if (removeColor) {
       d3.select(canvas).select(".legend").selectAll("*").remove();
     }
     if (removeMesh) {
       d3.select(canvas).select(".mesh-group").selectAll("*").remove();
     }
-    console.log(canvas);
     const svgString = simpleParseSVG(d3.select(canvas).node(), 'mesh');
     console.log("LENGTH", svgString.length);
     const chunkSize = Math.round(svgString.length / 4);
