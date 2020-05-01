@@ -34,9 +34,9 @@
 /=  canvas-png
   /^  (map knot @)
   /:  /===/app/canvas/img  /_  /png/
-/=  canvas-svg
+/=  canvas-images
   /^  (map knot @)
-  /:  /===/app/canvas/images  /_  /svg/
+  /:  /===/app/canvas/images  /_  /png/
 /=  canvas-maps
   /^  (map knot @)
   /:  /===/app/canvas/map  /_  /atom/
@@ -160,7 +160,6 @@
 ::
 |_  =bowl:gall
 ++  gallery-scry
-  ~&  "requesting gallery..."
   .^  (list canvas)
     %gx
     (scot %p our.bowl)
@@ -272,9 +271,9 @@
    [(send-canvas-action [%share name ~] [%share name path])]~
   ::
   ++  handle-save
-    |=  [=ship name=@t svg=@t last=?]
+    |=  [=ship name=@t svg=@t last=? =image-type]
     ^-  (list card)
-    [(send-canvas-action [%save name ~] [%save ship name svg last])]~
+    [(send-canvas-action [%save name ~] [%save +<])]~
   --
 ::
 ++  handle-view-update
@@ -314,18 +313,18 @@
   ~&  url
   |^
   ?:  ?=([%'~canvas' %images @t *] url)
-    (handle-svg-call i.t.t.url)
+    (handle-canvas-image-call i.t.t.url)
   %+  require-authorization:app  inbound-request
   handle-auth-call
   ::
-  ++  handle-svg-call
+  ++  handle-canvas-image-call
     |=  file=@t
     ^-  simple-payload:http
     ~&  file
-    =/  svg  (~(get by canvas-svg) file)
-    ?~  svg
+    =/  canvas-img  (~(get by canvas-images) file)
+    ?~  canvas-img
       not-found:gen
-    (svg-response:gen (as-octs:mimes:html u.svg))
+    (png-response:gen (as-octs:mimes:html u.canvas-img))
   ::
   ++  handle-auth-call
     |=  =inbound-request:eyre

@@ -3,11 +3,12 @@ import { Route, Link } from 'react-router-dom';
 
 import * as d3 from "d3";
 import { parseSVG, simpleParseSVG } from "./lib/compile-svg";
-
+import { width, height,
+         initDrawCanvas, drawHexCanvas }
+       from "./lib/draw-canvas";
+import { ShareImage } from "./lib/share-image";
 // import { Runtime, Inspector } from "@observablehq/runtime";
 // import notebook from "@yosoyubik/draw-me";
-
-import { width, height, initDrawCanvas, drawHexCanvas } from "./lib/draw-canvas";
 
 
 export class DrawCanvas extends Component {
@@ -26,6 +27,8 @@ export class DrawCanvas extends Component {
     this.setStrokes = this.setStrokes.bind(this);
     this.onChangeLine = this.onChangeLine.bind(this);
     this.onChangeColor = this.onChangeColor.bind(this);
+    this.onClickSave = this.onClickSave.bind(this);
+    this.onClickShare = this.onClickShare.bind(this);
   }
 
   componentDidUpdate() {
@@ -35,7 +38,10 @@ export class DrawCanvas extends Component {
 
   componentDidMount() {
     const { drawRef, lineWidthRef, strokeStyleRef, props, state } = this;
-
+    // TODO: Using observablehq makes the code cleaner encapsulating the
+    // logic in a separate compoenent and interfering less with React's
+    // DOM manipulation.
+    //
     // const runtime = new Runtime();
     // const observer = runtime.module(notebook, name => {
     //   console.log(name);
@@ -96,32 +102,15 @@ export class DrawCanvas extends Component {
 
   onClickSave () {
     const { props, state } = this;
-    (async () => {
-      // const forms = await state.observer.value("exposedData");
-      // let formsClone = forms.slice();
-      // formsClone.forEach(function(stroke, i, array) {
-      //   const lineWidth = stroke.lineWidth;
-      //   const strokeStyle = stroke.strokeStyle;
-      //   array[i] = { draw: {
-      //     coords: stroke,
-      //     lineWidth: lineWidth,
-      //     strokeStyle: strokeStyle
-      //   }}
-      // });
-      //
-      // // console.log(formsClone, props.location);
-      // props.api.canvas.paint({
-      //   "canvas-name": props.name,
-      //   "location": props.location,
-      //   "strokes": formsClone
-      // })
-      // .then(() => {
-      //   console.log("saving canvas");
-      //   // const svgString = simpleParseSVG(d3.select("canvas").node());
-      //   // this.props.api.svg.save(this.props.name, svgString);
-      // })
-      ;
-    })();
+    const canvas = d3.select("canvas").node().toDataURL("image/png");
+    // canvas.replace('data:image/png;base64,', '');
+    // .split("base64,")[1]
+    props.api.image.save(
+      props.metadata.location,
+      props.name,
+      canvas.split("base64,")[1],
+      true,
+      'png');
   }
 
   onChangeLine(event) {
@@ -132,8 +121,8 @@ export class DrawCanvas extends Component {
     this.setState({ color: event.target.value });
   }
 
-  onClickShare () {
-    this.props.api.svg.share(this.props.name);
+  onClickShare (chatPath) {
+    this.props.api.image.share(this.props.name, chatPath);
   }
 
   render() {
@@ -142,17 +131,13 @@ export class DrawCanvas extends Component {
     return (
       <div className="h-100 w-100 pa3 pt4 bg-gray0-d white-d flex flex-column">
         <div className="absolute mw5"
-             style={{right: "20px", top: "20px"}} >
+             style={{right: "20px", top: "20px"}}
+          >
+          <ShareImage chats={this.props.chats} share={this.onClickShare} saved={this.props.metadata.saved}/>
           <button
             onClick={this.onClickSave.bind(this)}
-            className="pointer mr2 f9 green2 bg-gray0-d ba pv3 ph4 b--green2">
+            className="pointer ml6 f9 green2 bg-gray0-d ba pv3 ph4 b--green2">
             Save Image
-          </button>
-          <button
-            onClick={this.onClickShare.bind(this)}
-            className="pointer f9 green2 bg-gray0-d ba pv3 ph4 b--green2"
-            >
-            Share Image
           </button>
         </div>
         <div ref={this.lineWidthRef}>

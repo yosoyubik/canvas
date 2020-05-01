@@ -51,11 +51,12 @@ export class MapCanvas extends Component {
     let i = 0;
     let chunks = [];
     while (i < svgString.length) {
-      this.props.api.svg.save(
+      this.props.api.image.save(
         this.props.metadata.location,
         this.props.name,
         svgString.slice(i, chunkSize + i),
-        ((i + chunkSize ) >= svgString.length) );
+        ((i + chunkSize ) >= svgString.length),
+        'svg');
       i += chunkSize;
     }
   }
@@ -78,7 +79,7 @@ export class MapCanvas extends Component {
     //     props.history.push(`/~canvas/item/${state.canvasName}`);
     //   })
     // });
-    props.api.svg.share(this.props.name, chatPath);
+    props.api.image.share(this.props.name, chatPath);
   }
 
   render() {

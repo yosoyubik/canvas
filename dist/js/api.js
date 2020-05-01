@@ -15,9 +15,9 @@ class UrbitApi {
       leave: this.leaveCanvas.bind(this)
     };
 
-    this.svg = {
-      save: this.saveSVG.bind(this),
-      share: this.shareSVG.bind(this)
+    this.image = {
+      save: this.saveImage.bind(this),
+      share: this.shareImage.bind(this)
     };
   }
 
@@ -46,18 +46,19 @@ class UrbitApi {
     this.action("canvas-view", "json", data);
   }
 
-  saveSVG(location, name, svgData, last) {
+  saveImage(location, name, svgData, last, type) {
     this.action("canvas-view", "canvas-view", {
       save: {
         'location': location,
         'canvas-name': name,
         'svg': svgData,
-        'last': last
+        'last': last,
+        'type': type
       }
     });
   }
 
-  shareSVG(name, chatPath) {
+  shareImage(name, chatPath) {
     this.action("canvas-view", "canvas-view", {
       share: {
         'canvas-name': name,

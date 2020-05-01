@@ -39,11 +39,12 @@ export class Hexagons extends Component {
     let i = 0;
     let chunks = [];
     while (i < svgString.length) {
-      this.props.api.svg.save(
+      this.props.api.image.save(
         this.props.metadata.location,
         this.props.name,
         svgString.slice(i, chunkSize + i),
-        ((i + chunkSize ) >= svgString.length) );
+        ((i + chunkSize ) >= svgString.length),
+        'svg');
       i += chunkSize;
     }
   }
@@ -65,7 +66,7 @@ export class Hexagons extends Component {
     //     props.history.push(`/~canvas/item/${state.canvasName}`);
     //   })
     // });
-    this.props.api.svg.share(this.props.name, chatPath);
+    this.props.api.image.share(this.props.name, chatPath);
   }
 
   render() {
@@ -74,7 +75,6 @@ export class Hexagons extends Component {
       // console.log("rendering", this.props.name);
       drawHexCanvas(this.props);
     }
-
     return (
       <div className="h-100 w-100 bg-gray0-d white-d flex flex-column">
         <div className="w-100 dn-m dn-l dn-xl inter pt1 pb6 f8">

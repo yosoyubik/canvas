@@ -3,11 +3,12 @@ import { Route, Link } from 'react-router-dom';
 
 import * as d3 from "d3";
 import { parseSVG, simpleParseSVG } from "./lib/compile-svg";
-
+import { width, height,
+         initDrawCanvas, drawHexCanvas }
+       from "./lib/draw-canvas";
+import { ShareImage } from "./lib/share-image";
 // import { Runtime, Inspector } from "@observablehq/runtime";
 // import notebook from "@yosoyubik/draw-me";
-
-import { width, height, initDrawCanvas, drawHexCanvas } from "./lib/draw-canvas";
 
 
 export class DrawCanvas extends Component {
@@ -26,6 +27,8 @@ export class DrawCanvas extends Component {
     this.setStrokes = this.setStrokes.bind(this);
     this.onChangeLine = this.onChangeLine.bind(this);
     this.onChangeColor = this.onChangeColor.bind(this);
+    this.onClickSave = this.onClickSave.bind(this);
+    this.onClickShare = this.onClickShare.bind(this);
   }
 
   componentDidUpdate() {
@@ -35,7 +38,10 @@ export class DrawCanvas extends Component {
 
   componentDidMount() {
     const { drawRef, lineWidthRef, strokeStyleRef, props, state } = this;
-
+    // TODO: Using observablehq makes the code cleaner encapsulating the
+    // logic in a separate compoenent and interfering less with React's
+    // DOM manipulation.
+    //
     // const runtime = new Runtime();
     // const observer = runtime.module(notebook, name => {
     //   console.log(name);
@@ -96,32 +102,15 @@ export class DrawCanvas extends Component {
 
   onClickSave () {
     const { props, state } = this;
-    (async () => {
-      // const forms = await state.observer.value("exposedData");
-      // let formsClone = forms.slice();
-      // formsClone.forEach(function(stroke, i, array) {
-      //   const lineWidth = stroke.lineWidth;
-      //   const strokeStyle = stroke.strokeStyle;
-      //   array[i] = { draw: {
-      //     coords: stroke,
-      //     lineWidth: lineWidth,
-      //     strokeStyle: strokeStyle
-      //   }}
-      // });
-      //
-      // // console.log(formsClone, props.location);
-      // props.api.canvas.paint({
-      //   "canvas-name": props.name,
-      //   "location": props.location,
-      //   "strokes": formsClone
-      // })
-      // .then(() => {
-      //   console.log("saving canvas");
-      //   // const svgString = simpleParseSVG(d3.select("canvas").node());
-      //   // this.props.api.svg.save(this.props.name, svgString);
-      // })
-      ;
-    })();
+    const canvas = d3.select("canvas").node().toDataURL("image/png");
+    // canvas.replace('data:image/png;base64,', '');
+    // .split("base64,")[1]
+    props.api.image.save(
+      props.metadata.location,
+      props.name,
+      canvas.split("base64,")[1],
+      true,
+      'png');
   }
 
   onChangeLine(event) {
@@ -132,38 +121,34 @@ export class DrawCanvas extends Component {
     this.setState({ color: event.target.value });
   }
 
-  onClickShare () {
-    this.props.api.svg.share(this.props.name);
+  onClickShare (chatPath) {
+    this.props.api.image.share(this.props.name, chatPath);
   }
 
   render() {
     const { props, state, onChangeLine, onChangeColor } = this;
 
     return (
-      React.createElement('div', { className: "h-100 w-100 pa3 pt4 bg-gray0-d white-d flex flex-column"       , __self: this, __source: {fileName: _jsxFileName, lineNumber: 143}}
+      React.createElement('div', { className: "h-100 w-100 pa3 pt4 bg-gray0-d white-d flex flex-column"       , __self: this, __source: {fileName: _jsxFileName, lineNumber: 132}}
         , React.createElement('div', { className: "absolute mw5" ,
-             style: {right: "20px", top: "20px"}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 144}} 
+             style: {right: "20px", top: "20px"}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 133}}
+          
+          , React.createElement(ShareImage, { chats: this.props.chats, share: this.onClickShare, saved: this.props.metadata.saved, __self: this, __source: {fileName: _jsxFileName, lineNumber: 136}})
           , React.createElement('button', {
             onClick: this.onClickSave.bind(this),
-            className: "pointer mr2 f9 green2 bg-gray0-d ba pv3 ph4 b--green2"        , __self: this, __source: {fileName: _jsxFileName, lineNumber: 146}}, "Save Image"
-
-          )
-          , React.createElement('button', {
-            onClick: this.onClickShare.bind(this),
-            className: "pointer f9 green2 bg-gray0-d ba pv3 ph4 b--green2"       , __self: this, __source: {fileName: _jsxFileName, lineNumber: 151}}
-            , "Share Image"
+            className: "pointer ml6 f9 green2 bg-gray0-d ba pv3 ph4 b--green2"        , __self: this, __source: {fileName: _jsxFileName, lineNumber: 137}}, "Save Image"
 
           )
         )
-        , React.createElement('div', { ref: this.lineWidthRef, __self: this, __source: {fileName: _jsxFileName, lineNumber: 158}}
+        , React.createElement('div', { ref: this.lineWidthRef, __self: this, __source: {fileName: _jsxFileName, lineNumber: 143}}
           , React.createElement('input', { id: "line", type: "range", min: "0.5", max: "20", value: this.state.line,
-                 step: "0.5", style: {width:"120px"}, onChange: onChangeLine, __self: this, __source: {fileName: _jsxFileName, lineNumber: 159}} )
+                 step: "0.5", style: {width:"120px"}, onChange: onChangeLine, __self: this, __source: {fileName: _jsxFileName, lineNumber: 144}} )
         )
-        , React.createElement('div', { ref: this.strokeStyleRef, __self: this, __source: {fileName: _jsxFileName, lineNumber: 162}}
-          , React.createElement('input', { id: "color", type: "color", style: {width:"120px"}, onChange: onChangeColor, __self: this, __source: {fileName: _jsxFileName, lineNumber: 163}} )
+        , React.createElement('div', { ref: this.strokeStyleRef, __self: this, __source: {fileName: _jsxFileName, lineNumber: 147}}
+          , React.createElement('input', { id: "color", type: "color", style: {width:"120px"}, onChange: onChangeColor, __self: this, __source: {fileName: _jsxFileName, lineNumber: 148}} )
         )
-        , React.createElement('div', { ref: this.drawRef, __self: this, __source: {fileName: _jsxFileName, lineNumber: 165}}
-          , React.createElement('canvas', { id: "canvas", width: width, height: height, __self: this, __source: {fileName: _jsxFileName, lineNumber: 166}})
+        , React.createElement('div', { ref: this.drawRef, __self: this, __source: {fileName: _jsxFileName, lineNumber: 150}}
+          , React.createElement('canvas', { id: "canvas", width: width, height: height, __self: this, __source: {fileName: _jsxFileName, lineNumber: 151}})
         )
       )
     )

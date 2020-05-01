@@ -1,4 +1,3 @@
-
 ::  canvas: A Canvas app for Urbit
 ::
 ::    data:            scry command:
@@ -7,7 +6,7 @@
 ::    gallery          .^(* %gx /=canvas=/gallery/noun)
 ::
 /-  *canvas, *chat-store
-/+  *server, default-agent, verb, *canvas
+/+  *server, default-agent, verb, *canvas, base=base64
 ::
 /=  index
   /^  octs
@@ -225,7 +224,7 @@
   =/  paths=(list path)
     .^  (list path)
         %ct
-        /=home/(same time)/app/canvas/images/(same file)/svg
+        /=home/(same time)/app/canvas/images/(same file)/png
     ==
   ~&  check-file+paths
   ?~  paths
@@ -359,7 +358,7 @@
    ==
   ::
   ++  handle-save
-    |=  [=ship file=@t chunk=@t last=?]
+    |=  [=ship file=@t chunk=@t last=? type=image-type]
     ^-  (quip card _state)
     ?>  (team:title our.bowl src.bowl)
     =/  temp=(unit [chunks=(list @t) *])  (~(get by buffer) file)
@@ -376,28 +375,35 @@
         ?~  temp  [chunk]~
         (snoc chunks.u.temp chunk)
       ==
-    ?~  temp  `state
-    =/  svg=@t  (crip (snoc chunks.u.temp chunk))
-    =/  =path  /=home/(scot %da now.bowl)/app/canvas/images/(same file)/svg
+    =/  img=@t
+      %-  crip
+      (snoc ?~(temp ~ chunks.u.temp) chunk)
+    =/  =path
+      /=home/(scot %da now.bowl)/app/canvas/images/(same file)/png
     ~&  path
-    =/  contents=cage  [%svg !>(svg)]
-    =+  dir=.^(arch %cy path)
-    =/  create-or-replace=toro:clay
-      =,  space:userlib
-      ?~  fil.dir
-        (foal path contents)
-      (furl (fray path) (foal path contents))
+    =/  contents=cage
+      :-  type
+      ?.  =(%png type)
+        !>(img)
+      !>(q:(need (de:base img)))
+    :: =/  contents=cage  [%svg !>(img)]
+    :: =+  dir=.^(arch %cy path)
+    :: =/  create-or-replace=toro:clay
+    ::   =,  space:userlib
+    ::   ?~  fil.dir
+    ::     (foal path contents)
+    ::   (furl (fray path) (foal path contents))
     ::  we wait up to 5 minutes for the file to be written
     ::
     :: =/  =moat:clay  [da+now.bowl da+(add now.bowl ~m5) path]
     ::  the full svg file is temporarily stored in the buffer
     ::
-    :: =.  buffer  (~(put by buffer) [file [~ `[svg path]]])
+    :: =.  buffer  (~(put by buffer) [file [~ `[img path]]])
     =/  location=wire  /write/(scot %p ship)/(same file)
     :_  state(buffer (~(del by buffer) file))
-    :: :_  state(buffer (~(put by buffer) [file [~ `[svg path]]]))
+    :: :_  state(buffer (~(put by buffer) [file [~ `[img path]]]))
     :~  ::[%pass /file/(same file) %arvo %c %warp our.bowl %home ~ %many & moat]
-        [%pass /write-file %arvo %c %info create-or-replace]
+        [%pass /write-file %arvo %c %info (foal:space:userlib path contents)]
         ::  a quick timer will set the file creation, that will fire
         ::  the file  watcher and send a notification to the browser
         ::

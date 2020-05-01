@@ -7,6 +7,7 @@
       %map-us-counties
       %map-us-states
   ==
++$  image-type   ?(%svg %png)
 +$  arc          [filled=? color=@t]
 +$  form         [strokes=(list [@t @t]) line-width=@t style-stroke=@t]
 +$  mesh         (map @t arc)
@@ -35,7 +36,7 @@
       [%leave =ship name=@t]
       [%create =canvas]
       [%share name=@t =path]
-      [%save =ship name=@t svg=@t last=?]
+      [%save =ship name=@t image=@t last=? type=image-type]
   ==
 ::
 +$  canvas-update
@@ -52,7 +53,7 @@
       [%create =canvas]
       [%file file=@t]
       [%share name=@t =path]
-      [%save =ship name=@t svg=@t last=?]
+      [%save =ship name=@t image=@t last=? type=image-type]
   ==
 ::
 +$  canvas-view-response

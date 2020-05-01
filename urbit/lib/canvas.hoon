@@ -81,6 +81,7 @@
         ['canvas-name' so]
         ['svg' so]
         ['last' bo]
+        ['type' (cu image-type so)]
     ==
   ::
   ++  share
