@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { Route, Link } from 'react-router-dom';
 import { TemplateSelector } from "/lib/template-selector";
+import { Spinner } from './lib/icons/icon-spinner';
 
 
 export class NewScreen extends Component {
@@ -20,7 +21,8 @@ export class NewScreen extends Component {
       template: "mesh",
       searchTerm: "",
       results: Object.entries(templates),
-      templates: templates
+      templates: templates,
+      awaiting: false
     }
 
     this.canvasNameChange = this.canvasNameChange.bind(this);
@@ -208,6 +210,7 @@ export class NewScreen extends Component {
           <Link to="/~canvas">
             <button className="f9 ml3 ba pa2 b--black pointer bg-transparent b--white-d white-d">Cancel</button>
           </Link>
+          <Spinner awaiting={this.state.awaiting} classes="mt4" text="Creating canvas..." />
         </div>
       </div>
     );
