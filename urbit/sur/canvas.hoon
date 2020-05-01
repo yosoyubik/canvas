@@ -35,7 +35,7 @@
       [%join =ship name=@t]
       [%leave =ship name=@t]
       [%create =canvas]
-      [%share name=@t =path]
+      [%share name=@t =path type=image-type]
       [%save =ship name=@t image=@t last=? type=image-type]
   ==
 ::
@@ -52,7 +52,7 @@
       [%leave =ship name=@t]
       [%create =canvas]
       [%file file=@t]
-      [%share name=@t =path]
+      [%share name=@t =path type=image-type]
       [%save =ship name=@t image=@t last=? type=image-type]
   ==
 ::

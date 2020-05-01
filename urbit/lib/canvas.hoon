@@ -85,7 +85,7 @@
     ==
   ::
   ++  share
-    (ot ~[['canvas-name' so] ['chat-path' pa]])
+    (ot ~[['canvas-name' so] ['chat-path' pa] ['type' (cu image-type so)]])
   --
 ::
 ++  canvas-view-response-to-json

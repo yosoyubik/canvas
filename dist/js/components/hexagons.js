@@ -66,7 +66,7 @@ export class Hexagons extends Component {
     //     props.history.push(`/~canvas/item/${state.canvasName}`);
     //   })
     // });
-    this.props.api.image.share(this.props.name, chatPath);
+    this.props.api.image.share(this.props.name, chatPath, 'svg');
   }
 
   render() {

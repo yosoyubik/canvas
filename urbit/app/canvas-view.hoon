@@ -34,9 +34,12 @@
 /=  canvas-png
   /^  (map knot @)
   /:  /===/app/canvas/img  /_  /png/
-/=  canvas-images
+/=  canvas-images-png
   /^  (map knot @)
-  /:  /===/app/canvas/images  /_  /png/
+  /:  /===/app/canvas/images/png  /_  /png/
+/=  canvas-images-svg
+  /^  (map knot @)
+  /:  /===/app/canvas/images/svg  /_  /svg/
 /=  canvas-maps
   /^  (map knot @)
   /:  /===/app/canvas/map  /_  /atom/
@@ -232,7 +235,7 @@
   ++  handle-paint
     |=  [location=@p name=@t strokes=(list stroke)]
     ^-  (list card)
-    [(send-canvas-action [%paint name ~] [%paint location name strokes])]~
+    [(send-canvas-action [%paint name ~] [%paint +<])]~
   ::
   ++  handle-join
     |=  [=ship canvas-name=@t]
@@ -241,7 +244,7 @@
     :_  ~
     %+  send-canvas-action
       [%join (scot %p ship) canvas-name ~]
-    [%join ship canvas-name]
+    [%join +<]
   ::
   ++  handle-leave
     |=  [=ship canvas-name=@t]
@@ -250,7 +253,7 @@
     :_  ~
     %+  send-canvas-action
       [%leave (scot %p ship) canvas-name ~]
-    [%leave ship canvas-name]
+    [%leave +<]
   ::
   ++  handle-create
    |=  =canvas
@@ -266,9 +269,9 @@
    ==
   ::
   ++  handle-share
-   |=  [name=@t =path]
+   |=  [name=@t =path =image-type]
    ^-  (list card)
-   [(send-canvas-action [%share name ~] [%share name path])]~
+   [(send-canvas-action [%share name ~] [%share +<])]~
   ::
   ++  handle-save
     |=  [=ship name=@t svg=@t last=? =image-type]
@@ -292,13 +295,13 @@
     ^-  (list card)
     ~&  "update paint"
     %-  send-frontend
-    (canvas-view-response-to-json [%paint location name strokes])
+    (canvas-view-response-to-json [%paint +<])
   ::
   ++  handle-load
     |=  [name=@t =canvas]
     ^-  (list card)
     ~&  "update load"
-    (send-frontend (canvas-view-response-to-json [%load name canvas]))
+    (send-frontend (canvas-view-response-to-json [%load +<]))
   ::
   ++  handle-file
     |=  file=@t
@@ -312,19 +315,28 @@
   ^-  simple-payload:http
   ~&  url
   |^
-  ?:  ?=([%'~canvas' %images @t *] url)
-    (handle-canvas-image-call i.t.t.url)
+  ?:  ?=([%'~canvas' %images image-type @t *] url)
+    (handle-canvas-image-call i.t.t.url i.t.t.t.url)
   %+  require-authorization:app  inbound-request
   handle-auth-call
   ::
   ++  handle-canvas-image-call
-    |=  file=@t
+    |=  [type=image-type file=@t]
     ^-  simple-payload:http
     ~&  file
-    =/  canvas-img  (~(get by canvas-images) file)
+    =/  [response=_png-response:gen canvas-img=(unit @)]
+      ?-    type
+          %png
+        :-  png-response:gen
+        (~(get by canvas-images-png) file)
+      ::
+          %svg
+        :-  svg-response:gen
+        (~(get by canvas-images-svg) file)
+      ==
     ?~  canvas-img
       not-found:gen
-    (png-response:gen (as-octs:mimes:html u.canvas-img))
+    (response (as-octs:mimes:html u.canvas-img))
   ::
   ++  handle-auth-call
     |=  =inbound-request:eyre

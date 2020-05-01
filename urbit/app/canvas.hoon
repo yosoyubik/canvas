@@ -136,9 +136,9 @@
         :: ?>  ?=(^ rot)
         :: [(send-updated-files u.rot) this]
       ::
-          [%write @t @t ~]
+          [%write @t @t @t ~]
         =^  cards  state
-          (check-file i.t.wire i.t.t.wire (scot %da now.bowl))
+          (check-file i.t.wire i.t.t.wire i.t.t.t.wire (scot %da now.bowl))
         [cards this]
       ==
     ::
@@ -217,14 +217,14 @@
   ==
 ::
 ++  check-file
-  |=  [host=@t file=@t time=@t]
+  |=  [host=@t file=@t type=@t time=@t]
   ^-  (quip card _state)
   ::  doing (scot %da now.bowl) here consistently produced ~2000.1.1 (?)
   ::
   =/  paths=(list path)
     .^  (list path)
         %ct
-        /=home/(same time)/app/canvas/images/(same file)/png
+        /=home/(same time)/app/canvas/images/(same type)/(same file)
     ==
   ~&  check-file+paths
   ?~  paths
@@ -322,30 +322,35 @@
    state(gallery (~(put by gallery) [[our.bowl name.metadata.canvas] canvas]))
   ::
   ++  handle-share
-   |=  [name=@t =path]
+   |=  [name=@t chat=path type=image-type]
    ^-  (quip card _state)
    ?>  (team:title our.bowl src.bowl)
    :_  state
    ::  TODO: check if file has been created already?
-   ::  disable share on browser if not
+   ::  now we disable share on browser if not
    ::
-   :: =/  =path  (weld /~ [(scot %p our.bowl) name ~])
    =/  serial=@uvH  (shaf %msg-uid eny.bowl)
    =/  =hart:eyre  .^(hart:eyre %e /(scot %p our.bowl)/host/real)
    =/  port=@ud  (need q.hart)
-   =/  domain=tape
-     %+  weld
-       ?:(p.hart "https://" "http://")
-    ?-  -.r.hart
-      %.y  (trip (en-turf:html p.r.hart))
-      %.n  (slag 1 (scow %if p.r.hart))
-    ==
+   =/  domain-port=tape
+     ;:  weld
+         ?:(p.hart "https://" "http://")
+       ::
+         ?-  -.r.hart
+           %.y  (trip (en-turf:html p.r.hart))
+           %.n  (slag 1 (scow %if p.r.hart))
+         ==
+      ::
+        ":"
+        ((d-co:co 1) port)
+     ==
    =/  =letter
      :-  %url
      %-  crip
-     ::  TODO: add svg preview option in chat
+     ::  TODO: add avg as option to preview in chat
+     ::        for now, using png as an extension works
      ::
-     "{domain}:{((d-co:co 1) port)}/~canvas/images/{(trip name)}.png"
+     "{domain-port}/~canvas/images/{(trip type)}/{(trip name)}.png"
    =/  =envelope  [serial *@ our.bowl now.bowl letter]
    :_  ~
    :*  %pass
@@ -354,7 +359,7 @@
        [our.bowl %chat-hook]
        %poke
        %chat-action
-       !>([%message path envelope])
+       !>([%message chat envelope])
    ==
   ::
   ++  handle-save
@@ -379,7 +384,7 @@
       %-  crip
       (snoc ?~(temp ~ chunks.u.temp) chunk)
     =/  =path
-      /=home/(scot %da now.bowl)/app/canvas/images/(same file)/png
+      /=home/(scot %da now.bowl)/app/canvas/images/(same type)/(same file)/(same type)
     ~&  path
     =/  contents=cage
       :-  type
@@ -399,7 +404,7 @@
     ::  the full svg file is temporarily stored in the buffer
     ::
     :: =.  buffer  (~(put by buffer) [file [~ `[img path]]])
-    =/  location=wire  /write/(scot %p ship)/(same file)
+    =/  location=wire  /write/(scot %p ship)/(same file)/(same type)
     :_  state(buffer (~(del by buffer) file))
     :: :_  state(buffer (~(put by buffer) [file [~ `[img path]]]))
     :~  ::[%pass /file/(same file) %arvo %c %warp our.bowl %home ~ %many & moat]

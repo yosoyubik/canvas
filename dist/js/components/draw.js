@@ -122,7 +122,7 @@ export class DrawCanvas extends Component {
   }
 
   onClickShare (chatPath) {
-    this.props.api.image.share(this.props.name, chatPath);
+    this.props.api.image.share(this.props.name, chatPath, 'png');
   }
 
   render() {

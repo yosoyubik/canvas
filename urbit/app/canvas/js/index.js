@@ -48705,11 +48705,12 @@
                 });
               }
 
-              shareImage(name, chatPath) {
+              shareImage(name, chatPath, type) {
                 this.action("canvas-view", "canvas-view", {
                   share: {
                     'canvas-name': name,
-                    'chat-path': chatPath
+                    'chat-path': chatPath,
+                    'type': type
                   }
                 });
               }
@@ -57262,7 +57263,7 @@
                 //     props.history.push(`/~canvas/item/${state.canvasName}`);
                 //   })
                 // });
-                this.props.api.image.share(this.props.name, chatPath);
+                this.props.api.image.share(this.props.name, chatPath, 'svg');
               }
 
               render() {
@@ -57767,7 +57768,7 @@
                 //     props.history.push(`/~canvas/item/${state.canvasName}`);
                 //   })
                 // });
-                props.api.image.share(this.props.name, chatPath);
+                props.api.image.share(this.props.name, chatPath, 'svg');
               }
 
               render() {
@@ -57908,7 +57909,7 @@
               }
 
               onClickShare (chatPath) {
-                this.props.api.image.share(this.props.name, chatPath);
+                this.props.api.image.share(this.props.name, chatPath, 'png');
               }
 
               render() {

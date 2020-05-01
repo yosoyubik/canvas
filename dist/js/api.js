@@ -58,11 +58,12 @@ class UrbitApi {
     });
   }
 
-  shareImage(name, chatPath) {
+  shareImage(name, chatPath, type) {
     this.action("canvas-view", "canvas-view", {
       share: {
         'canvas-name': name,
-        'chat-path': chatPath
+        'chat-path': chatPath,
+        'type': type
       }
     });
   }

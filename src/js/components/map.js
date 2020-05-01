@@ -79,7 +79,7 @@ export class MapCanvas extends Component {
     //     props.history.push(`/~canvas/item/${state.canvasName}`);
     //   })
     // });
-    props.api.image.share(this.props.name, chatPath);
+    props.api.image.share(this.props.name, chatPath, 'svg');
   }
 
   render() {
