@@ -89,12 +89,14 @@ export class Hexagons extends Component {
         <div className="w-100 dn-m dn-l dn-xl inter pt1 pb6 f8">
           <Link to="/~canvas/">{"⟵ Canvas"}</Link>
         </div>
-        <div className="absolute mw5"
-             style={{right: "20px", top: "20px"}}
-          >
-          <ShareImage chats={this.props.chats} share={this.onClickShare} saved={props.metadata.saved}/>
-          <SaveImage save={this.onClickSave} hasMesh={true} saved={props.metadata.saved} />
-        </div>
+        { (props.metadata.type !== 'welcome') ?
+          <div className="absolute mw5"
+               style={{right: "20px", top: "20px"}}
+            >
+            <ShareImage chats={this.props.chats} share={this.onClickShare} saved={props.metadata.saved}/>
+            <SaveImage save={this.onClickSave} hasMesh={true} saved={props.metadata.saved} />
+          </div> : null
+        }
         <div ref="canvas" className="w-100 pr0-l pr0-xl" style={{overflow: "hidden"}}>
           <svg className="db" id="canvas" width={width} height={height}
                viewBox={`0 0 ${width} ${height}`}

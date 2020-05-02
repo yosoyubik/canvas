@@ -48,6 +48,7 @@ const drawHexCanvas = (props) => {
   const canvasName = props.name;
   const canvasData = props.canvas;
   const location = props.metadata.location;
+  const type = props.metadata.type;
   const topology = hexTopology(radius, width, height, canvasData, canvasName);
 
   let mousing = 0;
@@ -64,7 +65,8 @@ const drawHexCanvas = (props) => {
     if (mousing) {
       const colors = d3.select(".legend").selectAll("rect").nodes();
       const color = d3.color(selectedColor(colors).style.fill).toString();
-      if ((d.attr.fill && d.attr.color === color) !== mousing > 0) {
+      if ((d.attr.fill && d.attr.color === color) !==
+           mousing > 0 && (type !== 'welcome')) {
         // Save stroke remotely
         apiCalls.push({mesh: {id: d.id, filled: mousing > 0, color: color}});
         // Save stroke locally on browser
@@ -85,7 +87,7 @@ const drawHexCanvas = (props) => {
 
   const mouseup = function() {
     mousemove.apply(this, arguments);
-    if (apiCalls.length > 0) {
+    if ((apiCalls.length > 0) && (type !== 'welcome')) {
       props.api.canvas.paint({
         "canvas-name": canvasName,
         "location": location,

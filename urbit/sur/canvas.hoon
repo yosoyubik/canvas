@@ -1,6 +1,8 @@
 |%
 +$  canvas-type
-  $?  %mesh
+  $?  %welcome
+      %martian
+      %mesh
       %draw
       %map-europe-europe
       %map-africa

@@ -142,8 +142,8 @@
         [cards this]
       ==
     ::
-    ++  on-save  on-save:def
-    ++  on-load  on-load:def
+    ++  on-save   on-save:def
+    ++  on-load   on-load:def
     ++  on-leave  on-leave:def
     ::  +on-peek: read from app state
     ::
