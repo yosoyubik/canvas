@@ -94,14 +94,14 @@ export class SaveImage extends Component {
       : "relative bg-gray4 bg-gray1-d br3 h1 toggle v-mid z-0";
 
     return (
-      <div className="ml1 dib">
+      <div className="ml3 dib">
         <div className={buttonOpened}
         onClick={() => this.toggleOpen()}
         ref={(el) => this.toggleButton = el}>
-          <p className="pointer f9 ba pv3 ph4 ">Save as File</p>
+          <p className="pointer f9 ba pv3 ph4 ">Export as File</p>
         </div>
         <div className={dropdownClass}
-          style={{ maxHeight: "24rem", width: 210, right: "0px" }}
+          style={{ maxHeight: "24rem", width: 228, right: "0px" }}
           ref={(el) => { this.dropdown = el }}>
           { (props.hasMesh) ?
               (<div className="mv1">
@@ -113,7 +113,7 @@ export class SaveImage extends Component {
                 />
                 <span className="dib f9 white-d inter ml3">Remove Hexagonal Mesh</span>
                 <p className="f9 gray2 pt1" style={{ paddingLeft: 40 }}>
-                  Keeping the hexagonal mesh increases the file size
+                  Keeping the hexagonal mesh would increase the file size.
                 </p>
               </div>
             ) : null
@@ -125,12 +125,12 @@ export class SaveImage extends Component {
               className={removeColorPaletteClass}
               onChange={this.removeColorPalette}
             />
-            <span className="dib f9 white-d inter ml3">Removes Color Palette</span>
+            <span className="dib f9 white-d inter ml3">Remove Color Palette</span>
           </div>
           <button
             onClick={this.onClickSave.bind(this)}
             className={saveClasses}>
-            Save Image as File
+            Save
           </button>
           <Spinner awaiting={this.state.awaiting} classes="mt4" text="Saving image..." />
         </div>

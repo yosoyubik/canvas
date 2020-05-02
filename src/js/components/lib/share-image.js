@@ -76,9 +76,8 @@ export class ShareImage extends Component {
     let buttonOpened = (state.open)
       ? "gray22 bg-gray0-d b--gray2" : "green2 bg-gray0-d b--green2";
 
-    let allowSend= "f9 ba pa2 pointer bg-transparent ml4 mb2 " +
+    let allowSend= "w-18 f9 ba pa2 pointer bg-transparent mb2 " +
     ((state.chat && this.props.saved) ? "b--green2 green2" : "b--gray4 gray4 b--gray2-d gray2-d")
-
     let dropdownClass = (state.open)
       ? "absolute db z-2 bg-white bg-gray0-d white-d ba b--gray3 b--gray1-d"
       : "dn";
@@ -106,35 +105,41 @@ export class ShareImage extends Component {
           <p className="pointer f9 ba pv3 ph4 ">Share Image</p>
         </div>
         <div className={dropdownClass}
-          style={{ maxHeight: "24rem", width: 210 }}
+          style={{ maxHeight: "24rem", width: 228 }}
           ref={(el) => { this.dropdown = el }}>
-          <p className="tc bb b--gray3 b--gray1-d gray3 pv4 f9">Chat Channels</p>
-          <div className="relative w-100 ph4 pt2 pb1">
+          <div className="relative mt2 w-100 ph4 pt2 pb2 ml1">
+            { (this.props.saved) ?
+                <button
+                  onClick={this.onClickShare.bind(this)}
+                  className={allowSend}>
+                 ←
+                </button>
+              : null
+            }
             <textarea
-              className="ba b--gray3 white-d bg-gray0-d inter w-100 f9 pa2"
+              className="w-80 ba b--gray3 white-d bg-gray0-d inter f9 pa2"
               rows={1}
               placeholder={this.state.placeholder}
               style={{
                 resize: "none",
-                boxSizing: "border-box"
+                boxSizing: "border-box",
+                float: "left"
               }}
               onChange={this.search.bind(this)}
               ref={(el) => this.dropdown = el}
             />
           </div>
-          {(this.props.saved) ? null :
-            <div className="f9 ph4 pt2 pb3">
-              <p className="mono">An svg files does not exist</p>
-              <p className="mono">Click on "Save Image" before sharing.</p>
-            </div>
+
+          { (!(this.props.saved)) ?
+              <div className="f9 ph4 pt2 pb3 mt7">
+                <p className="mono">A file does not exist.</p>
+                <p className="mono">Click on "Export as File" before sharing.</p>
+              </div>
+            : null
           }
-          <button
-            onClick={this.onClickShare.bind(this)}
-            className={allowSend}>
-            Send to {this.state.chatName}
-          </button>
+          <p className="tc bb b--gray3 b--gray1-d gray3 pt2 pb2 f9">Chat Channels</p>
           <div className="db z-2 bg-white bg-gray0-d white-d ba b--gray3 b--gray1-d"
-              style={{ maxHeight: "24rem", width: 210 }}
+              style={{ maxHeight: "24rem", width: 227 }}
               ref={(el) => { this.dropdown = el }}>
             {chatList}
           </div>

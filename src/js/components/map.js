@@ -6,8 +6,10 @@ import { parseSVG, simpleParseSVG } from "./lib/compile-svg";
 import { initMapCanvas, drawMapCanvas, width, height } from "./lib/map-canvas";
 import { createColorPicker } from "./lib/color";
 import { ShareImage } from "./lib/share-image";
+import { SaveImage } from "./lib/save-image";
 
 import { store } from '/store';
+
 
 export class MapCanvas extends Component {
   constructor(props) {
@@ -42,7 +44,7 @@ export class MapCanvas extends Component {
       }
   }
 
-    onClickSave (removeColor) {
+  onClickSave (removeColor) {
     const type = this.props.metadata.type.split("-");
     const canvas = d3.select("#canvas").node().cloneNode(true);
     if (removeColor) {
