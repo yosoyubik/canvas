@@ -24,10 +24,6 @@
       [%draw =form]
   ==
 ::
-+$  canvas-response
-  $%  [%paint arc]
-  ==
-::
 +$  canvas-action
   $%  [%paint location=@p name=@t strokes=(list stroke)]
       [%init gallery=(list canvas)]
