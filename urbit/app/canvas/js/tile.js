@@ -19177,8 +19177,13 @@
                 return (
                   react.createElement('div', { className: "w-100 h-100 relative bg-white bg-gray0-d ba b--black b--gray1-d"       , __self: this, __source: {fileName: _jsxFileName, lineNumber: 9}}
                     , react.createElement('a', { className: "w-100 h-100 db pa2 no-underline"    , href: "/~canvas", __self: this, __source: {fileName: _jsxFileName, lineNumber: 10}}
-                      , react.createElement('p', { className: "black white-d absolute f9"   , style: { left: 8, top: 8 }, __self: this, __source: {fileName: _jsxFileName, lineNumber: 11}}, "canvas")
-                      , react.createElement('img', { className: "absolute", src: "/~canvas/img/Tile.png", style: {top: 48, left: 48}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 12}})
+                      , react.createElement('p', { className: "black white-d absolute f9"   , style: { left: 8, top: 8 }, __self: this, __source: {fileName: _jsxFileName, lineNumber: 11}}, "Canvas")
+                      , react.createElement('img', {
+                        className: "absolute invert-d" ,
+                        style: { left: 16, top: 26 },
+                        src: "/~canvas/img/Tile.png",
+                        width: 90,
+                        height: 70, __self: this, __source: {fileName: _jsxFileName, lineNumber: 12}} )
                     )
                   )
                 );
