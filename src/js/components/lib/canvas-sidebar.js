@@ -51,16 +51,17 @@ export class CanvasSidebar extends Component {
     }
 
     return (
-      <div className={"bn br-m br-l br-xl b--gray4 b--gray1-d lh-copy h-100 " +
-       "flex-basis-30-ns flex-shrink-0 mw5-m mw5-l mw5-xl flex-basis-100-s " +
-        "relative overflow-hidden pt3 pt0-m pt0-l pt0-xl " + activeClasses}>
+      <div className={"bn br-m br-xl b--gray4 b--gray2-d lh-copy h-100 " +
+       "flex-shrink-0 pt3 pt0-m pt0-l pt0-xl relative overflow-y-hidden " +
+        "dn-s flex-basis-100-s flex-basis-250-ns " + activeClasses}>
+
         <a className="db dn-m dn-l dn-xl f8 pb6 pl3" href="/">⟵ Landscape</a>
-        <div className="overflow-auto pb8 h-100">
+        <div className="overflow-auto pb8 h-100 pr3">
           <Link to="/~canvas/new" className="dib">
-            <p className="f9 pt4 pl4 green2 bn">Create Canvas</p>
+            <p className="green2 pa4 f9 dib">New Canvas</p>
           </Link>
           <Link to="/~canvas/join" className="dib">
-            <p className="f9 pt4 pl4 green2 bn">Join Canvas</p>
+            <p className="f9 gray2">Join Canvas</p>
           </Link>
           <div className="pt1">
             <h2 className="f9 pt4 pr4 pb2 pl4 gray2 c-default">My Canvas</h2>

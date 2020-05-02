@@ -48864,19 +48864,20 @@
                 }
 
                 return (
-                  react.createElement('div', { className: "bn br-m br-l br-xl b--gray4 b--gray1-d lh-copy h-100 " +
-                   "flex-basis-30-ns flex-shrink-0 mw5-m mw5-l mw5-xl flex-basis-100-s " +
-                    "relative overflow-hidden pt3 pt0-m pt0-l pt0-xl " + activeClasses, __self: this, __source: {fileName: _jsxFileName$4, lineNumber: 54}}
-                    , react.createElement('a', { className: "db dn-m dn-l dn-xl f8 pb6 pl3"      , href: "/", __self: this, __source: {fileName: _jsxFileName$4, lineNumber: 57}}, "⟵ Landscape" )
-                    , react.createElement('div', { className: "overflow-auto pb8 h-100"  , __self: this, __source: {fileName: _jsxFileName$4, lineNumber: 58}}
-                      , react.createElement(Link, { to: "/~canvas/new", className: "dib", __self: this, __source: {fileName: _jsxFileName$4, lineNumber: 59}}
-                        , react.createElement('p', { className: "f9 pt4 pl4 green2 bn"    , __self: this, __source: {fileName: _jsxFileName$4, lineNumber: 60}}, "Create Canvas" )
+                  react.createElement('div', { className: "bn br-m br-xl b--gray4 b--gray2-d lh-copy h-100 " +
+                   "flex-shrink-0 pt3 pt0-m pt0-l pt0-xl relative overflow-y-hidden " +
+                    "dn-s flex-basis-100-s flex-basis-250-ns " + activeClasses, __self: this, __source: {fileName: _jsxFileName$4, lineNumber: 54}}
+
+                    , react.createElement('a', { className: "db dn-m dn-l dn-xl f8 pb6 pl3"      , href: "/", __self: this, __source: {fileName: _jsxFileName$4, lineNumber: 58}}, "⟵ Landscape" )
+                    , react.createElement('div', { className: "overflow-auto pb8 h-100 pr3"   , __self: this, __source: {fileName: _jsxFileName$4, lineNumber: 59}}
+                      , react.createElement(Link, { to: "/~canvas/new", className: "dib", __self: this, __source: {fileName: _jsxFileName$4, lineNumber: 60}}
+                        , react.createElement('p', { className: "green2 pa4 f9 dib"   , __self: this, __source: {fileName: _jsxFileName$4, lineNumber: 61}}, "New Canvas" )
                       )
-                      , react.createElement(Link, { to: "/~canvas/join", className: "dib", __self: this, __source: {fileName: _jsxFileName$4, lineNumber: 62}}
-                        , react.createElement('p', { className: "f9 pt4 pl4 green2 bn"    , __self: this, __source: {fileName: _jsxFileName$4, lineNumber: 63}}, "Join Canvas" )
+                      , react.createElement(Link, { to: "/~canvas/join", className: "dib", __self: this, __source: {fileName: _jsxFileName$4, lineNumber: 63}}
+                        , react.createElement('p', { className: "f9 gray2" , __self: this, __source: {fileName: _jsxFileName$4, lineNumber: 64}}, "Join Canvas" )
                       )
-                      , react.createElement('div', { className: "pt1", __self: this, __source: {fileName: _jsxFileName$4, lineNumber: 65}}
-                        , react.createElement('h2', { className: "f9 pt4 pr4 pb2 pl4 gray2 c-default"      , __self: this, __source: {fileName: _jsxFileName$4, lineNumber: 66}}, "My Canvas" )
+                      , react.createElement('div', { className: "pt1", __self: this, __source: {fileName: _jsxFileName$4, lineNumber: 66}}
+                        , react.createElement('h2', { className: "f9 pt4 pr4 pb2 pl4 gray2 c-default"      , __self: this, __source: {fileName: _jsxFileName$4, lineNumber: 67}}, "My Canvas" )
                         ,  canvasItems 
                       )
                     )
@@ -48895,7 +48896,7 @@
                 return (
                   react.createElement('div', { className: "h-100 w-100 ph4-m ph4-l ph4-xl pb4-m pb4-l pb4-xl"       , __self: this, __source: {fileName: _jsxFileName$5, lineNumber: 14}}
                     , react.createElement(HeaderBar, {__self: this, __source: {fileName: _jsxFileName$5, lineNumber: 15}} )
-                    , react.createElement('div', { className: "cf w-100 h-100 h-100-m-40-ns flex ba-m ba-l ba-xl b--gray4 b--gray1-d br1"          , __self: this, __source: {fileName: _jsxFileName$5, lineNumber: 16}}
+                    , react.createElement('div', { className: "cf w-100 h-100 flex ba-m ba-l ba-xl b--gray2 br1"        , __self: this, __source: {fileName: _jsxFileName$5, lineNumber: 16}}
                       , react.createElement(CanvasSidebar, {
                         activeDrawer: props.activeDrawer,
                         history: props.history,
@@ -58243,7 +58244,7 @@
                   ? "bg-gray5 bg-gray1-d white-d" : "hover-bg-gray5 hover-bg-gray1-d white-d";
 
                 let allowCreate = "f9 ba pa2 pointer bg-transparent " +
-                (state.canvasName ? "b--green2 green2" : "b--gray4 gray4 b--gray2-d gray2-d");
+                (state.canvasName ? "b--green2 green2" : "b--gray2 gray2 b--gray2-d gray2-d");
 
                 let dropdownClass = (state.open)
                   ? "absolute db z-2 bg-white bg-gray0-d white-d ba b--gray3 b--gray1-d"

@@ -13,7 +13,7 @@ export class Skeleton extends Component {
     return (
       React.createElement('div', { className: "h-100 w-100 ph4-m ph4-l ph4-xl pb4-m pb4-l pb4-xl"       , __self: this, __source: {fileName: _jsxFileName, lineNumber: 14}}
         , React.createElement(HeaderBar, {__self: this, __source: {fileName: _jsxFileName, lineNumber: 15}} )
-        , React.createElement('div', { className: "cf w-100 h-100 h-100-m-40-ns flex ba-m ba-l ba-xl b--gray4 b--gray1-d br1"          , __self: this, __source: {fileName: _jsxFileName, lineNumber: 16}}
+        , React.createElement('div', { className: "cf w-100 h-100 flex ba-m ba-l ba-xl b--gray2 br1"        , __self: this, __source: {fileName: _jsxFileName, lineNumber: 16}}
           , React.createElement(CanvasSidebar, {
             activeDrawer: props.activeDrawer,
             history: props.history,

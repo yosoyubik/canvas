@@ -51,19 +51,20 @@ export class CanvasSidebar extends Component {
     }
 
     return (
-      React.createElement('div', { className: "bn br-m br-l br-xl b--gray4 b--gray1-d lh-copy h-100 " +
-       "flex-basis-30-ns flex-shrink-0 mw5-m mw5-l mw5-xl flex-basis-100-s " +
-        "relative overflow-hidden pt3 pt0-m pt0-l pt0-xl " + activeClasses, __self: this, __source: {fileName: _jsxFileName, lineNumber: 54}}
-        , React.createElement('a', { className: "db dn-m dn-l dn-xl f8 pb6 pl3"      , href: "/", __self: this, __source: {fileName: _jsxFileName, lineNumber: 57}}, "⟵ Landscape" )
-        , React.createElement('div', { className: "overflow-auto pb8 h-100"  , __self: this, __source: {fileName: _jsxFileName, lineNumber: 58}}
-          , React.createElement(Link, { to: "/~canvas/new", className: "dib", __self: this, __source: {fileName: _jsxFileName, lineNumber: 59}}
-            , React.createElement('p', { className: "f9 pt4 pl4 green2 bn"    , __self: this, __source: {fileName: _jsxFileName, lineNumber: 60}}, "Create Canvas" )
+      React.createElement('div', { className: "bn br-m br-xl b--gray4 b--gray2-d lh-copy h-100 " +
+       "flex-shrink-0 pt3 pt0-m pt0-l pt0-xl relative overflow-y-hidden " +
+        "dn-s flex-basis-100-s flex-basis-250-ns " + activeClasses, __self: this, __source: {fileName: _jsxFileName, lineNumber: 54}}
+
+        , React.createElement('a', { className: "db dn-m dn-l dn-xl f8 pb6 pl3"      , href: "/", __self: this, __source: {fileName: _jsxFileName, lineNumber: 58}}, "⟵ Landscape" )
+        , React.createElement('div', { className: "overflow-auto pb8 h-100 pr3"   , __self: this, __source: {fileName: _jsxFileName, lineNumber: 59}}
+          , React.createElement(Link, { to: "/~canvas/new", className: "dib", __self: this, __source: {fileName: _jsxFileName, lineNumber: 60}}
+            , React.createElement('p', { className: "green2 pa4 f9 dib"   , __self: this, __source: {fileName: _jsxFileName, lineNumber: 61}}, "New Canvas" )
           )
-          , React.createElement(Link, { to: "/~canvas/join", className: "dib", __self: this, __source: {fileName: _jsxFileName, lineNumber: 62}}
-            , React.createElement('p', { className: "f9 pt4 pl4 green2 bn"    , __self: this, __source: {fileName: _jsxFileName, lineNumber: 63}}, "Join Canvas" )
+          , React.createElement(Link, { to: "/~canvas/join", className: "dib", __self: this, __source: {fileName: _jsxFileName, lineNumber: 63}}
+            , React.createElement('p', { className: "f9 gray2" , __self: this, __source: {fileName: _jsxFileName, lineNumber: 64}}, "Join Canvas" )
           )
-          , React.createElement('div', { className: "pt1", __self: this, __source: {fileName: _jsxFileName, lineNumber: 65}}
-            , React.createElement('h2', { className: "f9 pt4 pr4 pb2 pl4 gray2 c-default"      , __self: this, __source: {fileName: _jsxFileName, lineNumber: 66}}, "My Canvas" )
+          , React.createElement('div', { className: "pt1", __self: this, __source: {fileName: _jsxFileName, lineNumber: 66}}
+            , React.createElement('h2', { className: "f9 pt4 pr4 pb2 pl4 gray2 c-default"      , __self: this, __source: {fileName: _jsxFileName, lineNumber: 67}}, "My Canvas" )
             ,  canvasItems 
           )
         )
