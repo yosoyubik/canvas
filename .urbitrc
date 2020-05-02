@@ -3,6 +3,7 @@ module.exports = {
     "/Users/jose/urbit/urbit.ubik/zod/base",
     "/Users/jose/urbit/urbit.ubik/pkg/arvo",
     "/Users/jose/urbit/urbit.ubik/lur/home",
+    "/Users/jose/urbit/urbit.ubik/sen/home",
     "/Users/jose/urbit/urbit.ubik/fyr/home",
   ]
 };

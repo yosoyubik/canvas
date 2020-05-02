@@ -40,7 +40,7 @@
   ==
 ::
 +$  canvas-update
-  $%  [%paint location=@p name=@t strokes=(list stroke)]
+  $%  [%paint location=@p name=@t strokes=(list stroke) who=@p]
       [%load name=@t =canvas]
   ==
 ::

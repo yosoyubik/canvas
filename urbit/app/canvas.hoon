@@ -207,13 +207,13 @@
   [%give %fact ~ %canvas-update !>([%load name u.canvas])]~
 ::
 ++  send-paint-update
-  |=  [name=@t strokes=(list stroke)]
+  |=  [name=@t strokes=(list stroke) who=@p]
   ^-  card
   :*  %give
       %fact
       [/canvas/(scot %tas name)]~
       %canvas-update
-      !>([%paint our.bowl name strokes])
+      !>([%paint our.bowl name strokes who])
   ==
 ::
 ++  check-file
@@ -432,8 +432,12 @@
     [%give %fact [/updates]~ %canvas-view !>([%load name canvas])]~
   ::
   ++  handle-paint
-    |=  [location=@p name=@t strokes=(list stroke)]
+    |=  [location=@p name=@t strokes=(list stroke) who=@p]
     ^-  (quip card _state)
+    ?:  =(who our.bowl)
+      ::  we receive an update for a stroke we originaly sent; discard
+      ::
+      `state
     (process-remote-paint location name strokes)
   --
 ::
@@ -465,12 +469,14 @@
       ::  stroke from a remote ship
       ::
       :: ~&  "foreign, udpate my frontend"
-      [%give %fact [/updates]~ %canvas-view !>([%paint location name strokes])]~
+      :~  [%give %fact [/updates]~ %canvas-view !>([%paint location name strokes])]
+          [(send-paint-update name strokes src.bowl)]
+      ==
     ::  stroke from frontend
     ::
     ?:  =(location our.bowl)
       :: ~&  'local canvas, send to subscribers'
-      [(send-paint-update name strokes)]~
+      [(send-paint-update name strokes our.bowl)]~
     :: ~&  'remote canvas, poke owner'
     [(update-remote-canvas location name strokes)]~
   ::
