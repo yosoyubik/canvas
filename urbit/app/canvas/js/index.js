@@ -57076,7 +57076,7 @@
                 const { props, state } = this;
 
                 let buttonOpened = (state.open)
-                  ? "gray22 bg-gray0-d b--gray2" : "green2 bg-gray0-d b--green2";
+                  ? "gray2 bg-gray0-d b--gray2" : "green2 bg-gray0-d b--green2";
 
                 let allowSend= "w-18 f9 ba pa2 pointer bg-transparent mb2 " +
                 ((state.chat && this.props.saved) ? "b--green2 green2" : "b--gray4 gray4 b--gray2-d gray2-d");
@@ -57140,8 +57140,8 @@
                         : null
                       
                       , react.createElement('p', { className: "tc bb b--gray3 b--gray1-d gray3 pt2 pb2 f9"       , __self: this, __source: {fileName: _jsxFileName$6, lineNumber: 140}}, "Chat Channels" )
-                      , react.createElement('div', { className: "db z-2 bg-white bg-gray0-d white-d ba b--gray3 b--gray1-d"       ,
-                          style: { maxHeight: "24rem", width: 227 },
+                      , react.createElement('div', { className: "db z-2 bg-white bg-gray0-d white-d b--gray3 b--gray1-d"      ,
+                          style: { maxHeight: "24rem", width: 226 },
                           ref: (el) => { this.dropdown = el; }, __self: this, __source: {fileName: _jsxFileName$6, lineNumber: 141}}
                         , chatList
                       )
@@ -57253,7 +57253,7 @@
                 console.log("saved", this.props.saved);
 
                 let buttonOpened = (state.open)
-                  ? "gray22 bg-gray0-d b--gray2" : "green2 bg-gray0-d b--green2";
+                  ? "gray2 bg-gray0-d b--gray2" : "green2 bg-gray0-d b--green2";
 
                 let saveClasses= "f9 ba pa2 pointer bg-transparent mt2 b--green2 green2";
 
