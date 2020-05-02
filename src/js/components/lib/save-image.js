@@ -77,7 +77,7 @@ export class SaveImage extends Component {
     console.log("saved", this.props.saved);
 
     let buttonOpened = (state.open)
-      ? "gray2 bg-gray0-d b--gray2" : "green2 bg-gray0-d b--green2";
+      ? "gray2 bg-white bg-gray0-d b--gray2" : "green2 bg-white bg-gray0-d b--green2";
 
     let saveClasses= "f9 ba pa2 pointer bg-transparent mt2 b--green2 green2";
 

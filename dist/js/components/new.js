@@ -127,7 +127,7 @@ export class NewScreen extends Component {
       ? "bg-gray5 bg-gray1-d white-d" : "hover-bg-gray5 hover-bg-gray1-d white-d";
 
     let allowCreate = "f9 ba pa2 pointer bg-transparent " +
-    (state.canvasName ? "b--green2 green2" : "b--gray4 gray4 b--gray2-d gray2-d")
+    (state.canvasName ? "b--green2 green2" : "b--gray2 gray2 b--gray2-d gray2-d")
 
     let dropdownClass = (state.open)
       ? "absolute db z-2 bg-white bg-gray0-d white-d ba b--gray3 b--gray1-d"

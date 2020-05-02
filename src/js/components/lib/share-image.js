@@ -74,7 +74,7 @@ export class ShareImage extends Component {
     const { props, state } = this;
 
     let buttonOpened = (state.open)
-      ? "gray2 bg-gray0-d b--gray2" : "green2 bg-gray0-d b--green2";
+      ? "gray2 bg-white bg-gray0-d b--gray2" : "green2 bg-white bg-gray0-d b--green2";
 
     let allowSend= "w-18 f9 ba pa2 pointer bg-transparent mb2 " +
     ((state.chat && this.props.saved) ? "b--green2 green2" : "b--gray4 gray4 b--gray2-d gray2-d")
