@@ -15,6 +15,7 @@ export class ShareImage extends Component {
     this.selectChat = this.selectChat.bind(this);
     this.toggleOpen = this.toggleOpen.bind(this);
     this.handleClickOutside = this.handleClickOutside.bind(this);
+    this.onClickShare = this.onClickShare.bind(this);
   }
 
   componentDidMount() {

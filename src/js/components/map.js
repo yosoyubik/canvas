@@ -19,6 +19,7 @@ export class MapCanvas extends Component {
     }
 
     this.onClickShare = this.onClickShare.bind(this);
+    this.onClickSave = this.onClickSave.bind(this);
   }
 
   componentDidMount() {
@@ -50,10 +51,7 @@ export class MapCanvas extends Component {
     if (removeColor) {
       d3.select(canvas).select(".legend").selectAll("*").remove();
     }
-    if (removeMesh) {
-      d3.select(canvas).select(".mesh-group").selectAll("*").remove();
-    }
-    const svgString = simpleParseSVG(d3.select(canvas).node(), 'mesh');
+    const svgString = simpleParseSVG(d3.select(canvas).node(), 'map');
     const chunkSize = Math.round(svgString.length / 4);
     let last = false;
     let i = 0;

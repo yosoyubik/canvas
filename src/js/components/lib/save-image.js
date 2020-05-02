@@ -17,6 +17,7 @@ export class SaveImage extends Component {
     this.removeMeshPalette = this.removeMeshPalette.bind(this);
     this.toggleOpen = this.toggleOpen.bind(this);
     this.handleClickOutside = this.handleClickOutside.bind(this);
+    this.onClickSave = this.onClickSave.bind(this);
   }
 
   componentDidMount() {

@@ -57020,6 +57020,7 @@
                 this.selectChat = this.selectChat.bind(this);
                 this.toggleOpen = this.toggleOpen.bind(this);
                 this.handleClickOutside = this.handleClickOutside.bind(this);
+                this.onClickShare = this.onClickShare.bind(this);
               }
 
               componentDidMount() {
@@ -57087,7 +57088,7 @@
                   ? "absolute db z-2 bg-white bg-gray0-d white-d ba b--gray3 b--gray1-d"
                   : "dn";
 
-                let chatList = react.createElement('div', {__self: this, __source: {fileName: _jsxFileName$6, lineNumber: 85}} );
+                let chatList = react.createElement('div', {__self: this, __source: {fileName: _jsxFileName$6, lineNumber: 86}} );
                 if (state.results) {
                   chatList = state.results.map((path, i) => {
                     const elements = path.split("/");
@@ -57096,27 +57097,27 @@
                     return (
                       react.createElement('li', { key: i,
                           className: "tl list white-d f9 pv2 ph3 pointer hover-bg-gray4 hover-bg-gray1-d inter"         ,
-                          onClick: () => this.selectChat(path, chat), __self: this, __source: {fileName: _jsxFileName$6, lineNumber: 92}}
-                        , react.createElement('span', { className: "mix-blend-diff white" , __self: this, __source: {fileName: _jsxFileName$6, lineNumber: 95}}, chat, " on "  , host)
+                          onClick: () => this.selectChat(path, chat), __self: this, __source: {fileName: _jsxFileName$6, lineNumber: 93}}
+                        , react.createElement('span', { className: "mix-blend-diff white" , __self: this, __source: {fileName: _jsxFileName$6, lineNumber: 96}}, chat, " on "  , host)
                       ))
                   });
                 }
 
                 return (
-                  react.createElement('div', { className: "ml1 dib" , __self: this, __source: {fileName: _jsxFileName$6, lineNumber: 101}}
+                  react.createElement('div', { className: "ml1 dib" , __self: this, __source: {fileName: _jsxFileName$6, lineNumber: 102}}
                     , react.createElement('div', { className: buttonOpened,
                     onClick: () => this.toggleOpen(),
-                    ref: (el) => this.toggleButton = el, __self: this, __source: {fileName: _jsxFileName$6, lineNumber: 102}}
-                      , react.createElement('p', { className: "pointer f9 ba pv3 ph4 "     , __self: this, __source: {fileName: _jsxFileName$6, lineNumber: 105}}, "Share Image" )
+                    ref: (el) => this.toggleButton = el, __self: this, __source: {fileName: _jsxFileName$6, lineNumber: 103}}
+                      , react.createElement('p', { className: "pointer f9 ba pv3 ph4 "     , __self: this, __source: {fileName: _jsxFileName$6, lineNumber: 106}}, "Share Image" )
                     )
                     , react.createElement('div', { className: dropdownClass,
                       style: { maxHeight: "24rem", width: 228 },
-                      ref: (el) => { this.dropdown = el; }, __self: this, __source: {fileName: _jsxFileName$6, lineNumber: 107}}
-                      , react.createElement('div', { className: "relative mt2 w-100 ph4 pt2 pb2 ml1"      , __self: this, __source: {fileName: _jsxFileName$6, lineNumber: 110}}
+                      ref: (el) => { this.dropdown = el; }, __self: this, __source: {fileName: _jsxFileName$6, lineNumber: 108}}
+                      , react.createElement('div', { className: "relative mt2 w-100 ph4 pt2 pb2 ml1"      , __self: this, __source: {fileName: _jsxFileName$6, lineNumber: 111}}
                         ,  (this.props.saved) ?
                             react.createElement('button', {
                               onClick: this.onClickShare.bind(this),
-                              className: allowSend, __self: this, __source: {fileName: _jsxFileName$6, lineNumber: 112}}, "←"
+                              className: allowSend, __self: this, __source: {fileName: _jsxFileName$6, lineNumber: 113}}, "←"
 
                             )
                           : null
@@ -57131,21 +57132,21 @@
                             float: "left"
                           },
                           onChange: this.search.bind(this),
-                          ref: (el) => this.dropdown = el, __self: this, __source: {fileName: _jsxFileName$6, lineNumber: 119}}
+                          ref: (el) => this.dropdown = el, __self: this, __source: {fileName: _jsxFileName$6, lineNumber: 120}}
                         )
                       )
 
                       ,  (!(this.props.saved)) ?
-                          react.createElement('div', { className: "f9 ph4 pt2 pb3 mt7"    , __self: this, __source: {fileName: _jsxFileName$6, lineNumber: 134}}
-                            , react.createElement('p', { className: "mono", __self: this, __source: {fileName: _jsxFileName$6, lineNumber: 135}}, "A file does not exist."    )
-                            , react.createElement('p', { className: "mono", __self: this, __source: {fileName: _jsxFileName$6, lineNumber: 136}}, "Click on \"Export as File\" before sharing."      )
+                          react.createElement('div', { className: "f9 ph4 pt2 pb3 mt7"    , __self: this, __source: {fileName: _jsxFileName$6, lineNumber: 135}}
+                            , react.createElement('p', { className: "mono", __self: this, __source: {fileName: _jsxFileName$6, lineNumber: 136}}, "A file does not exist."    )
+                            , react.createElement('p', { className: "mono", __self: this, __source: {fileName: _jsxFileName$6, lineNumber: 137}}, "Click on \"Export as File\" before sharing."      )
                           )
                         : null
                       
-                      , react.createElement('p', { className: "tc bb b--gray3 b--gray1-d gray3 pt2 pb2 f9"       , __self: this, __source: {fileName: _jsxFileName$6, lineNumber: 140}}, "Chat Channels" )
+                      , react.createElement('p', { className: "tc bb b--gray3 b--gray1-d gray3 pt2 pb2 f9"       , __self: this, __source: {fileName: _jsxFileName$6, lineNumber: 141}}, "Chat Channels" )
                       , react.createElement('div', { className: "db z-2 bg-white bg-gray0-d white-d b--gray3 b--gray1-d"      ,
                           style: { maxHeight: "24rem", width: 226 },
-                          ref: (el) => { this.dropdown = el; }, __self: this, __source: {fileName: _jsxFileName$6, lineNumber: 141}}
+                          ref: (el) => { this.dropdown = el; }, __self: this, __source: {fileName: _jsxFileName$6, lineNumber: 142}}
                         , chatList
                       )
                     )
@@ -57196,6 +57197,7 @@
                 this.removeMeshPalette = this.removeMeshPalette.bind(this);
                 this.toggleOpen = this.toggleOpen.bind(this);
                 this.handleClickOutside = this.handleClickOutside.bind(this);
+                this.onClickSave = this.onClickSave.bind(this);
               }
 
               componentDidMount() {
@@ -57273,45 +57275,45 @@
                   : "relative bg-gray4 bg-gray1-d br3 h1 toggle v-mid z-0";
 
                 return (
-                  react.createElement('div', { className: "ml3 dib" , __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 97}}
+                  react.createElement('div', { className: "ml3 dib" , __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 98}}
                     , react.createElement('div', { className: buttonOpened,
                     onClick: () => this.toggleOpen(),
-                    ref: (el) => this.toggleButton = el, __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 98}}
-                      , react.createElement('p', { className: "pointer f9 ba pv3 ph4 "     , __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 101}}, "Export as File"  )
+                    ref: (el) => this.toggleButton = el, __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 99}}
+                      , react.createElement('p', { className: "pointer f9 ba pv3 ph4 "     , __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 102}}, "Export as File"  )
                     )
                     , react.createElement('div', { className: dropdownClass,
                       style: { maxHeight: "24rem", width: 228, right: "0px" },
-                      ref: (el) => { this.dropdown = el; }, __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 103}}
+                      ref: (el) => { this.dropdown = el; }, __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 104}}
                       ,  (props.hasMesh) ?
-                          (react.createElement('div', { className: "mv1", __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 107}}
+                          (react.createElement('div', { className: "mv1", __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 108}}
                             , react.createElement('input', {
                               type: "checkbox",
                               style: { WebkitAppearance: "none", width: 28 },
                               className: removeMeshClass,
-                              onChange: this.removeMeshPalette, __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 108}}
+                              onChange: this.removeMeshPalette, __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 109}}
                             )
-                            , react.createElement('span', { className: "dib f9 white-d inter ml3"    , __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 114}}, "Remove Hexagonal Mesh"  )
-                            , react.createElement('p', { className: "f9 gray2 pt1"  , style: { paddingLeft: 40 }, __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 115}}, "Keeping the hexagonal mesh would increase the file size."
+                            , react.createElement('span', { className: "dib f9 white-d inter ml3"    , __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 115}}, "Remove Hexagonal Mesh"  )
+                            , react.createElement('p', { className: "f9 gray2 pt1"  , style: { paddingLeft: 40 }, __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 116}}, "Keeping the hexagonal mesh would increase the file size."
 
                             )
                           )
                         ) : null
                       
-                      , react.createElement('div', { className: "mv1", __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 121}}
+                      , react.createElement('div', { className: "mv1", __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 122}}
                         , react.createElement('input', {
                           type: "checkbox",
                           style: { WebkitAppearance: "none", width: 28 },
                           className: removeColorPaletteClass,
-                          onChange: this.removeColorPalette, __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 122}}
+                          onChange: this.removeColorPalette, __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 123}}
                         )
-                        , react.createElement('span', { className: "dib f9 white-d inter ml3"    , __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 128}}, "Remove Color Palette"  )
+                        , react.createElement('span', { className: "dib f9 white-d inter ml3"    , __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 129}}, "Remove Color Palette"  )
                       )
                       , react.createElement('button', {
                         onClick: this.onClickSave.bind(this),
-                        className: saveClasses, __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 130}}, "Save"
+                        className: saveClasses, __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 131}}, "Save"
 
                       )
-                      , react.createElement(Spinner, { awaiting: this.state.awaiting, classes: "mt4", text: "Saving image..." , __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 135}} )
+                      , react.createElement(Spinner, { awaiting: this.state.awaiting, classes: "mt4", text: "Saving image..." , __self: this, __source: {fileName: _jsxFileName$8, lineNumber: 136}} )
                     )
                   )
 
@@ -57891,6 +57893,7 @@
                 };
 
                 this.onClickShare = this.onClickShare.bind(this);
+                this.onClickSave = this.onClickSave.bind(this);
               }
 
               componentDidMount() {
@@ -57922,10 +57925,7 @@
                 if (removeColor) {
                   select(canvas).select(".legend").selectAll("*").remove();
                 }
-                if (removeMesh) {
-                  select(canvas).select(".mesh-group").selectAll("*").remove();
-                }
-                const svgString = simpleParseSVG(select(canvas).node(), 'mesh');
+                const svgString = simpleParseSVG(select(canvas).node(), 'map');
                 const chunkSize = Math.round(svgString.length / 4);
                 let i = 0;
                 while (i < svgString.length) {
@@ -57973,21 +57973,21 @@
                 }
 
                 return (
-                  react.createElement('div', { className: "h-100 w-100 pa3 pt4 bg-gray0-d white-d flex flex-column"       , __self: this, __source: {fileName: _jsxFileName$a, lineNumber: 106}}
-                    , react.createElement('div', { className: "w-100 dn-m dn-l dn-xl inter pt1 pb6 f8"       , __self: this, __source: {fileName: _jsxFileName$a, lineNumber: 107}}
-                      , react.createElement(Link, { to: "/~canvas/", __self: this, __source: {fileName: _jsxFileName$a, lineNumber: 108}}, "⟵ Canvas")
+                  react.createElement('div', { className: "h-100 w-100 pa3 pt4 bg-gray0-d white-d flex flex-column"       , __self: this, __source: {fileName: _jsxFileName$a, lineNumber: 104}}
+                    , react.createElement('div', { className: "w-100 dn-m dn-l dn-xl inter pt1 pb6 f8"       , __self: this, __source: {fileName: _jsxFileName$a, lineNumber: 105}}
+                      , react.createElement(Link, { to: "/~canvas/", __self: this, __source: {fileName: _jsxFileName$a, lineNumber: 106}}, "⟵ Canvas")
                     )
                     , react.createElement('div', { className: "absolute mw5" ,
-                         style: {right: "20px", top: "20px"}, __self: this, __source: {fileName: _jsxFileName$a, lineNumber: 110}}
+                         style: {right: "20px", top: "20px"}, __self: this, __source: {fileName: _jsxFileName$a, lineNumber: 108}}
                       
-                      , react.createElement(ShareImage, { chats: this.props.chats, share: this.onClickShare, saved: props.metadata.saved, __self: this, __source: {fileName: _jsxFileName$a, lineNumber: 113}})
-                      , react.createElement(SaveImage, { save: this.onClickSave, hasMesh: false, saved: props.metadata.saved, __self: this, __source: {fileName: _jsxFileName$a, lineNumber: 114}} )
+                      , react.createElement(ShareImage, { chats: this.props.chats, share: this.onClickShare, saved: props.metadata.saved, __self: this, __source: {fileName: _jsxFileName$a, lineNumber: 111}})
+                      , react.createElement(SaveImage, { save: this.onClickSave, hasMesh: false, saved: props.metadata.saved, __self: this, __source: {fileName: _jsxFileName$a, lineNumber: 112}} )
                     )
-                    , react.createElement('div', { ref: "canvas", className: "w-100 mb4 pr6 pr0-l pr0-xl"    , __self: this, __source: {fileName: _jsxFileName$a, lineNumber: 116}}
-                      , react.createElement('svg', { className: "db", id: "canvas", width:  width$1 , height:  height$1 , __self: this, __source: {fileName: _jsxFileName$a, lineNumber: 117}}
-                        , react.createElement('g', { transform: "translate(25,25)", className: "foreground", style: { cursor: "pointer", strokeOpacity: .5 }, __self: this, __source: {fileName: _jsxFileName$a, lineNumber: 118}})
-                        , react.createElement('g', { transform: "translate(25,25)", className: "background", __self: this, __source: {fileName: _jsxFileName$a, lineNumber: 119}} )
-                        , react.createElement('g', { className: "legend", __self: this, __source: {fileName: _jsxFileName$a, lineNumber: 120}} )
+                    , react.createElement('div', { ref: "canvas", className: "w-100 mb4 pr6 pr0-l pr0-xl"    , __self: this, __source: {fileName: _jsxFileName$a, lineNumber: 114}}
+                      , react.createElement('svg', { className: "db", id: "canvas", width:  width$1 , height:  height$1 , __self: this, __source: {fileName: _jsxFileName$a, lineNumber: 115}}
+                        , react.createElement('g', { transform: "translate(25,25)", className: "foreground", style: { cursor: "pointer", strokeOpacity: .5 }, __self: this, __source: {fileName: _jsxFileName$a, lineNumber: 116}})
+                        , react.createElement('g', { transform: "translate(25,25)", className: "background", __self: this, __source: {fileName: _jsxFileName$a, lineNumber: 117}} )
+                        , react.createElement('g', { className: "legend", __self: this, __source: {fileName: _jsxFileName$a, lineNumber: 118}} )
                       )
                     )
                   )
