@@ -23,7 +23,6 @@ export class Root extends Component {
   render() {
     const { props, state } = this;
     let canvasList = !!state.canvasList ? state.canvasList : {};
-
     return (
       <BrowserRouter>
         <div className="absolute h-100 w-100 bg-gray0-d ph4-m ph4-l ph4-xl pb4-m pb4-l pb4-xl">

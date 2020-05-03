@@ -15,7 +15,8 @@ export class UpdateReducer {
                 name: data.name,
                 type: data.type,
                 location: data.location,
-                saved: false
+                saved: false,
+                private: data.private
               },
               data: data.data
             };

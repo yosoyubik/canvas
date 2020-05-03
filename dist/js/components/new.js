@@ -22,7 +22,8 @@ export class NewScreen extends Component {
       searchTerm: "",
       results: Object.entries(templates),
       templates: templates,
-      awaiting: false
+      awaiting: false,
+      privacy: false
     }
 
     this.canvasNameChange = this.canvasNameChange.bind(this);
@@ -30,6 +31,7 @@ export class NewScreen extends Component {
     this.toggleOpen = this.toggleOpen.bind(this);
     this.search = this.search.bind(this);
     this.handleClickOutside = this.handleClickOutside.bind(this);
+    this.changePrivacy = this.changePrivacy.bind(this);
   }
 
   componentDidMount() {
@@ -97,7 +99,8 @@ export class NewScreen extends Component {
         state.canvasName,
         (state.template.includes("map")) ? "mesh" : state.template,
         '~' + ship,
-        state.template
+        state.template,
+        state.privacy
       ).then(() => {
         this.setState({
           awaiting: false
@@ -120,6 +123,12 @@ export class NewScreen extends Component {
     });
   }
 
+  changePrivacy(event) {
+    this.setState({
+      privacy: !!event.target.checked
+    });
+  }
+
   render() {
     const { props, state } = this;
 
@@ -133,34 +142,38 @@ export class NewScreen extends Component {
       ? "absolute db z-2 bg-white bg-gray0-d white-d ba b--gray3 b--gray1-d"
       : "dn";
 
+    let changePrivacyClass = state.privacy
+      ? "relative checked bg-green2 br3 h1 toggle v-mid z-0"
+      : "relative bg-gray4 bg-gray1-d br3 h1 toggle v-mid z-0";
+
     const templateList = state.results.map((each, i) => {
       return (
         React.createElement('li', { key: each[0],
             className: "tl list white-d f9 pv2 ph3 pointer hover-bg-gray4 hover-bg-gray1-d inter"         ,
-            onClick: () => this.selectTemplate(each[0]), __self: this, __source: {fileName: _jsxFileName, lineNumber: 138}}
-          , React.createElement('span', { className: "mix-blend-diff white" , __self: this, __source: {fileName: _jsxFileName, lineNumber: 141}}, each[1])
+            onClick: () => this.selectTemplate(each[0]), __self: this, __source: {fileName: _jsxFileName, lineNumber: 151}}
+          , React.createElement('span', { className: "mix-blend-diff white" , __self: this, __source: {fileName: _jsxFileName, lineNumber: 154}}, each[1])
         ))
     });
 
-    let displayNameErrElem = (React.createElement('span', {__self: this, __source: {fileName: _jsxFileName, lineNumber: 145}} ));
+    let displayNameErrElem = (React.createElement('span', {__self: this, __source: {fileName: _jsxFileName, lineNumber: 158}} ));
     if (this.state.displayNameError) {
       displayNameErrElem = (
-        React.createElement('span', { className: "f9 inter red2 ml3 mt1 db"     , __self: this, __source: {fileName: _jsxFileName, lineNumber: 148}}, "Canvas must have a title."
+        React.createElement('span', { className: "f9 inter red2 ml3 mt1 db"     , __self: this, __source: {fileName: _jsxFileName, lineNumber: 161}}, "Canvas must have a title."
 
         )
         );
     }
 
     return (
-      React.createElement('div', { className: "h-100 w-100 mw6 pa3 pt4 overflow-x-hidden bg-gray0-d white-d flex flex-column"         , __self: this, __source: {fileName: _jsxFileName, lineNumber: 155}}
-        , React.createElement('div', { className: "w-100 dn-m dn-l dn-xl inter pt1 pb6 f8"       , __self: this, __source: {fileName: _jsxFileName, lineNumber: 156}}
-          , React.createElement(Link, { to: "/~canvas/", __self: this, __source: {fileName: _jsxFileName, lineNumber: 157}}, "⟵ All Groups")
+      React.createElement('div', { className: "h-100 w-100 mw6 pa3 pt4 overflow-x-hidden bg-gray0-d white-d flex flex-column"         , __self: this, __source: {fileName: _jsxFileName, lineNumber: 168}}
+        , React.createElement('div', { className: "w-100 dn-m dn-l dn-xl inter pt1 pb6 f8"       , __self: this, __source: {fileName: _jsxFileName, lineNumber: 169}}
+          , React.createElement(Link, { to: "/~canvas/", __self: this, __source: {fileName: _jsxFileName, lineNumber: 170}}, "⟵ All Groups")
         )
-        , React.createElement('div', { className: "w-100 mb4 pr6 pr0-l pr0-xl"    , __self: this, __source: {fileName: _jsxFileName, lineNumber: 159}}
+        , React.createElement('div', { className: "w-100 mb4 pr6 pr0-l pr0-xl"    , __self: this, __source: {fileName: _jsxFileName, lineNumber: 172}}
 
-          , React.createElement('h2', { className: "f8 pt6" , __self: this, __source: {fileName: _jsxFileName, lineNumber: 161}}, "Create Canvas" )
+          , React.createElement('h2', { className: "f8 pt6" , __self: this, __source: {fileName: _jsxFileName, lineNumber: 174}}, "Create Canvas" )
 
-          , React.createElement('h2', { className: "f8", __self: this, __source: {fileName: _jsxFileName, lineNumber: 163}}, "Name")
+          , React.createElement('h2', { className: "f8", __self: this, __source: {fileName: _jsxFileName, lineNumber: 176}}, "Name")
           , React.createElement('textarea', {
             className: 
               "f7 ba b--gray3 b--gray2-d bg-gray0-d white-d pa3 db w-100 mt2 " +
@@ -173,12 +186,24 @@ export class NewScreen extends Component {
               height: 48,
               paddingTop: 14
             },
-            onChange: this.canvasNameChange, __self: this, __source: {fileName: _jsxFileName, lineNumber: 164}}
+            onChange: this.canvasNameChange, __self: this, __source: {fileName: _jsxFileName, lineNumber: 177}}
           )
           , displayNameErrElem
 
-          , React.createElement('h2', { className: "f8", __self: this, __source: {fileName: _jsxFileName, lineNumber: 180}}, "Template")
-          , React.createElement('div', { className: "w-100 pb4" , __self: this, __source: {fileName: _jsxFileName, lineNumber: 181}}
+          , React.createElement('div', { className: "mv7", __self: this, __source: {fileName: _jsxFileName, lineNumber: 193}}
+            , React.createElement('input', {
+              type: "checkbox",
+              style: { WebkitAppearance: "none", width: 28 },
+              className: changePrivacyClass,
+              onChange: this.changePrivacy, __self: this, __source: {fileName: _jsxFileName, lineNumber: 194}}
+            )
+            , React.createElement('span', { className: "dib f9 white-d inter ml3"    , __self: this, __source: {fileName: _jsxFileName, lineNumber: 200}}, "Private Canvas" )
+            , React.createElement('p', { className: "f9 gray2 pt1"  , style: { paddingLeft: 40 }, __self: this, __source: {fileName: _jsxFileName, lineNumber: 201}}, "Only Public Canvas can be accessed by others."
+
+            )
+          )
+          , React.createElement('h2', { className: "f8", __self: this, __source: {fileName: _jsxFileName, lineNumber: 205}}, "Template")
+          , React.createElement('div', { className: "w-100 pb4" , __self: this, __source: {fileName: _jsxFileName, lineNumber: 206}}
             , React.createElement('textarea', {
               className: 
                 "f7 ba b--gray3 b--gray2-d bg-gray0-d white-d pa3 db w-100 mt2 " +
@@ -193,24 +218,24 @@ export class NewScreen extends Component {
               },
               onChange: this.search,
               onClick: () => this.toggleOpen(),
-              ref: (el) => this.toggleButton = el, __self: this, __source: {fileName: _jsxFileName, lineNumber: 182}}
+              ref: (el) => this.toggleButton = el, __self: this, __source: {fileName: _jsxFileName, lineNumber: 207}}
             )
           )
           , React.createElement('div', { className: dropdownClass,
               style: { maxHeight: "24rem", width: 285 },
-              ref: (el) => { this.dropdown = el }, __self: this, __source: {fileName: _jsxFileName, lineNumber: 199}}
+              ref: (el) => { this.dropdown = el }, __self: this, __source: {fileName: _jsxFileName, lineNumber: 224}}
             , templateList
           )
 
           , React.createElement('button', {
             onClick: this.onClickCreate.bind(this),
-            className: allowCreate, __self: this, __source: {fileName: _jsxFileName, lineNumber: 205}}, "Create Canvas"
+            className: allowCreate, __self: this, __source: {fileName: _jsxFileName, lineNumber: 230}}, "Create Canvas"
 
           )
-          , React.createElement(Link, { to: "/~canvas", __self: this, __source: {fileName: _jsxFileName, lineNumber: 210}}
-            , React.createElement('button', { className: "f9 ml3 ba pa2 b--black pointer bg-transparent b--white-d white-d"        , __self: this, __source: {fileName: _jsxFileName, lineNumber: 211}}, "Cancel")
+          , React.createElement(Link, { to: "/~canvas", __self: this, __source: {fileName: _jsxFileName, lineNumber: 235}}
+            , React.createElement('button', { className: "f9 ml3 ba pa2 b--black pointer bg-transparent b--white-d white-d"        , __self: this, __source: {fileName: _jsxFileName, lineNumber: 236}}, "Cancel")
           )
-          , React.createElement(Spinner, { awaiting: this.state.awaiting, classes: "mt4", text: "Creating canvas..." , __self: this, __source: {fileName: _jsxFileName, lineNumber: 213}} )
+          , React.createElement(Spinner, { awaiting: this.state.awaiting, classes: "mt4", text: "Creating canvas..." , __self: this, __source: {fileName: _jsxFileName, lineNumber: 238}} )
         )
       )
     );

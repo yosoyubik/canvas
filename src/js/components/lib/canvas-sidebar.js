@@ -45,7 +45,9 @@ export class CanvasSidebar extends Component {
       canvasItems = Object.entries(props.canvasList).map((each, i) => {
         console.log(each, i);
         return (
-          <CanvasTitle key={i} id={each[0]} location={each[1].metadata.location} />
+          <CanvasTitle key={i} id={each[0]}
+           private={each[1].metadata.private}
+           location={each[1].metadata.location} />
         )
       });
     }
@@ -64,7 +66,7 @@ export class CanvasSidebar extends Component {
             <p className="f9 gray2">Join Canvas</p>
           </Link>
           <div className="pt1">
-            <h2 className="f9 pt4 pr4 pb2 pl4 gray2 c-default">My Canvas</h2>
+            <h2 className="f8 pr4 pb2 pl4 gray2 c-default">Gallery</h2>
             { canvasItems }
           </div>
         </div>

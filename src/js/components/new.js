@@ -22,7 +22,8 @@ export class NewScreen extends Component {
       searchTerm: "",
       results: Object.entries(templates),
       templates: templates,
-      awaiting: false
+      awaiting: false,
+      privacy: false
     }
 
     this.canvasNameChange = this.canvasNameChange.bind(this);
@@ -30,6 +31,7 @@ export class NewScreen extends Component {
     this.toggleOpen = this.toggleOpen.bind(this);
     this.search = this.search.bind(this);
     this.handleClickOutside = this.handleClickOutside.bind(this);
+    this.changePrivacy = this.changePrivacy.bind(this);
   }
 
   componentDidMount() {
@@ -97,7 +99,8 @@ export class NewScreen extends Component {
         state.canvasName,
         (state.template.includes("map")) ? "mesh" : state.template,
         '~' + ship,
-        state.template
+        state.template,
+        state.privacy
       ).then(() => {
         this.setState({
           awaiting: false
@@ -120,6 +123,12 @@ export class NewScreen extends Component {
     });
   }
 
+  changePrivacy(event) {
+    this.setState({
+      privacy: !!event.target.checked
+    });
+  }
+
   render() {
     const { props, state } = this;
 
@@ -132,6 +141,10 @@ export class NewScreen extends Component {
     let dropdownClass = (state.open)
       ? "absolute db z-2 bg-white bg-gray0-d white-d ba b--gray3 b--gray1-d"
       : "dn";
+
+    let changePrivacyClass = state.privacy
+      ? "relative checked bg-green2 br3 h1 toggle v-mid z-0"
+      : "relative bg-gray4 bg-gray1-d br3 h1 toggle v-mid z-0";
 
     const templateList = state.results.map((each, i) => {
       return (
@@ -177,6 +190,18 @@ export class NewScreen extends Component {
           />
           {displayNameErrElem}
 
+          <div className="mv7">
+            <input
+              type="checkbox"
+              style={{ WebkitAppearance: "none", width: 28 }}
+              className={changePrivacyClass}
+              onChange={this.changePrivacy}
+            />
+            <span className="dib f9 white-d inter ml3">Private Canvas</span>
+            <p className="f9 gray2 pt1" style={{ paddingLeft: 40 }}>
+              Only Public Canvas can be accessed by others.
+            </p>
+          </div>
           <h2 className="f8">Template</h2>
           <div className="w-100 pb4">
             <textarea

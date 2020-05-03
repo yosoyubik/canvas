@@ -94,16 +94,17 @@ class UrbitApi {
     });
   }
 
-  create(name, type, location, subtype) {
+  create(name, type, location, subtype, privacy) {
     console.log("creating");
     let create = {};
     create[type] = {
-      'canvas': null,
-      'metadata': {
-        'name': name,
-        'type': subtype,
-        'location': location,
-        'saved': false
+      canvas: null,
+      metadata: {
+        name: name,
+        type: subtype,
+        location: location,
+        saved: false,
+        private: privacy
       }
     };
     return this.action("canvas-view", "canvas-view", {

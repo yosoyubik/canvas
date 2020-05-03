@@ -15,7 +15,7 @@
 +$  form         [strokes=(list [@t @t]) line-width=@t style-stroke=@t]
 +$  mesh         (map @t arc)
 +$  draw         (list form)
-+$  metadata     [name=@t type=canvas-type location=ship saved=? public=?]
++$  metadata     [name=@t type=canvas-type location=ship saved=? private=?]
 +$  location     [host=ship canvas=@t]
 ::
 +$  canvas

@@ -203,8 +203,8 @@
   ~&  "send-init-canvas"
   =/  canvas=(unit canvas)  (~(get by gallery) [our.bowl name])
   ?~  canvas  `state
-  ?.  public.metadata.u.canvas
-    ~|([%subs-not-allowed name] !!)  
+  ?:  private.metadata.u.canvas
+    ~|([%subs-not-allowed name] !!)
   :_  state
   [%give %fact ~ %canvas-update !>([%load name u.canvas])]~
 ::
