@@ -5,7 +5,7 @@
       %mesh
       %draw
       %map-europe-europe
-      %map-africa
+      %map-africa-africa
       %map-us-counties
       %map-us-states
   ==

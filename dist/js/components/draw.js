@@ -150,7 +150,7 @@ export class DrawCanvas extends Component {
               className: "pointer ml6 f9 green2 bg-gray0-d ba pv3 ph4 b--green2"        , __self: this, __source: {fileName: _jsxFileName, lineNumber: 148}}, "Save Image"
 
             )
-            , React.createElement(Spinner, { awaiting: this.state.awaiting, classes: "absolute ml6 mt4"  , text: "Saving image..." , __self: this, __source: {fileName: _jsxFileName, lineNumber: 153}} )
+            , React.createElement(Spinner, { awaiting: this.state.awaiting, classes: "absolute ml6 mt4"  , text: "Saving...", __self: this, __source: {fileName: _jsxFileName, lineNumber: 153}} )
           )
         )
         , React.createElement('div', { ref: this.lineWidthRef, __self: this, __source: {fileName: _jsxFileName, lineNumber: 156}}

@@ -16,15 +16,23 @@ class Store {
         this.paintReducer = new PaintReducer();
         this.setState = () => { };
 
+        // From: https://bl.ocks.org/mbostock/raw/4090846/us.json
         fetch("/~canvas/map/us.json")
           .then((response) => response.json())
           .then((json) => {
             this.state.maps.us = json;
           });
+        // From: https://github.com/leakyMirror/map-of-europe/blob/master/TopoJSON/europe.topojson
         fetch("/~canvas/map/europe.json")
           .then((response) => response.json())
           .then((json) => {
             this.state.maps.europe = json;
+          });
+        // From: https://github.com/deldersveld/topojson/blob/master/continents/africa.json
+        fetch("/~canvas/map/africa.json")
+          .then((response) => response.json())
+          .then((json) => {
+            this.state.maps.africa = json;
           });
     }
 

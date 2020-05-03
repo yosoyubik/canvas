@@ -30,6 +30,11 @@ const initMapCanvas = (map, metadata) => {
         .center([13, 52])
       	.translate([width / 2, (height / 2) + 20])
       	.scale([width / 1.6]);
+    }else if (maps[1] === 'africa') {
+      var projection = d3.geoMercator()
+        .center([3.1, 5.6])
+      	.translate([width / 2, (height / 2.5)])
+      	.scale([width / 2]);
     }
     path = d3.geoPath(projection);
     console.log(map, maps);
@@ -66,7 +71,12 @@ const drawMapCanvas = (map, props) => {
 
   features.forEach(function(item, index, array) {
     console.log(item);
-    item.id = (Number.isInteger(item.id)) ? item.id.toString() : item.id;
+    if (item.id) {
+      item.id = (Number.isInteger(item.id)) ? item.id.toString() : item.id;
+    } else {
+      item.id = item.properties.geounit;
+    }
+
     item.name = canvasName;
     array[index].attr = (canvasData && canvasData[item.id]) ? canvasData[item.id] : {};
   });

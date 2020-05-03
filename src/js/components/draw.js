@@ -150,7 +150,7 @@ export class DrawCanvas extends Component {
               className="pointer ml6 f9 green2 bg-gray0-d ba pv3 ph4 b--green2">
               Save Image
             </button>
-            <Spinner awaiting={this.state.awaiting} classes="absolute ml6 mt4" text="Saving image..." />
+            <Spinner awaiting={this.state.awaiting} classes="absolute ml6 mt4" text="Saving..." />
           </div>
         </div>
         <div ref={this.lineWidthRef}>

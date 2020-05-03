@@ -57524,6 +57524,11 @@
                     .center([13, 52])
                   	.translate([width$1 / 2, (height$1 / 2) + 20])
                   	.scale([width$1 / 1.6]);
+                }else if (maps[1] === 'africa') {
+                  var projection = mercator()
+                    .center([3.1, 5.6])
+                  	.translate([width$1 / 2, (height$1 / 2.5)])
+                  	.scale([width$1 / 2]);
                 }
                 path$1 = index$1(projection);
                 console.log(map, maps);
@@ -57560,7 +57565,12 @@
 
               features.forEach(function(item, index, array) {
                 console.log(item);
-                item.id = (Number.isInteger(item.id)) ? item.id.toString() : item.id;
+                if (item.id) {
+                  item.id = (Number.isInteger(item.id)) ? item.id.toString() : item.id;
+                } else {
+                  item.id = item.properties.geounit;
+                }
+
                 item.name = canvasName;
                 array[index].attr = (canvasData && canvasData[item.id]) ? canvasData[item.id] : {};
               });
@@ -57866,15 +57876,23 @@
                     this.paintReducer = new PaintReducer();
                     this.setState = () => { };
 
+                    // From: https://bl.ocks.org/mbostock/raw/4090846/us.json
                     fetch("/~canvas/map/us.json")
                       .then((response) => response.json())
                       .then((json) => {
                         this.state.maps.us = json;
                       });
+                    // From: https://github.com/leakyMirror/map-of-europe/blob/master/TopoJSON/europe.topojson
                     fetch("/~canvas/map/europe.json")
                       .then((response) => response.json())
                       .then((json) => {
                         this.state.maps.europe = json;
+                      });
+                    // From: https://github.com/deldersveld/topojson/blob/master/continents/africa.json
+                    fetch("/~canvas/map/africa.json")
+                      .then((response) => response.json())
+                      .then((json) => {
+                        this.state.maps.africa = json;
                       });
                 }
 
@@ -58136,7 +58154,7 @@
                           className: "pointer ml6 f9 green2 bg-gray0-d ba pv3 ph4 b--green2"        , __self: this, __source: {fileName: _jsxFileName$b, lineNumber: 148}}, "Save Image"
 
                         )
-                        , react.createElement(Spinner, { awaiting: this.state.awaiting, classes: "absolute ml6 mt4"  , text: "Saving image..." , __self: this, __source: {fileName: _jsxFileName$b, lineNumber: 153}} )
+                        , react.createElement(Spinner, { awaiting: this.state.awaiting, classes: "absolute ml6 mt4"  , text: "Saving...", __self: this, __source: {fileName: _jsxFileName$b, lineNumber: 153}} )
                       )
                     )
                     , react.createElement('div', { ref: this.lineWidthRef, __self: this, __source: {fileName: _jsxFileName$b, lineNumber: 156}}
@@ -58163,7 +58181,7 @@
                   'mesh': 'Hexagon Mesh',
                   'draw': 'Free-hand Canvas',
                   'map-europe-europe': 'Western Europe',
-                  'map-africa': 'Africa',
+                  'map-africa-africa': 'Africa',
                   'map-us-counties': 'U.S. Counties',
                   'map-us-states': 'U.S. States'
                 };

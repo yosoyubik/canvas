@@ -11,7 +11,7 @@ export class NewScreen extends Component {
       'mesh': 'Hexagon Mesh',
       'draw': 'Free-hand Canvas',
       'map-europe-europe': 'Western Europe',
-      'map-africa': 'Africa',
+      'map-africa-africa': 'Africa',
       'map-us-counties': 'U.S. Counties',
       'map-us-states': 'U.S. States'
     };
