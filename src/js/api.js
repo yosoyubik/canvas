@@ -59,7 +59,7 @@ class UrbitApi {
   }
 
   shareImage(name, chatPath, type) {
-    this.action("canvas-view", "canvas-view", {
+    return this.action("canvas-view", "canvas-view", {
       share: {
         'canvas-name': name,
         'chat-path': chatPath,
@@ -118,17 +118,6 @@ class UrbitApi {
       paint: strokes
     });
   }
-
-  // paint(name, location, stroke) {
-  //   console.log(name, stroke);
-  //   this.action("canvas-view", "canvas-view", {
-  //     paint: {
-  //       'canvas-name': name,
-  //       'stroke': stroke,
-  //       'location': location
-  //     }
-  //   });
-  // }
 
   action(appl, mark, data) {
     return new Promise((resolve, reject) => {

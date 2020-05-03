@@ -17,8 +17,6 @@ export class MapCanvas extends Component {
     this.state = {
       name: ''
     }
-
-    this.onClickShare = this.onClickShare.bind(this);
     this.onClickSave = this.onClickSave.bind(this);
   }
 
@@ -31,17 +29,6 @@ export class MapCanvas extends Component {
       initMapCanvas(json, props.metadata);
       drawMapCanvas(json, props, path);
       createColorPicker(width);
-      // fetch("/~canvas/map/" + maps[1] + ".json")
-      //   .then((response) => response.json())
-      //   .then((json) => {
-      //     const path = initMapCanvas(json, props.metadata);
-      //     drawMapCanvas(json, props, path);
-      //     createColorPicker(width);
-      //     this.setState({
-      //       data: json,
-      //       path: path
-      //     });
-      //   });
       }
   }
 
@@ -67,27 +54,6 @@ export class MapCanvas extends Component {
     }
   }
 
-  onClickShare (chatPath) {
-    const { props, state, animationRef } = this;
-    // this.setState({
-    //   error: false,
-    //   success: true,
-    //   awaiting: true
-    // }, () => {
-    //   props.api.canvas.create(
-    //     state.canvasName,
-    //     state.template,
-    //     '~' + ship
-    //   ).then(() => {
-    //     this.setState({
-    //       awaiting: false
-    //     });
-    //     props.history.push(`/~canvas/item/${state.canvasName}`);
-    //   })
-    // });
-    props.api.image.share(this.props.name, chatPath, 'svg');
-  }
-
   render() {
     const { props, state, animationRef } = this;
     d3.select(".foreground").selectAll("path").remove();
@@ -101,21 +67,22 @@ export class MapCanvas extends Component {
     }
 
     return (
-      React.createElement('div', { className: "h-100 w-100 pa3 pt4 bg-gray0-d white-d flex flex-column"       , __self: this, __source: {fileName: _jsxFileName, lineNumber: 104}}
-        , React.createElement('div', { className: "w-100 dn-m dn-l dn-xl inter pt1 pb6 f8"       , __self: this, __source: {fileName: _jsxFileName, lineNumber: 105}}
-          , React.createElement(Link, { to: "/~canvas/", __self: this, __source: {fileName: _jsxFileName, lineNumber: 106}}, "⟵ Canvas")
+      React.createElement('div', { className: "h-100 w-100 pa3 pt4 bg-gray0-d white-d flex flex-column"       , __self: this, __source: {fileName: _jsxFileName, lineNumber: 70}}
+        , React.createElement('div', { className: "w-100 dn-m dn-l dn-xl inter pt1 pb6 f8"       , __self: this, __source: {fileName: _jsxFileName, lineNumber: 71}}
+          , React.createElement(Link, { to: "/~canvas/", __self: this, __source: {fileName: _jsxFileName, lineNumber: 72}}, "⟵ Canvas")
         )
         , React.createElement('div', { className: "absolute mw5" ,
-             style: {right: "20px", top: "20px"}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 108}}
+             style: {right: "20px", top: "20px"}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 74}}
           
-          , React.createElement(ShareImage, { chats: this.props.chats, share: this.onClickShare, saved: props.metadata.saved, __self: this, __source: {fileName: _jsxFileName, lineNumber: 111}})
-          , React.createElement(SaveImage, { save: this.onClickSave, hasMesh: false, saved: props.metadata.saved, __self: this, __source: {fileName: _jsxFileName, lineNumber: 112}} )
+          , React.createElement(ShareImage, { chats: props.chats, name: props.name, type: 'svg',
+                      saved: props.metadata.saved, api: props.api, __self: this, __source: {fileName: _jsxFileName, lineNumber: 77}})
+          , React.createElement(SaveImage, { save: this.onClickSave, hasMesh: false, saved: props.metadata.saved, __self: this, __source: {fileName: _jsxFileName, lineNumber: 79}} )
         )
-        , React.createElement('div', { ref: "canvas", className: "w-100 mb4 pr6 pr0-l pr0-xl"    , __self: this, __source: {fileName: _jsxFileName, lineNumber: 114}}
-          , React.createElement('svg', { className: "db", id: "canvas", width:  width , height:  height , __self: this, __source: {fileName: _jsxFileName, lineNumber: 115}}
-            , React.createElement('g', { transform: "translate(25,25)", className: "foreground", style: { cursor: "pointer", strokeOpacity: .5 }, __self: this, __source: {fileName: _jsxFileName, lineNumber: 116}})
-            , React.createElement('g', { transform: "translate(25,25)", className: "background", __self: this, __source: {fileName: _jsxFileName, lineNumber: 117}} )
-            , React.createElement('g', { className: "legend", __self: this, __source: {fileName: _jsxFileName, lineNumber: 118}} )
+        , React.createElement('div', { ref: "canvas", className: "w-100 mb4 pr6 pr0-l pr0-xl"    , __self: this, __source: {fileName: _jsxFileName, lineNumber: 81}}
+          , React.createElement('svg', { className: "db", id: "canvas", width:  width , height:  height , __self: this, __source: {fileName: _jsxFileName, lineNumber: 82}}
+            , React.createElement('g', { transform: "translate(25,25)", className: "foreground", style: { cursor: "pointer", strokeOpacity: .5 }, __self: this, __source: {fileName: _jsxFileName, lineNumber: 83}})
+            , React.createElement('g', { transform: "translate(25,25)", className: "background", __self: this, __source: {fileName: _jsxFileName, lineNumber: 84}} )
+            , React.createElement('g', { className: "legend", __self: this, __source: {fileName: _jsxFileName, lineNumber: 85}} )
           )
         )
       )

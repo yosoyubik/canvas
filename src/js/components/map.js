@@ -17,8 +17,6 @@ export class MapCanvas extends Component {
     this.state = {
       name: ''
     }
-
-    this.onClickShare = this.onClickShare.bind(this);
     this.onClickSave = this.onClickSave.bind(this);
   }
 
@@ -31,17 +29,6 @@ export class MapCanvas extends Component {
       initMapCanvas(json, props.metadata);
       drawMapCanvas(json, props, path);
       createColorPicker(width);
-      // fetch("/~canvas/map/" + maps[1] + ".json")
-      //   .then((response) => response.json())
-      //   .then((json) => {
-      //     const path = initMapCanvas(json, props.metadata);
-      //     drawMapCanvas(json, props, path);
-      //     createColorPicker(width);
-      //     this.setState({
-      //       data: json,
-      //       path: path
-      //     });
-      //   });
       }
   }
 
@@ -67,27 +54,6 @@ export class MapCanvas extends Component {
     }
   }
 
-  onClickShare (chatPath) {
-    const { props, state, animationRef } = this;
-    // this.setState({
-    //   error: false,
-    //   success: true,
-    //   awaiting: true
-    // }, () => {
-    //   props.api.canvas.create(
-    //     state.canvasName,
-    //     state.template,
-    //     '~' + ship
-    //   ).then(() => {
-    //     this.setState({
-    //       awaiting: false
-    //     });
-    //     props.history.push(`/~canvas/item/${state.canvasName}`);
-    //   })
-    // });
-    props.api.image.share(this.props.name, chatPath, 'svg');
-  }
-
   render() {
     const { props, state, animationRef } = this;
     d3.select(".foreground").selectAll("path").remove();
@@ -108,7 +74,8 @@ export class MapCanvas extends Component {
         <div className="absolute mw5"
              style={{right: "20px", top: "20px"}}
           >
-          <ShareImage chats={this.props.chats} share={this.onClickShare} saved={props.metadata.saved}/>
+          <ShareImage chats={props.chats} name={props.name} type={'svg'}
+                      saved={props.metadata.saved} api={props.api}/>
           <SaveImage save={this.onClickSave} hasMesh={false} saved={props.metadata.saved} />
         </div>
         <div ref="canvas" className="w-100 mb4 pr6 pr0-l pr0-xl">

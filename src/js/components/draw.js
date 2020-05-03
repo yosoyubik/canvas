@@ -31,7 +31,6 @@ export class DrawCanvas extends Component {
     this.onChangeLine = this.onChangeLine.bind(this);
     this.onChangeColor = this.onChangeColor.bind(this);
     this.onClickSave = this.onClickSave.bind(this);
-    this.onClickShare = this.onClickShare.bind(this);
   }
 
   componentDidUpdate() {
@@ -64,27 +63,7 @@ export class DrawCanvas extends Component {
     // });
     //
     initDrawCanvas();
-    console.log(state.line, state.color);
     drawHexCanvas(props, state.line, state.color);
-    if (props.canvas.length) {
-
-    //   (async () => {
-    //     const forms = await observer.value("inputData");
-    //     props.canvas.concat(forms)
-    //     // console.log(props.canvas);
-    //     observer.redefine("inputData", props.canvas);
-    //     observer.redefine("exposedData", props.canvas);
-    //     // Re-render
-    //     // runtime.module(notebook, name => {
-    //     //   console.log(name);
-    //     //   if (name === "viewof exposedData") {
-    //     //     return Inspector.into(drawRef.current);
-    //     //   }
-    //     // });
-    //   })();
-    }
-
-    // this.setState({observer: observer});
   }
 
   // TODO: setStrokes doesn't know when the mouse stops moving
@@ -131,10 +110,6 @@ export class DrawCanvas extends Component {
     this.setState({ color: event.target.value });
   }
 
-  onClickShare (chatPath) {
-    this.props.api.image.share(this.props.name, chatPath, 'png');
-  }
-
   render() {
     const { props, state, onChangeLine, onChangeColor } = this;
 
@@ -143,7 +118,8 @@ export class DrawCanvas extends Component {
         <div className="absolute mw5"
              style={{right: "20px", top: "20px"}}
           >
-          <ShareImage chats={this.props.chats} share={this.onClickShare} saved={this.props.metadata.saved}/>
+          <ShareImage chats={props.chats} name={props.name} type={'png'}
+                      saved={props.metadata.saved} api={props.api}/>
           <div className="ml1 dib">
             <button
               onClick={this.onClickSave.bind(this)}

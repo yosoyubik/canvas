@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
-
 import { Route, Link } from 'react-router-dom';
+import { Spinner } from './icons/icon-spinner';
+
 
 export class ShareImage extends Component {
   constructor(props) {
@@ -9,7 +10,8 @@ export class ShareImage extends Component {
       open: false,
       placeholder: 'filter by name',
       results: [],
-      chatName: "?"
+      chatName: "?",
+      awaiting: false
     }
 
     this.selectChat = this.selectChat.bind(this);
@@ -46,8 +48,18 @@ export class ShareImage extends Component {
   }
 
   onClickShare () {
-    if (this.state.chat && this.props.saved){
-      this.props.share(this.state.chat);
+    const { props, state } = this;
+    if (state.chat && props.saved){
+      this.setState({
+        awaiting: true
+      }, () => {
+        console.log("awaiting");
+        props.api.image.share(props.name, state.chat, props.type).then(() => {
+          this.setState({
+            awaiting: false
+          });
+        });
+      });
     }
   }
 
@@ -129,7 +141,9 @@ export class ShareImage extends Component {
               onChange={this.search.bind(this)}
               ref={(el) => this.dropdown = el}
             />
+            <Spinner awaiting={this.state.awaiting} classes="mt4" text="Sharing in chat..." />
           </div>
+
 
           { (!(this.props.saved)) ?
               <div className="f9 ph4 pt2 pb3 mt7">

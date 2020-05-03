@@ -21,12 +21,10 @@ export class Hexagons extends Component {
       name: '',
       data: {}
     }
-    this.onClickShare = this.onClickShare.bind(this);
     this.onClickSave = this.onClickSave.bind(this);
   }
 
   componentDidMount() {
-    // console.log("mounting");
     drawHexCanvas(this.props);
     initHexMesh();
     createColorPicker(width);
@@ -57,26 +55,6 @@ export class Hexagons extends Component {
     }
   }
 
-  onClickShare (chatPath) {
-    // this.setState({
-    //   error: false,
-    //   success: true,
-    //   awaiting: true
-    // }, () => {
-    //   props.api.canvas.create(
-    //     state.canvasName,
-    //     state.template,
-    //     '~' + ship
-    //   ).then(() => {
-    //     this.setState({
-    //       awaiting: false
-    //     });
-    //     props.history.push(`/~canvas/item/${state.canvasName}`);
-    //   })
-    // });
-    this.props.api.image.share(this.props.name, chatPath, 'svg');
-  }
-
   render() {
     const { props, state } = this;
     d3.select(".hexagon").selectAll("path").remove();
@@ -93,7 +71,8 @@ export class Hexagons extends Component {
           <div className="absolute mw5"
                style={{right: "20px", top: "20px"}}
             >
-            <ShareImage chats={this.props.chats} share={this.onClickShare} saved={props.metadata.saved}/>
+            <ShareImage chats={props.chats} name={props.name} type={'svg'}
+                        saved={props.metadata.saved} api={props.api}/>
             <SaveImage save={this.onClickSave} hasMesh={true} saved={props.metadata.saved} />
           </div> : null
         }

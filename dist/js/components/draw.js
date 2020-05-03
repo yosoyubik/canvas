@@ -31,7 +31,6 @@ export class DrawCanvas extends Component {
     this.onChangeLine = this.onChangeLine.bind(this);
     this.onChangeColor = this.onChangeColor.bind(this);
     this.onClickSave = this.onClickSave.bind(this);
-    this.onClickShare = this.onClickShare.bind(this);
   }
 
   componentDidUpdate() {
@@ -64,27 +63,7 @@ export class DrawCanvas extends Component {
     // });
     //
     initDrawCanvas();
-    console.log(state.line, state.color);
     drawHexCanvas(props, state.line, state.color);
-    if (props.canvas.length) {
-
-    //   (async () => {
-    //     const forms = await observer.value("inputData");
-    //     props.canvas.concat(forms)
-    //     // console.log(props.canvas);
-    //     observer.redefine("inputData", props.canvas);
-    //     observer.redefine("exposedData", props.canvas);
-    //     // Re-render
-    //     // runtime.module(notebook, name => {
-    //     //   console.log(name);
-    //     //   if (name === "viewof exposedData") {
-    //     //     return Inspector.into(drawRef.current);
-    //     //   }
-    //     // });
-    //   })();
-    }
-
-    // this.setState({observer: observer});
   }
 
   // TODO: setStrokes doesn't know when the mouse stops moving
@@ -131,37 +110,34 @@ export class DrawCanvas extends Component {
     this.setState({ color: event.target.value });
   }
 
-  onClickShare (chatPath) {
-    this.props.api.image.share(this.props.name, chatPath, 'png');
-  }
-
   render() {
     const { props, state, onChangeLine, onChangeColor } = this;
 
     return (
-      React.createElement('div', { className: "h-100 w-100 pa3 pt4 bg-gray0-d white-d flex flex-column"       , __self: this, __source: {fileName: _jsxFileName, lineNumber: 142}}
+      React.createElement('div', { className: "h-100 w-100 pa3 pt4 bg-gray0-d white-d flex flex-column"       , __self: this, __source: {fileName: _jsxFileName, lineNumber: 117}}
         , React.createElement('div', { className: "absolute mw5" ,
-             style: {right: "20px", top: "20px"}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 143}}
+             style: {right: "20px", top: "20px"}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 118}}
           
-          , React.createElement(ShareImage, { chats: this.props.chats, share: this.onClickShare, saved: this.props.metadata.saved, __self: this, __source: {fileName: _jsxFileName, lineNumber: 146}})
-          , React.createElement('div', { className: "ml1 dib" , __self: this, __source: {fileName: _jsxFileName, lineNumber: 147}}
+          , React.createElement(ShareImage, { chats: props.chats, name: props.name, type: 'png',
+                      saved: props.metadata.saved, api: props.api, __self: this, __source: {fileName: _jsxFileName, lineNumber: 121}})
+          , React.createElement('div', { className: "ml1 dib" , __self: this, __source: {fileName: _jsxFileName, lineNumber: 123}}
             , React.createElement('button', {
               onClick: this.onClickSave.bind(this),
-              className: "pointer ml6 f9 green2 bg-gray0-d ba pv3 ph4 b--green2"        , __self: this, __source: {fileName: _jsxFileName, lineNumber: 148}}, "Save Image"
+              className: "pointer ml6 f9 green2 bg-gray0-d ba pv3 ph4 b--green2"        , __self: this, __source: {fileName: _jsxFileName, lineNumber: 124}}, "Save Image"
 
             )
-            , React.createElement(Spinner, { awaiting: this.state.awaiting, classes: "absolute ml6 mt4"  , text: "Saving...", __self: this, __source: {fileName: _jsxFileName, lineNumber: 153}} )
+            , React.createElement(Spinner, { awaiting: this.state.awaiting, classes: "absolute ml6 mt4"  , text: "Saving...", __self: this, __source: {fileName: _jsxFileName, lineNumber: 129}} )
           )
         )
-        , React.createElement('div', { ref: this.lineWidthRef, __self: this, __source: {fileName: _jsxFileName, lineNumber: 156}}
+        , React.createElement('div', { ref: this.lineWidthRef, __self: this, __source: {fileName: _jsxFileName, lineNumber: 132}}
           , React.createElement('input', { id: "line", type: "range", min: "0.5", max: "20", value: this.state.line,
-                 step: "0.5", style: {width:"120px"}, onChange: onChangeLine, __self: this, __source: {fileName: _jsxFileName, lineNumber: 157}} )
+                 step: "0.5", style: {width:"120px"}, onChange: onChangeLine, __self: this, __source: {fileName: _jsxFileName, lineNumber: 133}} )
         )
-        , React.createElement('div', { ref: this.strokeStyleRef, __self: this, __source: {fileName: _jsxFileName, lineNumber: 160}}
-          , React.createElement('input', { id: "color", type: "color", style: {width:"120px"}, onChange: onChangeColor, __self: this, __source: {fileName: _jsxFileName, lineNumber: 161}} )
+        , React.createElement('div', { ref: this.strokeStyleRef, __self: this, __source: {fileName: _jsxFileName, lineNumber: 136}}
+          , React.createElement('input', { id: "color", type: "color", style: {width:"120px"}, onChange: onChangeColor, __self: this, __source: {fileName: _jsxFileName, lineNumber: 137}} )
         )
-        , React.createElement('div', { ref: this.drawRef, __self: this, __source: {fileName: _jsxFileName, lineNumber: 163}}
-          , React.createElement('canvas', { id: "canvas", width: width, height: height, __self: this, __source: {fileName: _jsxFileName, lineNumber: 164}})
+        , React.createElement('div', { ref: this.drawRef, __self: this, __source: {fileName: _jsxFileName, lineNumber: 139}}
+          , React.createElement('canvas', { id: "canvas", width: width, height: height, __self: this, __source: {fileName: _jsxFileName, lineNumber: 140}})
         )
       )
     )
