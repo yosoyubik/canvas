@@ -39,7 +39,9 @@ export class MapCanvas extends Component {
       d3.select(canvas).select(".legend").selectAll("*").remove();
     }
     const svgString = simpleParseSVG(d3.select(canvas).node(), 'map');
-    const chunkSize = Math.round(svgString.length / 4);
+    // const chunkSize = Math.round(svgString.length / 4);
+    const chunkSize = 700 * 2**9;
+    console.log(chunkSize);
     let last = false;
     let i = 0;
     let chunks = [];

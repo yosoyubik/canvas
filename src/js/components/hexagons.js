@@ -40,7 +40,8 @@ export class Hexagons extends Component {
     }
     const svgString = simpleParseSVG(d3.select(canvas).node(), 'mesh');
     console.log("LENGTH", svgString.length);
-    const chunkSize = Math.round(svgString.length / 4);
+    // const chunkSize = Math.round(svgString.length / 4);
+    const chunkSize = 700 * 2**9;
     let last = false;
     let i = 0;
     let chunks = [];

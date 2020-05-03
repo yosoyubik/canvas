@@ -92,13 +92,23 @@ export class DrawCanvas extends Component {
     this.setState({
       awaiting: true
     }, () => {
-      const canvas = d3.select("canvas").node().toDataURL("image/png");
-      props.api.image.save(
-        props.metadata.location,
-        props.name,
-        canvas.split("base64,")[1],
-        true,
-        'png');
+      const canvas = d3.select("canvas")
+                  .node().toDataURL("image/png").split("base64,")[1];
+      console.log("LENGTH", canvas.length);
+      // const chunkSize = Math.round(svgString.length / 4);
+      const chunkSize = 700 * 2**9;
+      let last = false;
+      let i = 0;
+      let chunks = [];
+      while (i < canvas.length) {
+        props.api.image.save(
+          props.metadata.location,
+          props.name,
+          canvas.slice(i, chunkSize + i),
+          ((i + chunkSize ) >= canvas.length),
+          'png');
+        i += chunkSize;
+      }
     });
   }
 

@@ -40,7 +40,8 @@ export class Hexagons extends Component {
     }
     const svgString = simpleParseSVG(d3.select(canvas).node(), 'mesh');
     console.log("LENGTH", svgString.length);
-    const chunkSize = Math.round(svgString.length / 4);
+    // const chunkSize = Math.round(svgString.length / 4);
+    const chunkSize = 700 * 2**9;
     let last = false;
     let i = 0;
     let chunks = [];
@@ -63,26 +64,26 @@ export class Hexagons extends Component {
       drawHexCanvas(this.props);
     }
     return (
-      React.createElement('div', { className: "h-100 w-100 bg-gray0-d white-d flex flex-column"     , __self: this, __source: {fileName: _jsxFileName, lineNumber: 66}}
-        , React.createElement('div', { className: "w-100 dn-m dn-l dn-xl inter pt1 pb6 f8"       , __self: this, __source: {fileName: _jsxFileName, lineNumber: 67}}
-          , React.createElement(Link, { to: "/~canvas/", __self: this, __source: {fileName: _jsxFileName, lineNumber: 68}}, "⟵ Canvas")
+      React.createElement('div', { className: "h-100 w-100 bg-gray0-d white-d flex flex-column"     , __self: this, __source: {fileName: _jsxFileName, lineNumber: 67}}
+        , React.createElement('div', { className: "w-100 dn-m dn-l dn-xl inter pt1 pb6 f8"       , __self: this, __source: {fileName: _jsxFileName, lineNumber: 68}}
+          , React.createElement(Link, { to: "/~canvas/", __self: this, __source: {fileName: _jsxFileName, lineNumber: 69}}, "⟵ Canvas")
         )
         ,  (props.metadata.type !== 'welcome') ?
           React.createElement('div', { className: "absolute mw5" ,
-               style: {right: "20px", top: "20px"}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 71}}
+               style: {right: "20px", top: "20px"}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 72}}
             
             , React.createElement(ShareImage, { chats: props.chats, name: props.name, type: 'svg',
-                        saved: props.metadata.saved, api: props.api, __self: this, __source: {fileName: _jsxFileName, lineNumber: 74}})
-            , React.createElement(SaveImage, { save: this.onClickSave, hasMesh: true, saved: props.metadata.saved, __self: this, __source: {fileName: _jsxFileName, lineNumber: 76}} )
+                        saved: props.metadata.saved, api: props.api, __self: this, __source: {fileName: _jsxFileName, lineNumber: 75}})
+            , React.createElement(SaveImage, { save: this.onClickSave, hasMesh: true, saved: props.metadata.saved, __self: this, __source: {fileName: _jsxFileName, lineNumber: 77}} )
           ) : null
         
-        , React.createElement('div', { ref: "canvas", className: "w-100 pr0-l pr0-xl"  , style: {overflow: "hidden"}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 79}}
+        , React.createElement('div', { ref: "canvas", className: "w-100 pr0-l pr0-xl"  , style: {overflow: "hidden"}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 80}}
           , React.createElement('svg', { className: "db", id: "canvas", width: width, height: height,
                viewBox: `0 0 ${width} ${height}`,
-               perserveaspectratio: "xMinYMid", __self: this, __source: {fileName: _jsxFileName, lineNumber: 80}}
-            , React.createElement('g', { className: "hexagon", __self: this, __source: {fileName: _jsxFileName, lineNumber: 83}} )
-            , React.createElement('g', { className: "mesh-group", __self: this, __source: {fileName: _jsxFileName, lineNumber: 84}} )
-            , React.createElement('g', { className: "legend", __self: this, __source: {fileName: _jsxFileName, lineNumber: 85}} )
+               perserveaspectratio: "xMinYMid", __self: this, __source: {fileName: _jsxFileName, lineNumber: 81}}
+            , React.createElement('g', { className: "hexagon", __self: this, __source: {fileName: _jsxFileName, lineNumber: 84}} )
+            , React.createElement('g', { className: "mesh-group", __self: this, __source: {fileName: _jsxFileName, lineNumber: 85}} )
+            , React.createElement('g', { className: "legend", __self: this, __source: {fileName: _jsxFileName, lineNumber: 86}} )
           )
         )
       )

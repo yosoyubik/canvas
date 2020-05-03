@@ -114,7 +114,7 @@ export class SaveImage extends Component {
                 />
                 <span className="dib f9 white-d inter ml3">Remove Hexagonal Mesh</span>
                 <p className="f9 gray2 pt1" style={{ paddingLeft: 40 }}>
-                  Keeping the hexagonal mesh would increase the file size.
+                  Keeping the hexagonal mesh increases the file size.
                 </p>
               </div>
             ) : null
