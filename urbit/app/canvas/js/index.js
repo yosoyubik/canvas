@@ -58010,7 +58010,8 @@
               }
             }
 
-            const _jsxFileName$b = "/Users/jose/urbit/canvas/src/js/components/draw.js";// import { Runtime, Inspector } from "@observablehq/runtime";
+            const _jsxFileName$b = "/Users/jose/urbit/canvas/src/js/components/draw.js";
+            // import { Runtime, Inspector } from "@observablehq/runtime";
             // import notebook from "@yosoyubik/draw-me";
 
 
@@ -58021,7 +58022,8 @@
                 this.state = {
                   forms: [],
                   line: "1",
-                  color: "#000000"
+                  color: "#000000",
+                  awaiting: false
                 };
                 this.drawRef = react.createRef();
                 this.lineWidthRef = react.createRef();
@@ -58037,6 +58039,11 @@
               componentDidUpdate() {
                 console.log("componentDidUpdate", this.state.line, this.state.color);
                 drawHexCanvas$1(this.props, this.state.line, this.state.color);
+                if (this.state.awaiting && this.props.metadata.saved) {
+                  this.setState({
+                    awaiting: false
+                  });
+                }
               }
 
               componentDidMount() {
@@ -58089,15 +58096,17 @@
 
               onClickSave () {
                 const { props, state } = this;
-                const canvas = select("canvas").node().toDataURL("image/png");
-                // canvas.replace('data:image/png;base64,', '');
-                // .split("base64,")[1]
-                props.api.image.save(
-                  props.metadata.location,
-                  props.name,
-                  canvas.split("base64,")[1],
-                  true,
-                  'png');
+                this.setState({
+                  awaiting: true
+                }, () => {
+                  const canvas = select("canvas").node().toDataURL("image/png");
+                  props.api.image.save(
+                    props.metadata.location,
+                    props.name,
+                    canvas.split("base64,")[1],
+                    true,
+                    'png');
+                });
               }
 
               onChangeLine(event) {
@@ -58116,26 +58125,29 @@
                 const { props, state, onChangeLine, onChangeColor } = this;
 
                 return (
-                  react.createElement('div', { className: "h-100 w-100 pa3 pt4 bg-gray0-d white-d flex flex-column"       , __self: this, __source: {fileName: _jsxFileName$b, lineNumber: 132}}
+                  react.createElement('div', { className: "h-100 w-100 pa3 pt4 bg-gray0-d white-d flex flex-column"       , __self: this, __source: {fileName: _jsxFileName$b, lineNumber: 142}}
                     , react.createElement('div', { className: "absolute mw5" ,
-                         style: {right: "20px", top: "20px"}, __self: this, __source: {fileName: _jsxFileName$b, lineNumber: 133}}
+                         style: {right: "20px", top: "20px"}, __self: this, __source: {fileName: _jsxFileName$b, lineNumber: 143}}
                       
-                      , react.createElement(ShareImage, { chats: this.props.chats, share: this.onClickShare, saved: this.props.metadata.saved, __self: this, __source: {fileName: _jsxFileName$b, lineNumber: 136}})
-                      , react.createElement('button', {
-                        onClick: this.onClickSave.bind(this),
-                        className: "pointer ml6 f9 green2 bg-gray0-d ba pv3 ph4 b--green2"        , __self: this, __source: {fileName: _jsxFileName$b, lineNumber: 137}}, "Save Image"
+                      , react.createElement(ShareImage, { chats: this.props.chats, share: this.onClickShare, saved: this.props.metadata.saved, __self: this, __source: {fileName: _jsxFileName$b, lineNumber: 146}})
+                      , react.createElement('div', { className: "ml1 dib" , __self: this, __source: {fileName: _jsxFileName$b, lineNumber: 147}}
+                        , react.createElement('button', {
+                          onClick: this.onClickSave.bind(this),
+                          className: "pointer ml6 f9 green2 bg-gray0-d ba pv3 ph4 b--green2"        , __self: this, __source: {fileName: _jsxFileName$b, lineNumber: 148}}, "Save Image"
 
+                        )
+                        , react.createElement(Spinner, { awaiting: this.state.awaiting, classes: "absolute ml6 mt4"  , text: "Saving image..." , __self: this, __source: {fileName: _jsxFileName$b, lineNumber: 153}} )
                       )
                     )
-                    , react.createElement('div', { ref: this.lineWidthRef, __self: this, __source: {fileName: _jsxFileName$b, lineNumber: 143}}
+                    , react.createElement('div', { ref: this.lineWidthRef, __self: this, __source: {fileName: _jsxFileName$b, lineNumber: 156}}
                       , react.createElement('input', { id: "line", type: "range", min: "0.5", max: "20", value: this.state.line,
-                             step: "0.5", style: {width:"120px"}, onChange: onChangeLine, __self: this, __source: {fileName: _jsxFileName$b, lineNumber: 144}} )
+                             step: "0.5", style: {width:"120px"}, onChange: onChangeLine, __self: this, __source: {fileName: _jsxFileName$b, lineNumber: 157}} )
                     )
-                    , react.createElement('div', { ref: this.strokeStyleRef, __self: this, __source: {fileName: _jsxFileName$b, lineNumber: 147}}
-                      , react.createElement('input', { id: "color", type: "color", style: {width:"120px"}, onChange: onChangeColor, __self: this, __source: {fileName: _jsxFileName$b, lineNumber: 148}} )
+                    , react.createElement('div', { ref: this.strokeStyleRef, __self: this, __source: {fileName: _jsxFileName$b, lineNumber: 160}}
+                      , react.createElement('input', { id: "color", type: "color", style: {width:"120px"}, onChange: onChangeColor, __self: this, __source: {fileName: _jsxFileName$b, lineNumber: 161}} )
                     )
-                    , react.createElement('div', { ref: this.drawRef, __self: this, __source: {fileName: _jsxFileName$b, lineNumber: 150}}
-                      , react.createElement('canvas', { id: "canvas", width: width$2, height: height$2, __self: this, __source: {fileName: _jsxFileName$b, lineNumber: 151}})
+                    , react.createElement('div', { ref: this.drawRef, __self: this, __source: {fileName: _jsxFileName$b, lineNumber: 163}}
+                      , react.createElement('canvas', { id: "canvas", width: width$2, height: height$2, __self: this, __source: {fileName: _jsxFileName$b, lineNumber: 164}})
                     )
                   )
                 )
