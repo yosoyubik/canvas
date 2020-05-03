@@ -10,7 +10,7 @@ export default class canvasTile extends Component {
         <a className="w-100 h-100 db pa2 no-underline" href="/~canvas">
           <p className="black white-d absolute f9" style={{ left: 8, top: 8 }}>Canvas</p>
           <img
-            className="absolute invert-d"
+            className="absolute"
             style={{ left: 16, top: 26 }}
             src="/~canvas/img/Tile.png"
             width={90}
