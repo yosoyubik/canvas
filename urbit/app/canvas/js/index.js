@@ -48724,7 +48724,7 @@
               }
 
               joinCanvas(ship, name) {
-                this.action("canvas-view", "canvas-view", {
+                return this.action("canvas-view", "canvas-view", {
                   join: {
                     'ship': ship,
                     'canvas-name': name
@@ -66879,10 +66879,10 @@ lyrtesmudnytbyrsenwegfyrmurtelreptegpecnelnevfes\
 
               constructor(props) {
                 super(props);
-
                 this.state = {
                   canvas: '/',
-                  error: false
+                  error: false,
+                  awaiting: false,
                 };
 
                 this.canvasChange = this.canvasChange.bind(this);
@@ -66890,6 +66890,7 @@ lyrtesmudnytbyrsenwegfyrmurtelreptegpecnelnevfes\
 
               componentDidMount() {
                 const { props } = this;
+                console.log("componentDidMount");
                 if (props.autoJoin !== "/undefined/undefined" &&
                 props.autoJoin !== "/~/undefined/undefined") {
                   let canvas = props.autoJoin.split('/');
@@ -66907,26 +66908,31 @@ lyrtesmudnytbyrsenwegfyrmurtelreptegpecnelnevfes\
                     });
                     return;
                   }
+                  console.log("setting");
                   this.setState({
-                    canvas
+                    awaiting: true
                   }, () => {
-                    props.api.canvas.join(ship, canvas, true);
+                    console.log("awaiting");
+                    props.api.canvas.join(ship, canvasName).then(() => {
+                      this.setState({
+                        awaiting: false
+                      });
+                    });
                   });
                 }
               }
 
               componentDidUpdate(prevProps, prevState) {
-                const { props, state } = this;
-                let canvas = state.canvas.split('/');
-                let canvasName = canvas[canvas.length - 1];
-                if (canvasName in props.canvasList) {
-                  props.history.push(`/~canvas/item/${canvasName}`);
-                }
+                // let canvas = state.canvas.split('/');
+                // let canvasName = canvas[canvas.length - 1];
+                // if (canvasName in props.canvasList) {
+                //   props.history.push(`/~canvas/item/${canvasName}`);
+                // }
               }
 
               onClickJoin() {
                 const { props, state } = this;
-
+                console.log("onClickJoin");
                 let text = state.canvas;
 
                 let canvas = text.split('/');
@@ -66955,7 +66961,18 @@ lyrtesmudnytbyrsenwegfyrmurtelreptegpecnelnevfes\
                   });
                   return;
                 }
-                props.api.canvas.join(ship, canvasName);
+                console.log("setting");
+                this.setState({
+                  awaiting: true
+                }, () => {
+                  console.log("awaiting");
+                  props.api.canvas.join(ship, canvasName).then(() => {
+                    this.setState({
+                      awaiting: false
+                    });
+                    props.history.push(`/~canvas/item/${canvasName}`);
+                  });
+                });
               }
 
               canvasChange(event) {
@@ -66972,10 +66989,10 @@ lyrtesmudnytbyrsenwegfyrmurtelreptegpecnelnevfes\
                   joinClasses = 'db f9 gray2 ba pa2 b--gray3 bg-gray0-d pointer';
                 }
 
-                let errElem = (react.createElement('span', {__self: this, __source: {fileName: _jsxFileName$d, lineNumber: 104}} ));
+                let errElem = (react.createElement('span', {__self: this, __source: {fileName: _jsxFileName$d, lineNumber: 123}} ));
                 if (state.error) {
                   errElem = (
-                    react.createElement('span', { className: "f9 inter red2 db"   , __self: this, __source: {fileName: _jsxFileName$d, lineNumber: 107}}, "Canvas must have a valid name."
+                    react.createElement('span', { className: "f9 inter red2 db"   , __self: this, __source: {fileName: _jsxFileName$d, lineNumber: 126}}, "Canvas must have a valid name."
 
                     )
                   );
@@ -66983,15 +67000,15 @@ lyrtesmudnytbyrsenwegfyrmurtelreptegpecnelnevfes\
 
                 return (
                   react.createElement('div', { className: `h-100 w-100 pa3 pt2 overflow-x-hidden flex flex-column
-      bg-gray0-d white-d`, __self: this, __source: {fileName: _jsxFileName$d, lineNumber: 114}}
+      bg-gray0-d white-d`, __self: this, __source: {fileName: _jsxFileName$d, lineNumber: 133}}
                     , react.createElement('div', {
-                      className: "w-100 dn-m dn-l dn-xl inter pt1 pb6 f8"       , __self: this, __source: {fileName: _jsxFileName$d, lineNumber: 116}}
-                      , react.createElement(Link, { to: "/~canvas/", __self: this, __source: {fileName: _jsxFileName$d, lineNumber: 118}}, "⟵ All Chats")
+                      className: "w-100 dn-m dn-l dn-xl inter pt1 pb6 f8"       , __self: this, __source: {fileName: _jsxFileName$d, lineNumber: 135}}
+                      , react.createElement(Link, { to: "/~canvas/", __self: this, __source: {fileName: _jsxFileName$d, lineNumber: 137}}, "⟵ All Chats")
                     )
-                    , react.createElement('h2', { className: "mb3 f8" , __self: this, __source: {fileName: _jsxFileName$d, lineNumber: 120}}, "Join Existing Canvas"  )
-                    , react.createElement('div', { className: "w-100", __self: this, __source: {fileName: _jsxFileName$d, lineNumber: 121}}
-                      , react.createElement('p', { className: "f8 lh-copy mt3 db"   , __self: this, __source: {fileName: _jsxFileName$d, lineNumber: 122}}, "Enter a "  , react.createElement('span', { className: "mono", __self: this, __source: {fileName: _jsxFileName$d, lineNumber: 122}}, "~ship/canvas-name"), " or "  , react.createElement('span', { className: "mono", __self: this, __source: {fileName: _jsxFileName$d, lineNumber: 122}}, "~/~ship/canvas-name"))
-                      , react.createElement('p', { className: "f9 gray2 mb4"  , __self: this, __source: {fileName: _jsxFileName$d, lineNumber: 123}}, "Canvas names use lowercase, hyphens, and slashes."      )
+                    , react.createElement('h2', { className: "mb3 f8" , __self: this, __source: {fileName: _jsxFileName$d, lineNumber: 139}}, "Join Existing Canvas"  )
+                    , react.createElement('div', { className: "w-100", __self: this, __source: {fileName: _jsxFileName$d, lineNumber: 140}}
+                      , react.createElement('p', { className: "f8 lh-copy mt3 db"   , __self: this, __source: {fileName: _jsxFileName$d, lineNumber: 141}}, "Enter a "  , react.createElement('span', { className: "mono", __self: this, __source: {fileName: _jsxFileName$d, lineNumber: 141}}, "~ship/canvas-name"), " or "  , react.createElement('span', { className: "mono", __self: this, __source: {fileName: _jsxFileName$d, lineNumber: 141}}, "~/~ship/canvas-name"))
+                      , react.createElement('p', { className: "f9 gray2 mb4"  , __self: this, __source: {fileName: _jsxFileName$d, lineNumber: 142}}, "Canvas names use lowercase, hyphens, and slashes."      )
                       , react.createElement('textarea', {
                         ref:  e => { this.textarea = e; } ,
                         className: "f7 mono ba bg-gray0-d white-d pa3 mb2 db " +
@@ -67007,13 +67024,14 @@ lyrtesmudnytbyrsenwegfyrmurtelreptegpecnelnevfes\
                         style: {
                           resize: 'none',
                         },
-                        onChange: this.canvasChange, __self: this, __source: {fileName: _jsxFileName$d, lineNumber: 124}} )
+                        onChange: this.canvasChange, __self: this, __source: {fileName: _jsxFileName$d, lineNumber: 143}} )
                       , errElem
-                      , react.createElement('br', {__self: this, __source: {fileName: _jsxFileName$d, lineNumber: 141}} )
+                      , react.createElement('br', {__self: this, __source: {fileName: _jsxFileName$d, lineNumber: 160}} )
                       , react.createElement('button', {
                         onClick: this.onClickJoin.bind(this),
-                        className: joinClasses, __self: this, __source: {fileName: _jsxFileName$d, lineNumber: 142}}
+                        className: joinClasses, __self: this, __source: {fileName: _jsxFileName$d, lineNumber: 161}}
                       , "Join Canvas" )
+                      , react.createElement(Spinner, { awaiting: this.state.awaiting, classes: "mt4", text: "Joining canvas..." , __self: this, __source: {fileName: _jsxFileName$d, lineNumber: 165}} )
                     )
                   )
                 );

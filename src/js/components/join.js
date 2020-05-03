@@ -2,16 +2,17 @@ import React, { Component } from 'react';
 import classnames from 'classnames';
 import { Route, Link } from 'react-router-dom';
 import urbitOb from 'urbit-ob';
+import { Spinner } from './lib/icons/icon-spinner';
 
 
 export class JoinScreen extends Component {
 
   constructor(props) {
     super(props);
-
     this.state = {
       canvas: '/',
-      error: false
+      error: false,
+      awaiting: false,
     };
 
     this.canvasChange = this.canvasChange.bind(this);
@@ -19,6 +20,7 @@ export class JoinScreen extends Component {
 
   componentDidMount() {
     const { props } = this;
+    console.log("componentDidMount");
     if (props.autoJoin !== "/undefined/undefined" &&
     props.autoJoin !== "/~/undefined/undefined") {
       let canvas = props.autoJoin.split('/');
@@ -36,26 +38,32 @@ export class JoinScreen extends Component {
         });
         return;
       }
+      console.log("setting");
       this.setState({
-        canvas
+        awaiting: true
       }, () => {
-        props.api.canvas.join(ship, canvas, true);
+        console.log("awaiting");
+        props.api.canvas.join(ship, canvasName).then(() => {
+          this.setState({
+            awaiting: false
+          });
+        });
       });
     }
   }
 
   componentDidUpdate(prevProps, prevState) {
     const { props, state } = this;
-    let canvas = state.canvas.split('/');
-    let canvasName = canvas[canvas.length - 1];
-    if (canvasName in props.canvasList) {
-      props.history.push(`/~canvas/item/${canvasName}`);
-    }
+    // let canvas = state.canvas.split('/');
+    // let canvasName = canvas[canvas.length - 1];
+    // if (canvasName in props.canvasList) {
+    //   props.history.push(`/~canvas/item/${canvasName}`);
+    // }
   }
 
   onClickJoin() {
     const { props, state } = this;
-
+    console.log("onClickJoin");
     let text = state.canvas;
 
     let canvas = text.split('/');
@@ -84,7 +92,18 @@ export class JoinScreen extends Component {
       });
       return;
     }
-    props.api.canvas.join(ship, canvasName);
+    console.log("setting");
+    this.setState({
+      awaiting: true
+    }, () => {
+      console.log("awaiting");
+      props.api.canvas.join(ship, canvasName).then(() => {
+        this.setState({
+          awaiting: false
+        });
+        props.history.push(`/~canvas/item/${canvasName}`);
+      });
+    });
   }
 
   canvasChange(event) {
@@ -143,6 +162,7 @@ export class JoinScreen extends Component {
             onClick={this.onClickJoin.bind(this)}
             className={joinClasses}
           >Join Canvas</button>
+          <Spinner awaiting={this.state.awaiting} classes="mt4" text="Joining canvas..." />
         </div>
       </div>
     );

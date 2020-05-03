@@ -77,7 +77,7 @@ class UrbitApi {
   }
 
   joinCanvas(ship, name) {
-    this.action("canvas-view", "canvas-view", {
+    return this.action("canvas-view", "canvas-view", {
       join: {
         'ship': ship,
         'canvas-name': name
