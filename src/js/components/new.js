@@ -9,10 +9,9 @@ export class NewScreen extends Component {
     super(props);
     const templates = {
       'mesh': 'Hexagon Mesh',
-      'draw': 'Free-hand Canvas',
-      'map-europe-europe': 'Western Europe',
+      'draw': 'Freehand Canvas',
+      'map-europe-europe': 'Europe',
       'map-africa-africa': 'Africa',
-      'map-us-counties': 'U.S. Counties',
       'map-us-states': 'U.S. States'
     };
     this.state = {
