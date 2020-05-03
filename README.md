@@ -1,7 +1,6 @@
-# A Canvas App for Urbit
+# **Canvas** for *Urbit*
 
 ![Header](/images/canvas.png)
-
 
 ## Features
 
@@ -18,7 +17,7 @@
 
 ## Installation
 
-In order to run your application on your ship, you will need Urbit v.0.8.0 or higher. On your Urbit ship, if you haven't already, mount your pier to Unix with `|mount %`.
+In order to run your canvas app on your ship, before `|install` is implemented natively on urbit, you will need to mount your pier to Unix with `|mount %`.
 
 Then you need to add the path to you urbit's pier in .urbitrc. The file is not provided by this repo so you need to create it manually:
 
@@ -30,7 +29,7 @@ module.exports = {
 };
 ```
 
-You have two options to mount the game into your pier:
+You have two options to mount the canvas into your pier:
 
 - ##### `npm run build`
 
