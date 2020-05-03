@@ -35,6 +35,7 @@
               ['type' (cu canvas-type so)]
               ['location' (su ;~(pfix sig fed:ag))]
               ['saved' bo]
+              ['public' bo]
       ==  ==
     ::
     --
@@ -171,6 +172,7 @@
         ['location' s+(scot %p location.metadata)]
         ['type' s+type.metadata]
         ['saved' b+saved.metadata]
+        ['public' b+public.metadata]
     ==
   ::
   ++  arc-to-json

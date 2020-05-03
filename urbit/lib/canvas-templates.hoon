@@ -4,7 +4,7 @@
   |=  owner=@p
   ^-  canvas
   :-  %mesh
-  :_  ['martian' %martian owner %.n]
+  :_  ['martian' %martian owner %.n %.y]
   ^-  mesh
   %-  molt
   ^-  (list [@t arc])
@@ -233,7 +233,7 @@
   |=  owner=@p
   ^-  canvas
   :-  %mesh
-  :_  ['welcome' %welcome owner %.n]
+  :_  ['welcome' %welcome owner %.n %.y]
   ^-  mesh
   %-  molt
   ^-  (list [@t arc])

@@ -9,13 +9,15 @@
       %map-us-counties
       %map-us-states
   ==
+::
 +$  image-type   ?(%svg %png)
 +$  arc          [filled=? color=@t]
 +$  form         [strokes=(list [@t @t]) line-width=@t style-stroke=@t]
 +$  mesh         (map @t arc)
 +$  draw         (list form)
-+$  metadata     [name=@t type=canvas-type location=ship saved=?]
++$  metadata     [name=@t type=canvas-type location=ship saved=? public=?]
 +$  location     [host=ship canvas=@t]
+::
 +$  canvas
   $%  [%mesh =mesh =metadata]
       [%draw =draw =metadata]
