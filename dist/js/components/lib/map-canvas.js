@@ -32,7 +32,7 @@ const initMapCanvas = (map, metadata) => {
       	.scale([width / 1.6]);
     }else if (maps[1] === 'africa') {
       var projection = d3.geoMercator()
-        .center([3.1, 5.6])
+        .center([23.1, 5.6])
       	.translate([width / 2, (height / 2.5)])
       	.scale([width / 2]);
     }

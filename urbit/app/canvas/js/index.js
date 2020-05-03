@@ -57526,7 +57526,7 @@
                   	.scale([width$1 / 1.6]);
                 }else if (maps[1] === 'africa') {
                   var projection = mercator()
-                    .center([3.1, 5.6])
+                    .center([23.1, 5.6])
                   	.translate([width$1 / 2, (height$1 / 2.5)])
                   	.scale([width$1 / 2]);
                 }
