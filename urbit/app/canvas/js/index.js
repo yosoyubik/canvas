@@ -56907,7 +56907,6 @@
                   const color$1 = color(selectedColor(colors).style.fill).toString();
                   if ( !(mousing > 0 && d.attr.color === color$1) && (type !== 'welcome')) {
                     // Save stroke remotely
-                    // apiCalls.push({mesh: {id: d.id, filled: mousing > 0, color: color}});
                     apiCalls[d.id] = {
                       mesh: {
                         id: d.id, filled: mousing > 0,
@@ -57541,7 +57540,7 @@
             const drawMapCanvas = (map, props) => {
               const svg = select("svg");
               let mousing = 0;
-              let apiCalls = [];
+              let apiCalls = {};
               const canvasName = props.name;
               const canvasData = props.canvas;
               const location = props.metadata.location;
@@ -57581,11 +57580,17 @@
                 if (mousing) {
                   const colors = select(".legend").selectAll("rect").nodes();
                   const color$1 = color(selectedColor$1(colors).style.fill).toString();
-                  // Save stroke remotely
-                  apiCalls.push({mesh: {id: d.id, filled: mousing > 0, color: color$1}});
+                  if ( !(mousing > 0 && d.attr.color === color$1)) {
+                    // Save stroke remotely
+                    apiCalls[d.id] = {
+                      mesh: {
+                        id: d.id, filled: mousing > 0,
+                        color: (mousing > 0) ? color$1: ""}};
+                  }
                   // Save stroke locally on browser
-                  canvasData[d.id] = {fill: mousing > 0, color: color$1};
-                  // d3.select(this).classed("point fill", d.fill = mousing > 0);
+                  canvasData[d.id] = {
+                    fill: mousing > 0, color: (mousing > 0) ? color$1: undefined
+                  };
                   select(this).style('fill', () => {
                     d.attr.fill = mousing > 0;
                     if (d.attr.fill) {
@@ -57601,13 +57606,14 @@
 
               const mouseup = function() {
                 mousemove.apply(this, arguments);
-                if (apiCalls.length > 0) {
+                const strokes = Object.values(apiCalls);
+                if (strokes.length > 0) {
                   props.api.canvas.paint({
                     "canvas-name": canvasName,
                     "location": location,
-                    "strokes": apiCalls
+                    "strokes": strokes
                   });
-                  apiCalls = [];
+                  apiCalls = {};
                 }
                 mousing = 0;
               };

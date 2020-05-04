@@ -53,7 +53,7 @@ const initMapCanvas = (map, metadata) => {
 const drawMapCanvas = (map, props) => {
   const svg = d3.select("svg");
   let mousing = 0;
-  let apiCalls = [];
+  let apiCalls = {};
   const canvasName = props.name;
   const canvasData = props.canvas;
   const location = props.metadata.location;
@@ -93,11 +93,17 @@ const drawMapCanvas = (map, props) => {
     if (mousing) {
       const colors = d3.select(".legend").selectAll("rect").nodes();
       const color = d3.color(selectedColor(colors).style.fill).toString();
-      // Save stroke remotely
-      apiCalls.push({mesh: {id: d.id, filled: mousing > 0, color: color}});
+      if ( !(mousing > 0 && d.attr.color === color)) {
+        // Save stroke remotely
+        apiCalls[d.id] = {
+          mesh: {
+            id: d.id, filled: mousing > 0,
+            color: (mousing > 0) ? color: ""}};
+      }
       // Save stroke locally on browser
-      canvasData[d.id] = {fill: mousing > 0, color: color};
-      // d3.select(this).classed("point fill", d.fill = mousing > 0);
+      canvasData[d.id] = {
+        fill: mousing > 0, color: (mousing > 0) ? color: undefined
+      };
       d3.select(this).style('fill', () => {
         d.attr.fill = mousing > 0;
         if (d.attr.fill) {
@@ -113,13 +119,14 @@ const drawMapCanvas = (map, props) => {
 
   const mouseup = function() {
     mousemove.apply(this, arguments);
-    if (apiCalls.length > 0) {
+    const strokes = Object.values(apiCalls);
+    if (strokes.length > 0) {
       props.api.canvas.paint({
         "canvas-name": canvasName,
         "location": location,
-        "strokes": apiCalls
+        "strokes": strokes
       });
-      apiCalls = [];
+      apiCalls = {};
     }
     mousing = 0;
   }

@@ -53,7 +53,7 @@ const initMapCanvas = (map, metadata) => {
 const drawMapCanvas = (map, props) => {
   const svg = d3.select("svg");
   let mousing = 0;
-  let apiCalls = {}};
+  let apiCalls = {};
   const canvasName = props.name;
   const canvasData = props.canvas;
   const location = props.metadata.location;
@@ -120,7 +120,7 @@ const drawMapCanvas = (map, props) => {
   const mouseup = function() {
     mousemove.apply(this, arguments);
     const strokes = Object.values(apiCalls);
-    if ((strokes.length > 0) && (type !== 'welcome')) {
+    if (strokes.length > 0) {
       props.api.canvas.paint({
         "canvas-name": canvasName,
         "location": location,
