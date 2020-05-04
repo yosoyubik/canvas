@@ -15,7 +15,7 @@ const selectedColor = (colors) => {
 let path;
 
 const addStyle = function(d) {
-  return d.attr ? d.attr.color : undefined;
+  return (d.attr && d.attr.fill) ? d.attr.color : undefined;
 }
 
 const initMapCanvas = (map, metadata) => {
@@ -93,12 +93,10 @@ const drawMapCanvas = (map, props) => {
     if (mousing) {
       const colors = d3.select(".legend").selectAll("rect").nodes();
       const color = d3.color(selectedColor(colors).style.fill).toString();
-      if ((d.attr.fill && d.attr.color === color) !== mousing > 0) {
-        // Save stroke remotely
-        apiCalls.push({mesh: {id: d.id, filled: mousing > 0, color: color}});
-        // Save stroke locally on browser
-        canvasData[d.id] = {fill: mousing > 0, color: color};
-      }
+      // Save stroke remotely
+      apiCalls.push({mesh: {id: d.id, filled: mousing > 0, color: color}});
+      // Save stroke locally on browser
+      canvasData[d.id] = {fill: mousing > 0, color: color};
       // d3.select(this).classed("point fill", d.fill = mousing > 0);
       d3.select(this).style('fill', () => {
         d.attr.fill = mousing > 0;
@@ -110,7 +108,6 @@ const drawMapCanvas = (map, props) => {
           return 'white';
         }
       });
-      // border.call(redraw);
     }
   }
 
@@ -151,11 +148,16 @@ const drawMapCanvas = (map, props) => {
 const updateMapCanvas = (arc, canvas) => {
   d3.selectAll(".point")
     .style('fill', function (d) {
-    if (arc.id === d.id && canvas === d.name) {
-      d.attr.fill = arc.fill;
-      d.attr.color = arc.color;
-    }
-    return d.attr.color;
+      if (arc.id === d.id && canvas === d.name) {
+        d.attr.fill = arc.fill;
+        d.attr.color = d.attr.fill ? arc.color : undefined;
+      }
+      if (d.attr.fill) {
+        return d.attr.color;
+      }
+      else {
+        return '#fff0';
+      }
    });
 }
 

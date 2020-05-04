@@ -56892,7 +56892,7 @@
               const topology = hexTopology(radius, width, height, canvasData, canvasName);
 
               let mousing = 0;
-              let apiCalls = [];
+              let apiCalls = {};
 
               const mousedown = function(d) {
                 const colors = select(".legend").selectAll("rect").nodes();
@@ -56905,13 +56905,18 @@
                 if (mousing) {
                   const colors = select(".legend").selectAll("rect").nodes();
                   const color$1 = color(selectedColor(colors).style.fill).toString();
-                  if ((d.attr.fill && d.attr.color === color$1) !==
-                       mousing > 0 && (type !== 'welcome')) {
+                  if ( !(mousing > 0 && d.attr.color === color$1) && (type !== 'welcome')) {
                     // Save stroke remotely
-                    apiCalls.push({mesh: {id: d.id, filled: mousing > 0, color: color$1}});
-                    // Save stroke locally on browser
-                    canvasData[d.id] = {fill: mousing > 0, color: color$1};
+                    // apiCalls.push({mesh: {id: d.id, filled: mousing > 0, color: color}});
+                    apiCalls[d.id] = {
+                      mesh: {
+                        id: d.id, filled: mousing > 0,
+                        color: (mousing > 0) ? color$1: ""}};
                   }
+                  // Save stroke locally on browser
+                  canvasData[d.id] = {
+                    fill: mousing > 0, color: (mousing > 0) ? color$1: undefined
+                  };
                   select(this).style('fill', () => {
                     d.attr.fill = mousing > 0;
                     if (d.attr.fill) {
@@ -56927,19 +56932,20 @@
 
               const mouseup = function() {
                 mousemove.apply(this, arguments);
-                if ((apiCalls.length > 0) && (type !== 'welcome')) {
+                const strokes = Object.values(apiCalls);
+                if ((strokes.length > 0) && (type !== 'welcome')) {
                   props.api.canvas.paint({
                     "canvas-name": canvasName,
                     "location": location,
-                    "strokes": apiCalls
+                    "strokes": strokes
                   });
-                  apiCalls = [];
+                  apiCalls = {};
                 }
                 mousing = 0;
               };
 
               const addStyle = function(d) {
-                return d.attr ? d.attr.color : undefined;
+                return (d.attr && d.attr.fill) ? d.attr.color : undefined;
               };
 
               const svg = select("svg");
@@ -57003,9 +57009,14 @@
                 .style('fill', function (d) {
                 if (arc.id === d.id && canvas === d.name) {
                   d.attr.fill = arc.fill;
-                  d.attr.color = arc.color;
+                  d.attr.color = d.attr.fill ? arc.color : undefined;
                 }
-                return d.attr.color;
+                if (d.attr.fill) {
+                  return d.attr.color;
+                }
+                else {
+                  return '#fff0';
+                }
                });
             };
 
@@ -57492,7 +57503,7 @@
             let path$1;
 
             const addStyle = function(d) {
-              return d.attr ? d.attr.color : undefined;
+              return (d.attr && d.attr.fill) ? d.attr.color : undefined;
             };
 
             const initMapCanvas = (map, metadata) => {
@@ -57570,12 +57581,10 @@
                 if (mousing) {
                   const colors = select(".legend").selectAll("rect").nodes();
                   const color$1 = color(selectedColor$1(colors).style.fill).toString();
-                  if ((d.attr.fill && d.attr.color === color$1) !== mousing > 0) {
-                    // Save stroke remotely
-                    apiCalls.push({mesh: {id: d.id, filled: mousing > 0, color: color$1}});
-                    // Save stroke locally on browser
-                    canvasData[d.id] = {fill: mousing > 0, color: color$1};
-                  }
+                  // Save stroke remotely
+                  apiCalls.push({mesh: {id: d.id, filled: mousing > 0, color: color$1}});
+                  // Save stroke locally on browser
+                  canvasData[d.id] = {fill: mousing > 0, color: color$1};
                   // d3.select(this).classed("point fill", d.fill = mousing > 0);
                   select(this).style('fill', () => {
                     d.attr.fill = mousing > 0;
@@ -57587,7 +57596,6 @@
                       return 'white';
                     }
                   });
-                  // border.call(redraw);
                 }
               };
 
@@ -57628,11 +57636,16 @@
             const updateMapCanvas = (arc, canvas) => {
               selectAll(".point")
                 .style('fill', function (d) {
-                if (arc.id === d.id && canvas === d.name) {
-                  d.attr.fill = arc.fill;
-                  d.attr.color = arc.color;
-                }
-                return d.attr.color;
+                  if (arc.id === d.id && canvas === d.name) {
+                    d.attr.fill = arc.fill;
+                    d.attr.color = d.attr.fill ? arc.color : undefined;
+                  }
+                  if (d.attr.fill) {
+                    return d.attr.color;
+                  }
+                  else {
+                    return '#fff0';
+                  }
                });
             };
 

@@ -52,7 +52,7 @@ const drawHexCanvas = (props) => {
   const topology = hexTopology(radius, width, height, canvasData, canvasName);
 
   let mousing = 0;
-  let apiCalls = [];
+  let apiCalls = {};
 
   const mousedown = function(d) {
     const colors = d3.select(".legend").selectAll("rect").nodes();
@@ -65,13 +65,17 @@ const drawHexCanvas = (props) => {
     if (mousing) {
       const colors = d3.select(".legend").selectAll("rect").nodes();
       const color = d3.color(selectedColor(colors).style.fill).toString();
-      if ((d.attr.fill && d.attr.color === color) !==
-           mousing > 0 && (type !== 'welcome')) {
+      if ( !(mousing > 0 && d.attr.color === color) && (type !== 'welcome')) {
         // Save stroke remotely
-        apiCalls.push({mesh: {id: d.id, filled: mousing > 0, color: color}});
-        // Save stroke locally on browser
-        canvasData[d.id] = {fill: mousing > 0, color: color};
+        apiCalls[d.id] = {
+          mesh: {
+            id: d.id, filled: mousing > 0,
+            color: (mousing > 0) ? color: ""}};
       }
+      // Save stroke locally on browser
+      canvasData[d.id] = {
+        fill: mousing > 0, color: (mousing > 0) ? color: undefined
+      };
       d3.select(this).style('fill', () => {
         d.attr.fill = mousing > 0;
         if (d.attr.fill) {
@@ -87,19 +91,20 @@ const drawHexCanvas = (props) => {
 
   const mouseup = function() {
     mousemove.apply(this, arguments);
-    if ((apiCalls.length > 0) && (type !== 'welcome')) {
+    const strokes = Object.values(apiCalls);
+    if ((strokes.length > 0) && (type !== 'welcome')) {
       props.api.canvas.paint({
         "canvas-name": canvasName,
         "location": location,
-        "strokes": apiCalls
+        "strokes": strokes
       });
-      apiCalls = [];
+      apiCalls = {};
     }
     mousing = 0;
   }
 
   const addStyle = function(d) {
-    return d.attr ? d.attr.color : undefined;
+    return (d.attr && d.attr.fill) ? d.attr.color : undefined;
   }
 
   const svg = d3.select("svg");
@@ -163,9 +168,14 @@ const updateHexCanvas = (arc, canvas) => {
     .style('fill', function (d) {
     if (arc.id === d.id && canvas === d.name) {
       d.attr.fill = arc.fill;
-      d.attr.color = arc.color;
+      d.attr.color = d.attr.fill ? arc.color : undefined;
     }
-    return d.attr.color;
+    if (d.attr.fill) {
+      return d.attr.color;
+    }
+    else {
+      return '#fff0';
+    }
    });
 }
 
