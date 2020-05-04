@@ -1,6 +1,8 @@
 # **Canvas** for *Urbit*
 
-![Header](/images/canvas.png)
+[![Header](/images/canvas.png)](https://www.youtube.com/watch?v=S6DySv730Hw)
+
+[Video Demo](https://www.youtube.com/watch?v=S6DySv730Hw)
 
 ## Features
 
@@ -11,8 +13,8 @@
 - Live saving: Each stroke is stored remotely on your Urbit so you don't lose anything.
 - Export Canvas Images as SVG/PNG files.
   - Allows for selective removal of the Color Palette and/or Hexagonal Mesh.
-- Exported files can be shared and previewed in a chat.
-- Public/Private Canvas.
+- Exported files (stored on your Urbit and served via %eyre) can be shared and previewed in a chat room.
+- Allows creation of Public/Private Canvas.
 - Others can join a Public Canvas and collaborate in a cool art project.
 
 ## Installation
