@@ -333,7 +333,7 @@
    ::
    =/  serial=@uvH  (shaf %msg-uid eny.bowl)
    =/  =hart:eyre  .^(hart:eyre %e /(scot %p our.bowl)/host/real)
-   =/  port=@ud  (need q.hart)
+   =/  port=(unit @ud)  q.hart
    =/  domain-port=tape
      ;:  weld
          ?:(p.hart "https://" "http://")
@@ -344,7 +344,7 @@
          ==
       ::
         ":"
-        ((d-co:co 1) port)
+        ?~(port "" ((d-co:co 1) u.port))
      ==
    =/  =letter
      :-  %url
