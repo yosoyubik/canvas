@@ -316,12 +316,12 @@
     ==
   ::
   ++  handle-create
-   |=  =canvas
-   ^-  (quip card _state)
-   ?>  (team:title our.bowl src.bowl)
-   =/  load=canvas-view  [%load name.metadata.canvas canvas]
-   :-  [%give %fact [/updates]~ %canvas-view !>(load)]~
-   state(gallery (~(put by gallery) [[our.bowl name.metadata.canvas] canvas]))
+    |=  =canvas
+    ^-  (quip card _state)
+    ?>  (team:title our.bowl src.bowl)
+    =/  load=canvas-view  [%load name.metadata.canvas canvas]
+    :-  [%give %fact [/updates]~ %canvas-view !>(load)]~
+    state(gallery (~(put by gallery) [[our.bowl name.metadata.canvas] canvas]))
   ::
   ++  handle-share
    |=  [name=@t chat=path type=image-type]
