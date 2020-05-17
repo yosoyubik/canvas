@@ -187,7 +187,6 @@
   ++  stroke-to-json
     |=  =stroke
     ^-  (list [@t json])
-    =,  enjs:format
     ?-    -.stroke
         %mesh
       :~  ['id' s+id.stroke]
@@ -205,7 +204,6 @@
   ++  form-strokes-to-json
     |=  strokes=(list [@t @t])
     ^-  (list json)
-    =,  enjs:format
     %+  turn  strokes
     |=  [x=@t y=@t]
     ^-  json
