@@ -46,7 +46,15 @@ When you make changes, the `urbit` directory will update with the compiled appli
 
 ## Running
 
-If the tile doesn't load on the Home page run this from `%dojo`:
+To start the canvas agent run this commands from `%dojo`:
+```
+> |start %canvas
+>=
+> |start %canvas-view
+>=
+```
+
+If the tile doesn't load on the Home page screen run this command:
 
 ```
 > :launch &launch-action [%remove %canvas-view /canvastile]
@@ -58,7 +66,7 @@ If the tile doesn't load on the Home page run this from `%dojo`:
 
 Otherwise visit: `<YOUR_URL>/~canvas`
 
-## Examples
+## Templates
 
 #### Mesh
 ![Mesh](/images/export-mesh.png)
@@ -70,7 +78,7 @@ Otherwise visit: `<YOUR_URL>/~canvas`
 ![US](/images/export.png)
 #### FreeHand
 ![Free](/images/freehand.png)
-#### Chat (I)
+#### Share on Chat (I)
 ![Chat](/images/share-chat.png)
-#### Chat (II)
+#### Share on Chat (II)
 ![Chat](/images/chat.png)
