@@ -44,18 +44,32 @@ Builds the application and copies it into your Urbit ship's desk, watching for c
 
 When you make changes, the `urbit` directory will update with the compiled application and, if you're running `npm run serve`, it will automatically copy itself to your Urbit ship when you save your changes (more information on that below).
 
+## Running
+
+If the tile doesn't load run this from `%dojo`:
+
+```
+> :launch &launch-action [%remove %canvas-view /canvastile]
+>=
+> :launch &launch-action [%add %canvas-view /canvastile '/~canvas/js/tile.js']
+>=
+```
+<img src="/images/tile.png" width="100">
+
+Otherwise visit: `<YOUR_URL>/~canvas`
+
 ## Examples
 
 #### Mesh
 ![Mesh](/images/export-mesh.png)
-#### Europe Map
+#### Europe
 ![Europe](/images/europe.png)
 #### Africa
 ![Africa](/images/exported-africa.svg)
 #### US
 ![US](/images/export.png)
 #### FreeHand
-![Chat](/images/freehand.png)
+![Free](/images/freehand.png)
 #### Chat (I)
 ![Chat](/images/share-chat.png)
 #### Chat (II)
