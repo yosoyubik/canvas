@@ -1,4 +1,4 @@
-# **Canvas** for *Urbit*
+# *Canvas* for \~Urbit
 
 [![Header](/images/canvas.png)](https://www.youtube.com/watch?v=S6DySv730Hw)
 
@@ -46,7 +46,7 @@ When you make changes, the `urbit` directory will update with the compiled appli
 
 ## Running
 
-If the tile doesn't load run this from `%dojo`:
+If the tile doesn't load on the Home page run this from `%dojo`:
 
 ```
 > :launch &launch-action [%remove %canvas-view /canvastile]
@@ -54,7 +54,7 @@ If the tile doesn't load run this from `%dojo`:
 > :launch &launch-action [%add %canvas-view /canvastile '/~canvas/js/tile.js']
 >=
 ```
-<img src="/images/tile.png" width="100">
+<img src="/images/tile.png" width="120">
 
 Otherwise visit: `<YOUR_URL>/~canvas`
 
