@@ -8,8 +8,6 @@
 ++  grab
   |%
   ++  noun  ^canvas-view
-  ++  json
-    |=  jon=^json
-    (json-to-canvas-view jon)
+  ++  json  json-to-canvas-view
   --
 --

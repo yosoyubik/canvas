@@ -4,8 +4,5 @@
 ++  grab
   |%
   ++  noun  canvas-update
-  :: ++  json
-  ::   |=  jon=^json
-  ::   (json-to-canvas-action jon)
   --
 --
