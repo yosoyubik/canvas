@@ -15,6 +15,7 @@
   - Allows for selective removal of the Color Palette and/or Hexagonal Mesh.
 - Exported files (stored on your Urbit and served via %eyre) can be shared and previewed in a chat room.
 - Allows creation of Public/Private Canvas.
+- A shared canvas becomes local once the subscription is pulled.
 - Others can join a Public Canvas and collaborate in a cool art project.
 
 ## Installation
@@ -53,6 +54,8 @@ When you make changes, the `urbit` directory will update with the compiled appli
 ![Africa](/images/exported-africa.png)
 #### US
 ![US](/images/export.png)
+#### FreeHand
+![Chat](/images/freehand.png)
 #### Chat (I)
 ![Chat](/images/share-chat.png)
 #### Chat (II)
