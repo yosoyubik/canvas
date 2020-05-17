@@ -83,7 +83,6 @@
     ::
     ++  on-poke
       |=  [=mark =vase]
-      ~&  mark
       ^-  (quip card _this)
       ?+    mark  (on-poke:def mark vase)
           %canvas-action
@@ -95,13 +94,11 @@
     ++  on-watch
       |=  =path
       ^-  (quip card _this)
-      ~&  [src.bowl path]
       :_  this
       ?+    path  ~|([%peer-canvas-strange path] !!)
           [%updates ~]  ~
       ::
           [%canvas ^]
-        ~&  [src.bowl path %canvas]
         =^  cards  state
            (send-init-canvas:cc i.t.path)
          cards
@@ -110,7 +107,6 @@
     ++  on-agent
       |=  [=wire =sign:agent:gall]
       ^-  (quip card _this)
-      ~&  -.sign
       ?-    -.sign
           %poke-ack   (on-agent:def wire sign)
           %watch-ack  (on-agent:def wire sign)
@@ -120,7 +116,6 @@
         =^  cards  state
           =*  vase  q.cage.sign
           ^-  (quip card _state)
-          ~&  p.cage.sign
           ?+    p.cage.sign  ~|([%canvas-bad-update-mark wire vase] !!)
               %canvas-update
             (handle-canvas-update:cc !<(canvas-update vase))
@@ -154,7 +149,6 @@
     ++  on-peek
       |=  =path
       ^-  (unit (unit cage))
-      ~&  scry+path
       ?+    path  (on-peek:def path)
           [%x %canvas @t @t ~]
         ``noun+!>((~(got by gallery) (extract-location t.t.path)))
