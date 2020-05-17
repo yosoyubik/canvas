@@ -51,7 +51,7 @@ When you make changes, the `urbit` directory will update with the compiled appli
 #### Europe Map
 ![Europe](/images/europe.png)
 #### Africa
-![Africa](/images/exported-africa.png)
+![Africa](/images/exported-africa.svg)
 #### US
 ![US](/images/export.png)
 #### FreeHand
