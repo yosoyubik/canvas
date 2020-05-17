@@ -6,14 +6,15 @@
 
 ## Features
 
-- Available templates:
+- Templates:
   - Hexagonal Mesh.
   - World Maps: US, Europe, Africa (more soon...)
   - Freehand Canvas.
-- Live saving: Each stroke is stored remotely on your Urbit so you don't lose anything.
+- Each stroke is stored automatically on your Urbit so you don't have to manually save.
 - Export Canvas Images as SVG/PNG files.
   - Allows for selective removal of the Color Palette and/or Hexagonal Mesh.
-- Exported files (stored on your Urbit and served via %eyre) can be shared and previewed in a chat room.
+  - Image files are stored on your Urbit and served through %eyre.
+  - Option to share a canvas file in a chat room.
 - Allows creation of Public/Private Canvas.
 - A shared canvas becomes local once the subscription is pulled.
 - Others can join a Public Canvas and collaborate in a cool art project.
