@@ -111,7 +111,6 @@
     ++  on-watch
       |=  =path
       ^-  (quip card _this)
-      ~&  path
       :_  this
       ?+    path  ~|([%peer-canvas-strange path] !!)
           [%canvastile ~]
@@ -129,7 +128,6 @@
     ++  on-agent
       |=  [=wire =sign:agent:gall]
       ^-  (quip card _this)
-      ~&  -.sign
       ?-    -.sign
           %poke-ack   (on-agent:def wire sign)
           %watch-ack  (on-agent:def wire sign)
@@ -141,7 +139,6 @@
           ^-  (quip card _state)
           ?+    p.cage.sign  ~|([%canvas-bad-update-mark wire vase] !!)
               %canvas-view
-            ~&  "handle-view-update"
             (handle-view-update:cv !<(canvas-view q.cage.sign))
           ==
         [cards this]
@@ -150,7 +147,6 @@
     ++  on-arvo
       |=  [=wire =sign-arvo]
       ^-  (quip card _this)
-      ~&  [wire sign-arvo]
       ?:  ?=(%bound +<.sign-arvo)
         [~ this]
       (on-arvo:def wire sign-arvo)
@@ -315,7 +311,6 @@
 ++  poke-handle-http-request
   |=  [=inbound-request:eyre url=(list @t)]
   ^-  simple-payload:http
-  ~&  url
   |^
   ?:  ?=([%'~canvas' %images image-type @t *] url)
     (handle-canvas-image-call i.t.t.url i.t.t.t.url)
@@ -325,7 +320,6 @@
   ++  handle-canvas-image-call
     |=  [type=image-type file=@t]
     ^-  simple-payload:http
-    ~&  file
     =/  [response=_png-response:gen canvas-img=(unit @)]
       ?-    type
           %png
@@ -365,7 +359,6 @@
   ++  handle-json-call
     |=  name=@t
     ^-  simple-payload:http
-    ~&  name
     =/  json  (~(get by canvas-maps) name)
     ?~  json
       not-found:gen
