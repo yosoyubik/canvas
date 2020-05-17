@@ -198,7 +198,6 @@
 ++  send-init-canvas
   |=  name=@t
   ^-  (quip card _state)
-  ~&  "send-init-canvas"
   =/  canvas=(unit canvas)  (~(get by gallery) [our.bowl name])
   ?~  canvas  `state
   ?:  private.metadata.u.canvas
@@ -226,7 +225,6 @@
         %ct
         /=home/(same time)/app/canvas/images/(same type)/(same file)
     ==
-  ~&  check-file+paths
   ?~  paths
     =/  location=wire  /write/(same host)/(same file)
     ::  set up timer again
@@ -292,14 +290,12 @@
     |=  [=ship name=@t]
     ^-  (quip card _state)
     ?>  (team:title our.bowl src.bowl)
-    ~&  ["subscribing..." ship name]
     [[(subscribe ship name)]~ state]
   ::
   ++  handle-leave
     |=  [=ship name=@t]
     ^-  (quip card _state)
     ?>  (team:title our.bowl src.bowl)
-    ~&  ["leaving" ship name]
     =/  =canvas  (~(got by gallery) [ship name])
     ::  the canvas becomes local
     ::
