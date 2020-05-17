@@ -54,7 +54,7 @@ If the tile doesn't load on the Home page run this from `%dojo`:
 > :launch &launch-action [%add %canvas-view /canvastile '/~canvas/js/tile.js']
 >=
 ```
-<img src="/images/tile.png" width="120">
+<img src="/images/tile.png" width="180">
 
 Otherwise visit: `<YOUR_URL>/~canvas`
 
