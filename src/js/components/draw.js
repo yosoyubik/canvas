@@ -9,6 +9,7 @@ import { width, height,
 import { ShareImage } from "./lib/share-image";
 import { Spinner } from './lib/icons/icon-spinner';
 
+// TODO: future work
 // import { Runtime, Inspector } from "@observablehq/runtime";
 // import notebook from "@yosoyubik/draw-me";
 
@@ -27,14 +28,12 @@ export class DrawCanvas extends Component {
     this.lineWidthRef = React.createRef();
     this.strokeStyleRef = React.createRef();
 
-    this.setStrokes = this.setStrokes.bind(this);
     this.onChangeLine = this.onChangeLine.bind(this);
     this.onChangeColor = this.onChangeColor.bind(this);
     this.onClickSave = this.onClickSave.bind(this);
   }
 
   componentDidUpdate() {
-    console.log("componentDidUpdate", this.state.line, this.state.color);
     drawHexCanvas(this.props, this.state.line, this.state.color);
     if (this.state.awaiting && this.props.metadata.saved) {
       this.setState({
@@ -45,7 +44,8 @@ export class DrawCanvas extends Component {
 
   componentDidMount() {
     const { drawRef, lineWidthRef, strokeStyleRef, props, state } = this;
-    // TODO: Using observablehq makes the code cleaner encapsulating the
+    // TODO: future work
+    // Using observablehq makes the code cleaner encapsulating the
     // logic in a separate compoenent and interfering less with React's
     // DOM manipulation.
     //
@@ -66,36 +66,13 @@ export class DrawCanvas extends Component {
     drawHexCanvas(props, state.line, state.color);
   }
 
-  // TODO: setStrokes doesn't know when the mouse stops moving
-  setStrokes(updatedForms) {
-    const { props, state, setState } = this;
-    if (updatedForms.length < state.forms.length) {
-      const newForm = updatedForms[updatedForms.length - 1];
-      setState({ buffer: [newForm] });
-    } else {
-      setState(state => {
-        const forms = [...state.forms, newForm];
-        return { forms, buffer: [newForm] };
-      }, () => {
-        props.canvas.push(newForm);
-        props.api.canvas.paint({
-          "canvas-name": props.name,
-          "location": props.location,
-          "strokes": [newForm]
-        });
-      });
-    }
-  }
-
   onClickSave () {
     const { props, state } = this;
     this.setState({
       awaiting: true
     }, () => {
       const canvas = d3.select("canvas")
-                  .node().toDataURL("image/png").split("base64,")[1];
-      console.log("LENGTH", canvas.length);
-      // const chunkSize = Math.round(svgString.length / 4);
+          .node().toDataURL("image/png").split("base64,")[1];
       const chunkSize = 700 * 2**9;
       let last = false;
       let i = 0;

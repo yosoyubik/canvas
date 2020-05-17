@@ -1,8 +1,8 @@
 //  Adapted from: https://bl.ocks.org/mbostock/5249328
 //
+
 import * as d3 from "d3";
 import * as topojson from "topojson";
-
 
 const width = 1500,
       height = 1000,
@@ -44,7 +44,6 @@ const initHexMesh = () => {
 }
 
 const drawHexCanvas = (props) => {
-  // console.log("drawing", props);
   const canvasName = props.name;
   const canvasData = props.canvas;
   const location = props.metadata.location;

@@ -4,7 +4,6 @@ import { reparseDrawForms } from '/lib/form-reparser';
 
 export class InitialReducer {
     reduce(json, state) {
-        console.log("initial", json);
         let data = _.get(json, 'init-frontend', false);
         if (data) {
           state.chats = data.chats;
@@ -12,14 +11,12 @@ export class InitialReducer {
             if (data.canvas[canvas].metadata.type === 'draw') {
               data.canvas[canvas].data = reparseDrawForms(data.canvas[canvas].data);
             }
-            console.log(data.canvas[canvas].metadata.type);
             if (data.canvas[canvas].metadata.type === 'welcome') {
               state.welcome = data.canvas[canvas];
             } else {
               state.canvasList[canvas] = data.canvas[canvas];
             }
           }
-          console.log(state);
         }
     }
 }

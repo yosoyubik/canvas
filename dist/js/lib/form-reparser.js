@@ -1,6 +1,5 @@
 
 export function reparseDrawForms(data) {
-  console.log(data);
   data.forEach(function (item, i, array) {
     const properties = item[item.length - 1];
     array[i].strokeStyle = properties.strokeStyle;
@@ -11,7 +10,6 @@ export function reparseDrawForms(data) {
       array[i][1] = parseFloat(item[1]);
     });
   });
-  console.log(data);
   return data;
 }
 

@@ -5,5 +5,6 @@ module.exports = {
     "/Users/jose/urbit/urbit.ubik/lur/home",
     "/Users/jose/urbit/urbit.ubik/sen/home",
     "/Users/jose/urbit/urbit.ubik/fyr/home",
+    "/Users/jose/urbit/urbit.ubik/fakezod/home"
   ]
 };

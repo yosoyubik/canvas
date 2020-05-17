@@ -21,7 +21,6 @@ export class MapCanvas extends Component {
   }
 
   componentDidMount() {
-    console.log("mounting");
     const { props, state, animationRef } = this;
     const maps = props.metadata.type.split("-");
     if (maps.length > 1) {
@@ -39,9 +38,7 @@ export class MapCanvas extends Component {
       d3.select(canvas).select(".legend").selectAll("*").remove();
     }
     const svgString = simpleParseSVG(d3.select(canvas).node(), 'map');
-    // const chunkSize = Math.round(svgString.length / 4);
     const chunkSize = 700 * 2**9;
-    console.log(chunkSize);
     let last = false;
     let i = 0;
     let chunks = [];
@@ -62,7 +59,6 @@ export class MapCanvas extends Component {
     d3.select(".background").selectAll("path").remove();
     if (props.metadata) {
       const maps = props.metadata.type.split("-");
-      console.log(store);
       const json = store.state.maps[maps[1]];
       initMapCanvas(json, props.metadata);
       drawMapCanvas(json, props);

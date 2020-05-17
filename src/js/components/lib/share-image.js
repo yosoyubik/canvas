@@ -41,7 +41,6 @@ export class ShareImage extends Component {
   }
 
   selectChat(chat) {
-    console.log(template);
     this.setState({
       chat: chat
     });
@@ -53,7 +52,6 @@ export class ShareImage extends Component {
       this.setState({
         awaiting: true
       }, () => {
-        console.log("awaiting");
         props.api.image.share(props.name, state.chat, props.type).then(() => {
           this.setState({
             awaiting: false
@@ -65,7 +63,6 @@ export class ShareImage extends Component {
 
   search(evt) {
     const { props, state } = this;
-    console.log(props);
     let term = evt.target.value.toLowerCase();
     let chatMatches = [];
     chatMatches = props.chats.filter(e => {
@@ -75,7 +72,6 @@ export class ShareImage extends Component {
   }
 
   selectChat(chat, name) {
-    console.log(chat);
     this.setState({
       placeholder: chat,
       chat: chat,
@@ -143,7 +139,6 @@ export class ShareImage extends Component {
             />
             <Spinner awaiting={this.state.awaiting} classes="mt4" text="Sharing in chat..." />
           </div>
-
 
           { (!(this.props.saved)) ?
               <div className="f9 ph4 pt2 pb3 mt7">

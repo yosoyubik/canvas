@@ -24,7 +24,6 @@ function createColorPicker(width) {
 
   var legend = d3.select(".legend")
       .attr("transform", "translate(25,25)")
-      // .attr("transform", "translate(" + ((width - 18 * 24) / 2) + ",10)")
       .style("cursor", "pointer");
 
     legend.selectAll("rect")
@@ -46,12 +45,6 @@ function createColorPicker(width) {
         }
         else {
           return grays(d);
-          // if (d === 9) {
-          //   grays(d);
-          //   return "#ff000000";
-          // } else {
-          //   return grays(d);
-          // }
         }
       })
       .on("click", clicklegend);

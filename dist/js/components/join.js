@@ -20,7 +20,6 @@ export class JoinScreen extends Component {
 
   componentDidMount() {
     const { props } = this;
-    console.log("componentDidMount");
     if (props.autoJoin !== "/undefined/undefined" &&
     props.autoJoin !== "/~/undefined/undefined") {
       let canvas = props.autoJoin.split('/');
@@ -38,11 +37,9 @@ export class JoinScreen extends Component {
         });
         return;
       }
-      console.log("setting");
       this.setState({
         awaiting: true
       }, () => {
-        console.log("awaiting");
         props.api.canvas.join(ship, canvasName).then(() => {
           this.setState({
             awaiting: false
@@ -52,18 +49,8 @@ export class JoinScreen extends Component {
     }
   }
 
-  componentDidUpdate(prevProps, prevState) {
-    const { props, state } = this;
-    // let canvas = state.canvas.split('/');
-    // let canvasName = canvas[canvas.length - 1];
-    // if (canvasName in props.canvasList) {
-    //   props.history.push(`/~canvas/item/${canvasName}`);
-    // }
-  }
-
   onClickJoin() {
     const { props, state } = this;
-    console.log("onClickJoin");
     let text = state.canvas;
 
     let canvas = text.split('/');
@@ -92,11 +79,9 @@ export class JoinScreen extends Component {
       });
       return;
     }
-    console.log("setting");
     this.setState({
       awaiting: true
     }, () => {
-      console.log("awaiting");
       props.api.canvas.join(ship, canvasName).then(() => {
         this.setState({
           awaiting: false
@@ -120,10 +105,10 @@ export class JoinScreen extends Component {
       joinClasses = 'db f9 gray2 ba pa2 b--gray3 bg-gray0-d pointer';
     }
 
-    let errElem = (React.createElement('span', {__self: this, __source: {fileName: _jsxFileName, lineNumber: 123}} ));
+    let errElem = (React.createElement('span', {__self: this, __source: {fileName: _jsxFileName, lineNumber: 108}} ));
     if (state.error) {
       errElem = (
-        React.createElement('span', { className: "f9 inter red2 db"   , __self: this, __source: {fileName: _jsxFileName, lineNumber: 126}}, "Canvas must have a valid name."
+        React.createElement('span', { className: "f9 inter red2 db"   , __self: this, __source: {fileName: _jsxFileName, lineNumber: 111}}, "Canvas must have a valid name."
 
         )
       );
@@ -131,15 +116,15 @@ export class JoinScreen extends Component {
 
     return (
       React.createElement('div', { className: `h-100 w-100 pa3 pt2 overflow-x-hidden flex flex-column
-      bg-gray0-d white-d`, __self: this, __source: {fileName: _jsxFileName, lineNumber: 133}}
+      bg-gray0-d white-d`, __self: this, __source: {fileName: _jsxFileName, lineNumber: 118}}
         , React.createElement('div', {
-          className: "w-100 dn-m dn-l dn-xl inter pt1 pb6 f8"       , __self: this, __source: {fileName: _jsxFileName, lineNumber: 135}}
-          , React.createElement(Link, { to: "/~canvas/", __self: this, __source: {fileName: _jsxFileName, lineNumber: 137}}, "⟵ All Chats")
+          className: "w-100 dn-m dn-l dn-xl inter pt1 pb6 f8"       , __self: this, __source: {fileName: _jsxFileName, lineNumber: 120}}
+          , React.createElement(Link, { to: "/~canvas/", __self: this, __source: {fileName: _jsxFileName, lineNumber: 122}}, "⟵ All Chats")
         )
-        , React.createElement('h2', { className: "mb3 f8" , __self: this, __source: {fileName: _jsxFileName, lineNumber: 139}}, "Join Existing Canvas"  )
-        , React.createElement('div', { className: "w-100", __self: this, __source: {fileName: _jsxFileName, lineNumber: 140}}
-          , React.createElement('p', { className: "f8 lh-copy mt3 db"   , __self: this, __source: {fileName: _jsxFileName, lineNumber: 141}}, "Enter a "  , React.createElement('span', { className: "mono", __self: this, __source: {fileName: _jsxFileName, lineNumber: 141}}, "~ship/canvas-name"), " or "  , React.createElement('span', { className: "mono", __self: this, __source: {fileName: _jsxFileName, lineNumber: 141}}, "~/~ship/canvas-name"))
-          , React.createElement('p', { className: "f9 gray2 mb4"  , __self: this, __source: {fileName: _jsxFileName, lineNumber: 142}}, "Canvas names use lowercase, hyphens, and slashes."      )
+        , React.createElement('h2', { className: "mb3 f8" , __self: this, __source: {fileName: _jsxFileName, lineNumber: 124}}, "Join Existing Canvas"  )
+        , React.createElement('div', { className: "w-100", __self: this, __source: {fileName: _jsxFileName, lineNumber: 125}}
+          , React.createElement('p', { className: "f8 lh-copy mt3 db"   , __self: this, __source: {fileName: _jsxFileName, lineNumber: 126}}, "Enter a "  , React.createElement('span', { className: "mono", __self: this, __source: {fileName: _jsxFileName, lineNumber: 126}}, "~ship/canvas-name"), " or "  , React.createElement('span', { className: "mono", __self: this, __source: {fileName: _jsxFileName, lineNumber: 126}}, "~/~ship/canvas-name"))
+          , React.createElement('p', { className: "f9 gray2 mb4"  , __self: this, __source: {fileName: _jsxFileName, lineNumber: 127}}, "Canvas names use lowercase, hyphens, and slashes."      )
           , React.createElement('textarea', {
             ref:  e => { this.textarea = e; } ,
             className: "f7 mono ba bg-gray0-d white-d pa3 mb2 db " +
@@ -155,14 +140,14 @@ export class JoinScreen extends Component {
             style: {
               resize: 'none',
             },
-            onChange: this.canvasChange, __self: this, __source: {fileName: _jsxFileName, lineNumber: 143}} )
+            onChange: this.canvasChange, __self: this, __source: {fileName: _jsxFileName, lineNumber: 128}} )
           , errElem
-          , React.createElement('br', {__self: this, __source: {fileName: _jsxFileName, lineNumber: 160}} )
+          , React.createElement('br', {__self: this, __source: {fileName: _jsxFileName, lineNumber: 145}} )
           , React.createElement('button', {
             onClick: this.onClickJoin.bind(this),
-            className: joinClasses, __self: this, __source: {fileName: _jsxFileName, lineNumber: 161}}
+            className: joinClasses, __self: this, __source: {fileName: _jsxFileName, lineNumber: 146}}
           , "Join Canvas" )
-          , React.createElement(Spinner, { awaiting: this.state.awaiting, classes: "mt4", text: "Joining canvas..." , __self: this, __source: {fileName: _jsxFileName, lineNumber: 165}} )
+          , React.createElement(Spinner, { awaiting: this.state.awaiting, classes: "mt4", text: "Joining canvas..." , __self: this, __source: {fileName: _jsxFileName, lineNumber: 150}} )
         )
       )
     );

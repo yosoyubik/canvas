@@ -95,7 +95,6 @@ class UrbitApi {
   }
 
   create(name, type, location, subtype, privacy) {
-    console.log("creating");
     let create = {};
     create[type] = {
       canvas: null,
@@ -113,7 +112,6 @@ class UrbitApi {
   }
 
   paint(strokes) {
-    // console.log(strokes);
     this.action("canvas-view", "canvas-view", {
       paint: strokes
     });

@@ -37,7 +37,6 @@ const initMapCanvas = (map, metadata) => {
       	.scale([width / 2]);
     }
     path = d3.geoPath(projection);
-    console.log(map, maps);
     if (maps.length > 2) {
       var data = map.objects[maps[2]];
     } else {
@@ -63,14 +62,12 @@ const drawMapCanvas = (map, props) => {
   var bisectId = d3.bisector(function(d) { return d.id; }).left;
 
   if (maps.length > 2) {
-    console.log(maps[2], maps, map.objects[maps[2]]);
     var features = topojson.feature(map, map.objects[maps[2]]).features;
   } else {
     var features = topojson.feature(map, map.objects).features;
   }
 
   features.forEach(function(item, index, array) {
-    console.log(item);
     if (item.id) {
       item.id = (Number.isInteger(item.id)) ? item.id.toString() : item.id;
     } else {
@@ -84,7 +81,6 @@ const drawMapCanvas = (map, props) => {
   const mousedown = function(d) {
     const colors = d3.select(".legend").selectAll("rect").nodes();
     const color = d3.color(selectedColor(colors).style.fill).toString();
-    // console.log(d);
     mousing = (d.attr.fill && d.attr.color === color) ? -1 : +1;
     mousemove.apply(this, arguments);
   }

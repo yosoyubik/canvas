@@ -56,18 +56,11 @@ export class NewScreen extends Component {
     const asciiSafe = event.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-");
     this.setState({
       canvasName: event.target.value
-      // idName: asciiSafe + '-' + Math.floor(Math.random()*10000), // uniqueness
     });
   }
 
   search(evt) {
-    // this.setState({searchTerm: evt.target.value});
     let term = evt.target.value.toLowerCase();
-
-    // if (term.length < 3) {
-    //   return this.setState({results: []})
-    // }
-
     let templateMatches = [];
     templateMatches = Object.entries(this.state.templates).filter(e => {
       return (e[0].includes(term) ||
@@ -78,7 +71,6 @@ export class NewScreen extends Component {
   }
 
   selectTemplate(template) {
-    console.log(template);
     this.setState({
       placeholder: this.state.templates[template],
       template: template,
@@ -104,19 +96,6 @@ export class NewScreen extends Component {
         this.setState({
           awaiting: false
         });
-        // store.setState(prevState => ({
-        //   canvasList: {
-        //     ...prevState.canvasList,
-        //     [state.canvasName]: {
-        //       "data": {},
-        //       "metadata": {
-        //         "name": state.canvasName,
-        //         "type": "mesh",
-        //         "location": '~' + ship
-        //       }
-        //     }
-        //   }
-        // }));
         props.history.push(`/~canvas/item/${state.canvasName}`);
       })
     });

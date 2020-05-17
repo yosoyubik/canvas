@@ -2,8 +2,8 @@
 ::
 ::    data:            scry command:
 ::    ------------    ----------------------------------------------
-::    canvas           .^(* %gx /=canvas=/canvas/<name>/noun)
-::    gallery          .^(* %gx /=canvas=/gallery/noun)
+::    canvas           .^(canvas %gx /=canvas=/canvas/<name>/noun)
+::    gallery          .^((map location canvas) %gx /=canvas=/gallery/noun)
 ::
 /-  *canvas, *chat-store
 /+  *server, default-agent, verb, *canvas, base=base64
@@ -64,17 +64,22 @@
 %+  verb  |
 ^-  agent:gall
 =<  |_  =bowl:gall
-    +*  this       .
+    +*  this         .
         canvas-core  +>
-        cc         ~(. canvas-core bowl)
-        def        ~(. (default-agent this %|) bowl)
+        cc           ~(. canvas-core bowl)
+        def          ~(. (default-agent this %|) bowl)
     ::
-    ++  on-init  on-init:def
+    ++  on-init
+      on-init:def
       ::  FIXME: attemp to have a watcher on the images folder
+      ::
       :: ^-  (quip card _this)
-      :: =/  rav  [%next %t [%da now.bowl] /=home=/app/canvas/images]
       :: :_  this
-      :: [%pass /read/images %arvo %c %warp our.bowl q.byk.bowl `rav]~
+      :: =/  sing  [%sing %t  [%da now.bowl] /app/canvas/images]
+      :: =/  next  [%next %t [%da now.bowl] /app/canvas/images]
+      :: :~  [%pass /read/images %arvo %c %warp our.bowl q.byk.bowl `sing]
+      ::     [%pass /read/images %arvo %c %warp our.bowl q.byk.bowl `next]
+      :: ==
     ::
     ++  on-poke
       |=  [=mark =vase]
@@ -145,7 +150,6 @@
     ++  on-save   on-save:def
     ++  on-load   on-load:def
     ++  on-leave  on-leave:def
-    ::  +on-peek: read from app state
     ::
     ++  on-peek
       |=  =path
@@ -244,8 +248,6 @@
 ++  write-svg-file
   |=  file=@t
   ^-  (list card)
-  ~&  "writing file"
-  ~&  ~(key by buffer)
   =/  buffer=[* (unit [svg=@t =path])]  (~(got by buffer) file)
   =+  (need +.buffer)
   =/  contents=cage  [%svg !>(svg)]
@@ -255,10 +257,10 @@
 ::   |=  ran=rant:clay
 ::   ^-  (list card)
 ::   ~&  "send-updated-files"
-::   =/  rav  [%next %t [%da now.bowl] /=home=/app/canvas/images]
+::   =/  next  [%next %t [%da now.bowl] /app/canvas/images]
 ::   =/  files  !>([%files !<((list path) q.r.ran)])
 ::   :~  [%give %fact [/updates]~ %canvas-view files]
-::       [%pass /read/images %arvo %c %warp our.bowl q.byk.bowl `rav]
+::       [%pass /read/images %arvo %c %warp our.bowl q.byk.bowl `next]
 ::   ==
 ::
 ++  update-remote-canvas
@@ -277,7 +279,6 @@
 ++  handle-canvas-action
   |=  act=canvas-action
   ^-  (quip card _state)
-  ~&  -.act
   |^
   ?+  -.act  !!
     %paint   (handle-paint +.act)
@@ -291,7 +292,6 @@
   ++  handle-paint
     |=  [location=@p name=@t strokes=(list stroke)]
     ^-  (quip card _state)
-    ~&  "processing remote paint"
     (process-remote-paint location name strokes)
   ::
   ++  handle-join
@@ -321,7 +321,10 @@
     ?>  (team:title our.bowl src.bowl)
     =/  load=canvas-view  [%load name.metadata.canvas canvas]
     :-  [%give %fact [/updates]~ %canvas-view !>(load)]~
-    state(gallery (~(put by gallery) [[our.bowl name.metadata.canvas] canvas]))
+    %_    state
+        gallery
+      (~(put by gallery) [[our.bowl name.metadata.canvas] canvas])
+    ==
   ::
   ++  handle-share
    |=  [name=@t chat=path type=image-type]
@@ -386,13 +389,17 @@
       %-  crip
       (snoc ?~(temp ~ chunks.u.temp) chunk)
     =/  =path
-      /=home/(scot %da now.bowl)/app/canvas/images/(same type)/(same file)/(same type)
-    ~&  path
+      %+  weld
+        /=home/(scot %da now.bowl)/app/canvas
+      /images/(same type)/(same file)/(same type)
     =/  contents=cage
       :-  type
       ?.  =(%png type)
         !>(img)
       !>(q:(need (de:base img)))
+    ::
+    :: FIXME: attempt to have a watcher on the images directory
+    ::
     :: =/  contents=cage  [%svg !>(img)]
     :: =+  dir=.^(arch %cy path)
     :: =/  create-or-replace=toro:clay
@@ -406,10 +413,12 @@
     ::  the full svg file is temporarily stored in the buffer
     ::
     :: =.  buffer  (~(put by buffer) [file [~ `[img path]]])
+    :: :_  state(buffer (~(put by buffer) [file [~ `[img path]]]))
+    ::[%pass /file/(same file) %arvo %c %warp our.bowl %home ~ %many & moat]
+    ::
     =/  location=wire  /write/(scot %p ship)/(same file)/(same type)
     :_  state(buffer (~(del by buffer) file))
-    :: :_  state(buffer (~(put by buffer) [file [~ `[img path]]]))
-    :~  ::[%pass /file/(same file) %arvo %c %warp our.bowl %home ~ %many & moat]
+    :~
         [%pass /write-file %arvo %c %info (foal:space:userlib path contents)]
         ::  a quick timer will set the file creation, that will fire
         ::  the file  watcher and send a notification to the browser
@@ -470,16 +479,14 @@
     ?.  (team:title our.bowl src.bowl)
       ::  stroke from a remote ship
       ::
-      :: ~&  "foreign, udpate my frontend"
-      :~  [%give %fact [/updates]~ %canvas-view !>([%paint location name strokes])]
+      =/  paint  !>([%paint location name strokes])
+      :~  [%give %fact [/updates]~ %canvas-view paint]
           [(send-paint-update name strokes src.bowl)]
       ==
     ::  stroke from frontend
     ::
     ?:  =(location our.bowl)
-      :: ~&  'local canvas, send to subscribers'
       [(send-paint-update name strokes our.bowl)]~
-    :: ~&  'remote canvas, poke owner'
     [(update-remote-canvas location name strokes)]~
   ::
   ++  update-mesh

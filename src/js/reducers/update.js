@@ -26,7 +26,6 @@ export class UpdateReducer {
     file(json, state) {
         let data = _.get(json, 'file', false);
         if (data) {
-            console.log(data);
             state.canvasList[data].metadata.saved = true;
         }
     }

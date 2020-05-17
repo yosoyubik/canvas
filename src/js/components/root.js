@@ -29,7 +29,6 @@ export class Root extends Component {
           <Route exact path="/~canvas"
             render={ () => {
               let canvas;
-              console.log(state.welcome);
               if (state.welcome) {
                 canvas = <Hexagons api={api} canvas={state.welcome.data} chats={{}}
                           name={'welcome'} metadata={state.welcome.metadata} />;
@@ -77,12 +76,10 @@ export class Root extends Component {
                 const name =  props.match.params.name;
                 if (canvasList) {
                   let canvas;
-                  console.log(canvasList);
                   const data = !!canvasList[name] ? canvasList[name].data : {};
                   const chats = state.chats;
                   const canvasType = !!canvasList[name] ? canvasList[name].metadata.type : "";
                   const metadata = !!canvasList[name] ? canvasList[name].metadata : {};
-                  console.log(chats, canvasType);
                   const subtypes = canvasType.split("-");
                   switch (subtypes[0]) {
                     case 'mesh':
@@ -99,7 +96,6 @@ export class Root extends Component {
                       break;
                     default: canvas = null;
                   }
-                  // console.log(canvas);
                   return (
                     <Skeleton
                       history={props.history}

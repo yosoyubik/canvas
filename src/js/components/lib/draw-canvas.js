@@ -47,7 +47,6 @@ const drawHexCanvas = (props, line, color) => {
 
   function mouseEnds() {
     const stroke = strokes[strokes.length - 1];
-    console.log("finished", stroke);
     const lineWidth = stroke.lineWidth;
     const strokeStyle = stroke.strokeStyle;
     props.api.canvas.paint({
@@ -77,7 +76,6 @@ const drawHexCanvas = (props, line, color) => {
   function dragged() {
     d3.event.subject.push([d3.event.x, d3.event.y]);
   }
-
 }
 
 // Render and report the new value.
@@ -91,8 +89,6 @@ const render = () => {
     }
     if (stroke.length === 1) curve.point(...stroke[0]);
     curve.lineEnd();
-    // context.lineWidth = line;
-    // context.strokeStyle = color;
     context.lineWidth = stroke.lineWidth;
     context.strokeStyle = stroke.strokeStyle;
     context.stroke();

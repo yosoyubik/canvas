@@ -39,8 +39,6 @@ export class Hexagons extends Component {
       d3.select(canvas).select(".mesh-group").selectAll("*").remove();
     }
     const svgString = simpleParseSVG(d3.select(canvas).node(), 'mesh');
-    console.log("LENGTH", svgString.length);
-    // const chunkSize = Math.round(svgString.length / 4);
     const chunkSize = 700 * 2**9;
     let last = false;
     let i = 0;
@@ -60,7 +58,6 @@ export class Hexagons extends Component {
     const { props, state } = this;
     d3.select(".hexagon").selectAll("path").remove();
     if (this.props.canvas) {
-      // console.log("rendering", this.props.name);
       drawHexCanvas(this.props);
     }
     return (

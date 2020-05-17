@@ -75,7 +75,6 @@ export class SaveImage extends Component {
 
   render() {
     const { props, state } = this;
-    console.log("saved", this.props.saved);
 
     let buttonOpened = (state.open)
       ? "gray2 bg-white bg-gray0-d b--gray2" : "green2 bg-white bg-gray0-d b--green2";
