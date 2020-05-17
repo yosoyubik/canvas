@@ -420,8 +420,8 @@
     :_  state(buffer (~(del by buffer) file))
     :~
         [%pass /write-file %arvo %c %info (foal:space:userlib path contents)]
-        ::  a quick timer will set the file creation, that will fire
-        ::  the file  watcher and send a notification to the browser
+        ::  this sets up a timer that will fire a "file-watcher"
+        ::  that manually checks if the file has been created
         ::
         [%pass location %arvo %b %wait (add now.bowl ~s2)]
     ==
