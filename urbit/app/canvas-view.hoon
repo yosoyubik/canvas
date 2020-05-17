@@ -238,7 +238,6 @@
   ++  handle-join
     |=  [=ship canvas-name=@t]
     ^-  (list card)
-    ~&  "subscribing..."
     :_  ~
     %+  send-canvas-action
       [%join (scot %p ship) canvas-name ~]
@@ -247,7 +246,6 @@
   ++  handle-leave
     |=  [=ship canvas-name=@t]
     ^-  (list card)
-    ~&  "leaving..."
     :_  ~
     %+  send-canvas-action
       [%leave (scot %p ship) canvas-name ~]
@@ -291,20 +289,17 @@
   ++  handle-paint
     |=  [location=@p name=@t strokes=(list stroke)]
     ^-  (list card)
-    ~&  "update paint"
     %-  send-frontend
     (canvas-view-response-to-json [%paint +<])
   ::
   ++  handle-load
     |=  [name=@t =canvas]
     ^-  (list card)
-    ~&  "update load"
     (send-frontend (canvas-view-response-to-json [%load +<]))
   ::
   ++  handle-file
     |=  file=@t
     ^-  (list card)
-    ~&  "file saved"
     (send-frontend (canvas-view-response-to-json [%file file]))
   --
 ::
