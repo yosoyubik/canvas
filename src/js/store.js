@@ -42,7 +42,7 @@ class Store {
 
     handleEvent(data) {
         let json = data.data;
-
+        console.log(json);
         this.initialReducer.reduce(json, this.state);
         this.updateReducer.canvas(json, this.state);
         this.updateReducer.file(json, this.state);

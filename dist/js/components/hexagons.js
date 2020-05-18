@@ -65,7 +65,7 @@ export class Hexagons extends Component {
         , React.createElement('div', { className: "w-100 dn-m dn-l dn-xl inter pt1 pb6 f8"       , __self: this, __source: {fileName: _jsxFileName, lineNumber: 65}}
           , React.createElement(Link, { to: "/~canvas/", __self: this, __source: {fileName: _jsxFileName, lineNumber: 66}}, "⟵ Canvas")
         )
-        ,  (props.metadata.type !== 'welcome') ?
+        ,  (props.metadata.type !== 'mesh-welcome') ?
           React.createElement('div', { className: "absolute mw5" ,
                style: {right: "20px", top: "20px"}, __self: this, __source: {fileName: _jsxFileName, lineNumber: 69}}
             

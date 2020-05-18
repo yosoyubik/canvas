@@ -9,6 +9,10 @@ export class NewScreen extends Component {
     super(props);
     const templates = {
       'mesh': 'Hexagon Mesh',
+      'mesh-welcome': 'Canvas Logo',
+      'mesh-bitcoin': 'Bitcoin',
+      'mesh-sigil': 'Sigil',
+      'mesh-martian': 'Martian',
       'draw': 'Freehand Canvas',
       'map-europe-europe': 'Europe',
       'map-africa-africa': 'Africa',
@@ -53,7 +57,6 @@ export class NewScreen extends Component {
   }
 
   canvasNameChange(event) {
-    const asciiSafe = event.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-");
     this.setState({
       canvasName: event.target.value
     });
@@ -88,7 +91,7 @@ export class NewScreen extends Component {
     }, () => {
       props.api.canvas.create(
         state.canvasName,
-        (state.template.includes("map")) ? "mesh" : state.template,
+        (state.template.includes("draw")) ? "draw" : "mesh",
         '~' + ship,
         state.template,
         state.privacy

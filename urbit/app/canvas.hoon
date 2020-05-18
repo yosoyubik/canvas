@@ -1,12 +1,12 @@
-::  canvas: A Canvas app for Urbit
+::  canvas: A p2p Canvas app
 ::
 ::    data:            scry command:
 ::    ------------    ----------------------------------------------
-::    canvas           .^(canvas %gx /=canvas=/canvas/<name>/noun)
-::    gallery          .^((map location canvas) %gx /=canvas=/gallery/noun)
+::    canvas           .^(canvas %gx /=canvas=/canvas/<ship>/<canvas>/noun)
+::    gallery          .^((list canvas) %gx /=canvas=/gallery/noun)
 ::
 /-  *canvas, *chat-store
-/+  *server, default-agent, verb, *canvas, base=base64
+/+  *server, default-agent, verb, *canvas, *canvas-templates, base=base64
 ::
 /=  index
   /^  octs
@@ -309,6 +309,16 @@
     |=  =canvas
     ^-  (quip card _state)
     ?>  (team:title our.bowl src.bowl)
+    =*  name  name.metadata.canvas
+    =*  private  private.metadata.canvas
+    =.  canvas
+      %.  [canvas name our.bowl private]
+      ?+  type.metadata.canvas  blank
+        %mesh-welcome  welcome
+        %mesh-martian  martian
+        %mesh-bitcoin  bitcoin
+        %mesh-sigil    sigil
+      ==
     =/  load=canvas-view  [%load name.metadata.canvas canvas]
     :-  [%give %fact [/updates]~ %canvas-view !>(load)]~
     %_    state

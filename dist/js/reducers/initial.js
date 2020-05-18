@@ -11,7 +11,7 @@ export class InitialReducer {
             if (data.canvas[canvas].metadata.type === 'draw') {
               data.canvas[canvas].data = reparseDrawForms(data.canvas[canvas].data);
             }
-            if (data.canvas[canvas].metadata.type === 'welcome') {
+            if (data.canvas[canvas].metadata.type === 'mesh-welcome') {
               state.welcome = data.canvas[canvas];
             } else {
               state.canvasList[canvas] = data.canvas[canvas];

@@ -65,7 +65,7 @@ export class Hexagons extends Component {
         <div className="w-100 dn-m dn-l dn-xl inter pt1 pb6 f8">
           <Link to="/~canvas/">{"⟵ Canvas"}</Link>
         </div>
-        { (props.metadata.type !== 'welcome') ?
+        { (props.metadata.type !== 'mesh-welcome') ?
           <div className="absolute mw5"
                style={{right: "20px", top: "20px"}}
             >

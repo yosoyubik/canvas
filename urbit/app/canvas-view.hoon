@@ -1,4 +1,3 @@
-
 ::  canvas-view: A Canvas app for Urbit
 ::
 /-  *canvas, *chat-store
@@ -228,7 +227,7 @@
     ^-  (list card)
     %-  send-frontend
     %-  canvas-view-response-to-json
-    [%init-frontend [(welcome our.bowl) gallery-scry] chats-scry]
+    [%init-frontend [(welcome ~ 'welcome' our.bowl &) gallery-scry] chats-scry]
   ::
   ++  handle-paint
     |=  [location=@p name=@t strokes=(list stroke)]
