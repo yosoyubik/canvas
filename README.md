@@ -13,7 +13,7 @@
   - Option to share a canvas file in a chat room.
 - Allows creation of Public/Private Canvas.
   - A shared canvas becomes local once the subscription is pulled.
-  - Others can join a Public Canvas and work in real-time in a cool art project.
+  - Others can join a Public Canvas and work collaboratively in a cool art project.
 
 ## Installation
 
@@ -39,7 +39,7 @@ This builds your application and copies it into your Urbit ship's desk. In your 
 
 Builds the application and copies it into your Urbit ship's desk, watching for changes. In your Urbit (v.0.8.0 or higher) `|commit %home` (or `%your-desk-name`) to synchronize your changes.
 
-When you make changes, the `urbit` directory will update with the compiled application and, if you're running `npm run serve`, it will automatically copy itself to your Urbit ship when you save your changes (more information on that below).
+When you make changes, the `urbit` directory will update with the compiled application and, if you're running `npm run serve`, it will automatically copy itself to your Urbit ship when you save your.
 
 ## Running
 
@@ -61,18 +61,18 @@ If the tile doesn't load on the Home page screen run this command:
 ```
 <img src="/images/tile.png" width="180">
 
-Otherwise visit: `<YOUR_URL>/~canvas`
+Direct link: `<YOUR_URL>/~canvas`
 
 ## Templates
 
 <img src="/images/templates.png" width="500">
 
 - Hexagonal Mesh.
-  - Pre-filled with:
+  - Templates:
     - Bitcoin Logo
     - Urbit Canvas Logo
-    - (friendly) Martian
-    - Urbit Sigil (~norsyr-torryn!)
+    - ~friendly~ Martian
+    - Urbit Sigil ~\~norsyr-torryn!~
 - World Maps: US, Europe, Africa (more soon...)
 - Freehand Canvas.
 
