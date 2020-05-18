@@ -71,8 +71,8 @@ Direct link: `<YOUR_URL>/~canvas`
   - Templates:
     - Bitcoin Logo
     - Urbit Canvas Logo
-    - ~friendly~ Martian
-    - Urbit Sigil ~\~norsyr-torryn!~
+    - <sub>friendly</sub> Martian
+    - Urbit Sigil <sub>~norsyr-torryn!</sub>
 - World Maps: US, Europe, Africa (more soon...)
 - Freehand Canvas.
 
