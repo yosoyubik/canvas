@@ -6,18 +6,14 @@
 
 ## Features
 
-- Templates:
-  - Hexagonal Mesh.
-  - World Maps: US, Europe, Africa (more soon...)
-  - Freehand Canvas.
 - Each stroke is stored automatically on your Urbit.
 - Export Canvas Images as SVG/PNG files.
   - Allows for selective removal of the Color Palette and/or Hexagonal Mesh.
   - Image files are stored on your Urbit and served through %eyre.
   - Option to share a canvas file in a chat room.
 - Allows creation of Public/Private Canvas.
-- A shared canvas becomes local once the subscription is pulled.
-- Others can join a Public Canvas and work in real-time in a cool art project.
+  - A shared canvas becomes local once the subscription is pulled.
+  - Others can join a Public Canvas and work in real-time in a cool art project.
 
 ## Installation
 
@@ -69,8 +65,25 @@ Otherwise visit: `<YOUR_URL>/~canvas`
 
 ## Templates
 
+<img src="/images/templates.png" width="500">
+
+- Hexagonal Mesh.
+  - Pre-filled with:
+    - Bitcoin Logo
+    - Urbit Canvas Logo
+    - (friendly) Martian
+    - Urbit Sigil (~norsyr-torryn!)
+- World Maps: US, Europe, Africa (more soon...)
+- Freehand Canvas.
+
 #### Mesh
 ![Mesh](/images/export-mesh.png)
+#### Bitcoin
+![Bitcoin](/images/bitcoin.png)
+#### Sigil
+![Sigil](/images/sigil.png)
+#### Martian
+![Martian](/images/martian.png)
 #### Europe
 ![Europe](/images/europe.png)
 #### Africa
