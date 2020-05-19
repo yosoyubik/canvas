@@ -7,6 +7,7 @@
       %mesh-hashtag
       %mesh-sigil
       %mesh-yc-hn
+      %mesh-crypto
       %draw
       %map-europe-europe
       %map-africa-africa
