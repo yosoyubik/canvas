@@ -314,7 +314,7 @@
     =.  canvas
       %.  [canvas name our.bowl private]
       ?+  type.metadata.canvas  blank
-        %mesh-welcome  welcome
+        %mesh-welcome  tmdw
         %mesh-martian  martian
         %mesh-bitcoin  bitcoin
         %mesh-sigil    larsen
