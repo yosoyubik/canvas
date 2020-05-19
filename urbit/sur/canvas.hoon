@@ -4,7 +4,9 @@
       %mesh-welcome
       %mesh-martian
       %mesh-bitcoin
+      %mesh-hashtag
       %mesh-sigil
+      %mesh-yc-hn
       %draw
       %map-europe-europe
       %map-africa-africa

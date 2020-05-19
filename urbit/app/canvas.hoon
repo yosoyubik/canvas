@@ -317,7 +317,7 @@
         %mesh-welcome  welcome
         %mesh-martian  martian
         %mesh-bitcoin  bitcoin
-        %mesh-sigil    sigil
+        %mesh-sigil    larsen
       ==
     =/  load=canvas-view  [%load name.metadata.canvas canvas]
     :-  [%give %fact [/updates]~ %canvas-view !>(load)]~

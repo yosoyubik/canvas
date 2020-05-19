@@ -64,27 +64,30 @@ const drawHexCanvas = (props) => {
     if (mousing) {
       const colors = d3.select(".legend").selectAll("rect").nodes();
       const color = d3.color(selectedColor(colors).style.fill).toString();
-      if ( !(mousing > 0 && d.attr.color === color) && (type !== 'mesh-welcome')) {
-        // Save stroke remotely
-        apiCalls[d.id] = {
-          mesh: {
-            id: d.id, filled: mousing > 0,
-            color: (mousing > 0) ? color: ""}};
-      }
       // Save stroke locally on browser
       canvasData[d.id] = {
-        fill: mousing > 0, color: (mousing > 0) ? color: undefined
+        fill: mousing > 0, color: (mousing > 0) ? color : undefined
       };
       d3.select(this).style('fill', () => {
         d.attr.fill = mousing > 0;
         if (d.attr.fill) {
-          var color = d3.color(selectedColor(colors).style.fill).toString();
           d.attr.color = color;
           return color;
         } else {
           return '#fff0';
         }
       });
+      // removes (-1) or adds  (+1) color to an hexagon
+      if ( (mousing !== 0) && (type !== 'mesh-welcome') ) {
+        // Save stroke remotely
+        apiCalls[d.id] = {
+          mesh: {
+            id: d.id,
+            filled: d.attr.fill,
+            color: mousing > 0 ? color: ""
+          }
+        };
+      }
     }
   }
 
