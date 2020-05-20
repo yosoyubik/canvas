@@ -1,5 +1,5 @@
 ::  canvas: A p2p Canvas app
-::
+:: 
 ::    data:            scry command:
 ::    ------------    ----------------------------------------------
 ::    canvas           .^(canvas %gx /=canvas=/canvas/<ship>/<canvas>/noun)
@@ -47,12 +47,9 @@
 =>  |%
     +$  card  card:agent:gall
     ::
-    +$  state
-      $%  [%0 state-zero]
-      ==
-    ::
     +$  state-zero
-      $:  gallery=(map location canvas)
+      $:  %0
+          gallery=(map location canvas)
           buffer=(map @t [chunks=(list @t) svg=(unit [@t path])])
       ==
     --
@@ -69,8 +66,7 @@
         cc           ~(. canvas-core bowl)
         def          ~(. (default-agent this %|) bowl)
     ::
-    ++  on-init
-      on-init:def
+    ++  on-init  on-init:def
       ::  FIXME: attemp to have a watcher on the images folder
       ::
       :: ^-  (quip card _this)
@@ -80,6 +76,14 @@
       :: :~  [%pass /read/images %arvo %c %warp our.bowl q.byk.bowl `sing]
       ::     [%pass /read/images %arvo %c %warp our.bowl q.byk.bowl `next]
       :: ==
+    ::
+    ++  on-save
+      !>(state)
+    ::
+    ++  on-load
+      |=  old=vase
+      ^-  (quip card _this)
+      [~ this(state !<(state-zero old))]
     ::
     ++  on-poke
       |=  [=mark =vase]
@@ -142,8 +146,6 @@
         [cards this]
       ==
     ::
-    ++  on-save   on-save:def
-    ++  on-load   on-load:def
     ++  on-leave  on-leave:def
     ::
     ++  on-peek
