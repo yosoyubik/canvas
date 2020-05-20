@@ -16,6 +16,7 @@ export class NewScreen extends Component {
       'mesh-crypto': 'Cryptonomicon',
       'mesh-yc-hn': 'Hacker News',
       'mesh-tile': 'Easel',
+      'mesh-guy': 'Guybrush Threepwood',
       'draw': 'Freehand Canvas',
       'map-europe-europe': 'Europe',
       'map-africa-africa': 'Africa',

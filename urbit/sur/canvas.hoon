@@ -10,6 +10,7 @@
       %mesh-tile
       %mesh-yc-hn
       %mesh-crypto
+      %mesh-guy
       %draw
       %map-europe-europe
       %map-africa-africa

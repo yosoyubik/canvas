@@ -1,13 +1,20 @@
 # Templates Gallery
 
+- Cryptonomicon
+- Easel
+- Guybrush Threepwood
 - Bitcoin Logo
 - <sub>customized</sub>Urbit Canvas Logo
 - <sub>friendly</sub> Martian
 - Urbit Sigil <sub>~norsyr-torryn!</sub> <sub>~larsen!</sub>
 - Hacker News Logo
-- Cryptonomicon
-- Easel
 
+#### Cryptonomicon
+![Crypto](/images/crypto.png)
+#### Easel
+![Easel](/images/easel.png)
+#### Guybrush Threepwood
+![GuyBrush](/images/guy.png)
 #### Bitcoin
 ![Bitcoin](/images/bitcoin.png)
 #### Custom
@@ -19,7 +26,3 @@
 ![Sigil-2](/images/larsen.png)
 #### HN
 ![HN](/images/hn.png)
-#### Cryptonomicon
-![Crypto](/images/crypto.png)
-#### Easel
-![Easel](/images/easel.png)

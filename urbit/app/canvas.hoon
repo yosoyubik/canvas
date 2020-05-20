@@ -320,6 +320,7 @@
         %mesh-martian  martian
         %mesh-bitcoin  bitcoin
         %mesh-crypto   crypto
+        %mesh-guy      guybrush
         %mesh-yc-hn    yc-hn
         %mesh-sigil    larsen
         %mesh-tile     tile
