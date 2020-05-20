@@ -19188,7 +19188,6 @@
                   )
                 );
               }
-
             }
 
             window.canvasTile = canvasTile;

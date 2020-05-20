@@ -2,9 +2,13 @@ var gulp = require('gulp');
 var cssimport = require('gulp-cssimport');
 var rollup = require('gulp-better-rollup');
 var cssnano = require('cssnano');
-var postcss = require('gulp-postcss');
+var postcss = require('gulp-postcss')
 var sucrase = require('@sucrase/gulp-plugin');
 var minify = require('gulp-minify');
+var rename = require('gulp-rename');
+var del = require('del');
+var json = require('rollup-plugin-json');
+var rollupReplace = require("@rollup/plugin-replace");
 
 var resolve = require('rollup-plugin-node-resolve');
 var commonjs = require('rollup-plugin-commonjs');
@@ -40,7 +44,7 @@ gulp.task('jsx-transform', function(cb) {
     .pipe(gulp.dest('dist'));
 });
 
-gulp.task('tile-jsx-transform', function(cb) {
+gulp.task('tile-jsx-transform', function (cb) {
   return gulp.src('tile/**/*.js')
     .pipe(sucrase({
       transforms: ['jsx']
@@ -54,8 +58,11 @@ gulp.task('js-imports', function(cb) {
       plugins: [
         commonjs({
           namedExports: {
-            'node_modules/react/index.js': [ 'Component' ],
-            'node_modules/react-is/index.js': [ 'isValidElementType' ],
+            'node_modules/react/index.js': ['Component', 'cloneElement',
+            'createContext', 'createElement', 'useState', 'useRef',
+            'useLayoutEffect', 'useMemo', 'useEffect', 'forwardRef', 'useContext', 'Children' ],
+            'node_modules/react-is/index.js': [ 'isValidElementType', 'isElement', 'ForwardRef' ],
+            'node_modules/react-dom/index.js': [ 'createPortal' ]
           }
         }),
         rootImport({
@@ -63,6 +70,7 @@ gulp.task('js-imports', function(cb) {
           useEntry: 'prepend',
           extensions: '.js'
         }),
+        json(),
         globals(),
         resolve()
       ]
@@ -75,13 +83,45 @@ gulp.task('js-imports', function(cb) {
     .on('end', cb);
 });
 
-gulp.task('tile-js-imports', function(cb) {
+gulp.task('tile-js-imports', function (cb) {
   return gulp.src('dist/tile.js')
     .pipe(rollup({
       plugins: [
         commonjs({
           namedExports: {
-            'node_modules/react/index.js': [ 'Component' ],
+            'node_modules/react/index.js': ['Component'],
+          }
+        }),
+        rootImport({
+          root: `${__dirname}/dist/js`,
+          useEntry: 'prepend',
+          extensions: '.js'
+        }),
+        json(),
+        globals(),
+        resolve()
+      ]
+    }, 'umd'))
+    .on('error', function (e) {
+      console.log(e);
+      cb();
+    })
+    .pipe(gulp.dest('./urbit/app/canvas/js/'))
+    .on('end', cb);
+});
+
+gulp.task('js-imports-prod', function(cb) {
+  return gulp.src('dist/index.js')
+    .pipe(rollup({
+      plugins: [
+        rollupReplace({'process.env.NODE_ENV': JSON.stringify('production')}),
+        commonjs({
+          namedExports: {
+            'node_modules/react/index.js': ['Component', 'cloneElement',
+            'createContext', 'createElement', 'useState', 'useRef',
+            'useLayoutEffect', 'useMemo', 'useEffect', 'forwardRef', 'useContext', 'Children' ],
+            'node_modules/react-is/index.js': [ 'isValidElementType', 'isElement', 'ForwardRef' ],
+            'node_modules/react-dom/index.js': [ 'createPortal' ]
           }
         }),
         rootImport({
@@ -90,6 +130,7 @@ gulp.task('tile-js-imports', function(cb) {
           extensions: '.js'
         }),
         globals(),
+        json(),
         resolve()
       ]
     }, 'umd'))
@@ -100,7 +141,6 @@ gulp.task('tile-js-imports', function(cb) {
     .pipe(gulp.dest('./urbit/app/canvas/js/'))
     .on('end', cb);
 });
-
 
 gulp.task('js-minify', function () {
   return gulp.src('./urbit/app/canvas/js/index.js')
@@ -108,11 +148,27 @@ gulp.task('js-minify', function () {
     .pipe(gulp.dest('./urbit/app/canvas/js/'));
 });
 
+gulp.task('rename-index-min', function() {
+  return gulp.src('./urbit/canvas/js/index-min.js')
+    .pipe(rename('index.js'))
+    .pipe(gulp.dest('./urbit/canvas/js/'));
+});
+
 gulp.task('tile-js-minify', function () {
   return gulp.src('./urbit/app/canvas/js/tile.js')
     .pipe(minify())
     .pipe(gulp.dest('./urbit/app/canvas/js/'));
 });
+
+gulp.task('rename-tile-min', function() {
+  return gulp.src('./urbit/app/canvas/js/tile-min.js')
+    .pipe(rename('tile.js'))
+    .pipe(gulp.dest('./urbit/app/canvas/js/'));
+});
+
+gulp.task('clean-min', function(){
+  return del(['./urbit/app/canvas/js/index-min.js', './urbit/app/canvas/js/tile-min.js'], {force: true})
+})
 
 gulp.task('urbit-copy', function () {
   let ret = gulp.src('urbit/**/*');
@@ -126,7 +182,7 @@ gulp.task('urbit-copy', function () {
 
 gulp.task('js-bundle-dev', gulp.series('jsx-transform', 'js-imports'));
 gulp.task('tile-js-bundle-dev', gulp.series('tile-jsx-transform', 'tile-js-imports'));
-gulp.task('js-bundle-prod', gulp.series('jsx-transform', 'js-imports', 'js-minify'))
+gulp.task('js-bundle-prod', gulp.series('jsx-transform', 'js-imports-prod', 'js-minify'))
 gulp.task('tile-js-bundle-prod',
   gulp.series('tile-jsx-transform', 'tile-js-imports', 'tile-js-minify'));
 
@@ -148,15 +204,17 @@ gulp.task('bundle-prod',
       'js-bundle-prod',
       'tile-js-bundle-prod',
     ),
+    'rename-index-min',
+    'rename-tile-min',
+    'clean-min',
     'urbit-copy'
   )
 );
 
 gulp.task('default', gulp.series('bundle-dev'));
 
-gulp.task('watch', gulp.series('default', function() {
+gulp.task('watch', gulp.series('default', function () {
   gulp.watch('tile/**/*.js', gulp.parallel('tile-js-bundle-dev'));
-
   gulp.watch('src/**/*.js', gulp.parallel('js-bundle-dev'));
   gulp.watch('src/**/*.css', gulp.parallel('css-bundle'));
 

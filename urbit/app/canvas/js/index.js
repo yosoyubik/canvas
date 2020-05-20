@@ -2081,6 +2081,17 @@
             }
             });
             var react_1 = react.Component;
+            var react_2 = react.cloneElement;
+            var react_3 = react.createContext;
+            var react_4 = react.createElement;
+            var react_5 = react.useState;
+            var react_6 = react.useRef;
+            var react_7 = react.useLayoutEffect;
+            var react_8 = react.useMemo;
+            var react_9 = react.useEffect;
+            var react_10 = react.forwardRef;
+            var react_11 = react.useContext;
+            var react_12 = react.Children;
 
             var scheduler_production_min = createCommonjsModule(function (module, exports) {
             Object.defineProperty(exports,"__esModule",{value:!0});var d=null,e=!1,g=3,k=-1,l=-1,m=!1,n=!1;function p(){if(!m){var a=d.expirationTime;n?q():n=!0;r(t,a);}}
@@ -23851,6 +23862,7 @@
               module.exports = reactDom_development;
             }
             });
+            var reactDom_1 = reactDom.createPortal;
 
             function _inheritsLoose(subClass, superClass) {
               subClass.prototype = Object.create(superClass.prototype);
@@ -24161,6 +24173,8 @@
             }
             });
             var reactIs_1 = reactIs.isValidElementType;
+            var reactIs_2 = reactIs.isElement;
+            var reactIs_3 = reactIs.ForwardRef;
 
             var has$1 = Function.call.bind(Object.prototype.hasOwnProperty);
             var printWarning$1 = function() {};

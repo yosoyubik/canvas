@@ -19,7 +19,6 @@ export default class canvasTile extends Component {
       )
     );
   }
-
 }
 
 window.canvasTile = canvasTile;

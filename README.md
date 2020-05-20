@@ -54,12 +54,11 @@ To start the canvas agent run this commands from `%dojo`:
 If the tile doesn't load on the Home page screen run this command:
 
 ```
-> :launch &launch-action [%remove %canvas-view /canvastile]
->=
-> :launch &launch-action [%add %canvas-view /canvastile '/~canvas/js/tile.js']
->=
+> :launch &launch-action [%add %canvas /canvastile '/~canvas/js/tile.js']
 ```
 <img src="/images/tile.png" width="180">
+
+You'll get an error (more info [here](https://github.com/yosoyubik/canvas/issues/2#issuecomment-631248364)) but the tile will show up on the home screen.
 
 Direct link: `<YOUR_URL>/~canvas`
 
