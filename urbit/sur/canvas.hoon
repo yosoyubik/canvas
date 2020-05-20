@@ -7,6 +7,7 @@
       %mesh-hashtag
       %mesh-sigil
       %mesh-tmdw
+      %mesh-tile
       %mesh-yc-hn
       %mesh-crypto
       %draw

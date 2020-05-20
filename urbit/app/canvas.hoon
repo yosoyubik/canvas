@@ -1,5 +1,5 @@
 ::  canvas: A p2p Canvas app
-:: 
+::
 ::    data:            scry command:
 ::    ------------    ----------------------------------------------
 ::    canvas           .^(canvas %gx /=canvas=/canvas/<ship>/<canvas>/noun)
@@ -319,7 +319,10 @@
         %mesh-welcome  tmdw
         %mesh-martian  martian
         %mesh-bitcoin  bitcoin
+        %mesh-crypto   crypto
+        %mesh-yc-hn    yc-hn
         %mesh-sigil    larsen
+        %mesh-tile     tile
       ==
     =/  load=canvas-view  [%load name.metadata.canvas canvas]
     :-  [%give %fact [/updates]~ %canvas-view !>(load)]~

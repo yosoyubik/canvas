@@ -66,23 +66,14 @@ Direct link: `<YOUR_URL>/~canvas`
 
 <img src="/images/templates.png" width="500">
 
-- Hexagonal Mesh.
-  - Templates:
-    - Bitcoin Logo
-    - Urbit Canvas Logo
-    - <sub>friendly</sub> Martian
-    - Urbit Sigil <sub>~norsyr-torryn!</sub>
+
+
+- Hexagonal Mesh (See [Gallery](./GALLERY.md) for a preview of the available Mesh templates.)
 - World Maps: US, Europe, Africa (more soon...)
 - Freehand Canvas.
 
 #### Mesh
 ![Mesh](/images/export-mesh.png)
-#### Bitcoin
-![Bitcoin](/images/bitcoin.png)
-#### Sigil
-![Sigil](/images/sigil.png)
-#### Martian
-![Martian](/images/martian.png)
 #### Europe
 ![Europe](/images/europe.png)
 #### Africa
