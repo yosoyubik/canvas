@@ -15,6 +15,32 @@
   - A shared canvas becomes local once the subscription is pulled.
   - Others can join a Public Canvas and work collaboratively in a cool art project.
 
+## Dependencies
+
+[NodeJS](https://nodejs.org/en/) needs to be installed to package and copy the app to the mounted urbit folder:
+
+  Linux:
+  ```
+  sudo apt install nodejs
+  ```
+  Mac:
+  ```
+  :: Homebrew can be installed running:
+  :: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+  ::
+  brew install node
+  ```
+
+A specific version of node can be installed with the following commands:  
+```  
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
+export NVM_DIR="$HOME/.nvm"
+nvm install 12.0.0
+nvm use 12.0.0
+```
+
+Finally, to install all the dependencies run `npm install`
+
 ## Installation
 
 In order to run your canvas app on your ship, before `|install` is implemented natively on urbit, you will need to mount your pier to Unix with `|mount %`.
@@ -73,7 +99,7 @@ Direct link: `<YOUR_URL>/~canvas`
 - Freehand Canvas.
 
 #### Mesh
-![Mesh](/images/export-mesh.png)
+![Mesh](/images/mesh.png)
 #### Europe
 ![Europe](/images/europe.png)
 #### Africa
