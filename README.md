@@ -15,6 +15,10 @@
   - A shared canvas becomes local once the subscription is pulled.
   - Others can join a Public Canvas and work collaboratively in a cool art project.
 
+## Access
+
+A public canvas is hosted at `~norsyr-torryn-norsyr-torryn/canvas`. Come and join the first collaborative Urbit Canvas!
+
 ## Dependencies
 
 [NodeJS](https://nodejs.org/en/) needs to be installed to package and copy the app to the mounted urbit folder:
