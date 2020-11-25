@@ -1,32 +1,26 @@
 import _ from 'lodash';
 
-import { reparseDrawForms } from '/lib/form-reparser';
 
 export class UpdateReducer {
-    canvas(json, state) {
-        let data = _.get(json, 'load', false);
+
+  /* If we get an incoming object like this:
+
+  { update: {new: {}}}
+
+  It will replace the entire contents of the state with the incoming state enclosed in "new".
+
+  Feel free to amend the behaviour as necessary.
+  */
+    reduce(json, state) {
+        let data = _.get(json, 'update', false);
         if (data) {
-            if (data.type === 'draw') {
-              data.data = reparseDrawForms(data.data);
-            }
-            state.canvasList[data.name] = {
-              type: data.type,
-              metadata: {
-                name: data.name,
-                type: data.type,
-                location: data.location,
-                saved: false,
-                private: data.private
-              },
-              data: data.data
-            };
+            this.reduceState(_.get(data, 'new', false), state);
         }
     }
 
-    file(json, state) {
-        let data = _.get(json, 'file', false);
-        if (data) {
-            state.canvasList[data].metadata.saved = true;
+    reduceState(incoming, state) {
+        if (incoming) {
+            state = incoming;
         }
     }
 }
