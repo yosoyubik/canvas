@@ -1,39 +1,21 @@
-import { InitialReducer } from '/reducers/initial';
-import { UpdateReducer } from '/reducers/update';
-import { PaintReducer } from '/reducers/paint';
-
+import { InitialReducer } from './reducers/initial';
+import { UpdateReducer } from './reducers/update';
 
 class Store {
+
+  /*
+  The store holds all state for the front-end. We initialise a subscription to the back-end through
+  subscription.js and then let the store class handle all incoming diffs, including the initial one
+  we get from subscribing to the back-end.
+
+  It's important that state be mutated and set in one place, so pipe changes through the handleEvent method.
+  */
     constructor() {
-        this.state = {
-            canvasList: {},
-            chats: [],
-            maps: {}
-        };
+        this.state = {};
 
         this.initialReducer = new InitialReducer();
         this.updateReducer = new UpdateReducer();
-        this.paintReducer = new PaintReducer();
         this.setState = () => { };
-
-        // From: https://bl.ocks.org/mbostock/raw/4090846/us.json
-        fetch("/~canvas/map/us.json")
-          .then((response) => response.json())
-          .then((json) => {
-            this.state.maps.us = json;
-          });
-        // From: https://github.com/leakyMirror/map-of-europe/blob/master/TopoJSON/europe.topojson
-        fetch("/~canvas/map/europe.json")
-          .then((response) => response.json())
-          .then((json) => {
-            this.state.maps.europe = json;
-          });
-        // From: https://github.com/deldersveld/topojson/blob/master/continents/africa.json
-        fetch("/~canvas/map/africa.json")
-          .then((response) => response.json())
-          .then((json) => {
-            this.state.maps.africa = json;
-          });
     }
 
     setStateHandler(setState) {
@@ -42,14 +24,12 @@ class Store {
 
     handleEvent(data) {
         let json = data.data;
+
         console.log(json);
         this.initialReducer.reduce(json, this.state);
-        this.updateReducer.canvas(json, this.state);
-        this.updateReducer.file(json, this.state);
-        this.paintReducer.reduce(json, this.state);
-        if (!('paint' in json)) {
-          this.setState(this.state);
-        }
+        this.updateReducer.reduce(json, this.state);
+
+        this.setState(this.state);
     }
 }
 

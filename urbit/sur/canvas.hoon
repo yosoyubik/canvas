@@ -11,6 +11,8 @@
       %mesh-yc-hn
       %mesh-crypto
       %mesh-guy
+      %mesh-public
+      %mesh-life
       %draw
       %map-europe-europe
       %map-africa-africa

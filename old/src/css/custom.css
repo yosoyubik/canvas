@@ -18,6 +18,13 @@ textarea, select, input, button {
   background-color: #fff;
 }
 
+
+h2 {
+  font-size: 32px;
+  line-height: 48px;
+  font-weight: bold;
+}
+
 .body-regular {
   font-size: 16px;
   line-height: 24px;
@@ -66,6 +73,29 @@ textarea, select, input, button {
 
 .mix-blend-diff {
   mix-blend-mode: difference;
+}
+
+/* toggler checkbox */
+.toggle::after {
+  content: "";
+  height: 12px;
+  width: 12px;
+  background: white;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  border-radius: 100%;
+}
+
+.toggle.checked::after {
+  content: "";
+  height: 12px;
+  width: 12px;
+  background: white;
+  position: absolute;
+  top: 2px;
+  left: 14px;
+  border-radius: 100%;
 }
 
 /* dark */
@@ -128,31 +158,5 @@ textarea, select, input, button {
   }
   .hover-bg-gray1-d:hover {
     color: #4d4d4d;
-  }
-}
-
-/* responsive */
-
-@media all and (max-width: 34.375em) {
-  .h-100-minus-40-s {
-    height: calc(100% - 40px);
-  }
-}
-
-@media all and (min-width: 34.375em) and (max-width: 46.875em) {
-  .h-100-minus-40-m {
-    height: calc(100% - 40px);
-  }
-}
-
-@media all and (min-width: 46.875em) and (max-width: 60em) {
-  .h-100-minus-40-l {
-    height: calc(100% - 40px);
-  }
-}
-
-@media all and (min-width: 60em) {
-  .h-100-minus-40-xl {
-    height: calc(100% - 40px);
   }
 }
