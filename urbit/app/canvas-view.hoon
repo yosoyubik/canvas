@@ -32,8 +32,12 @@
     ::
     ++  on-init
       ^-  (quip card _this)
+      ~&  %init
       :_  this
-      :~  ::  Serve Web content
+      :~  ::  Connect to %eyre
+          ::
+          :: [%pass /bind/canvas-view %arvo %e %connect [~ /'~canvas'] dap.bowl]
+          ::  Serve Web content
           :: 
           :*  %pass  /srv  %agent  [our.bowl %file-server]
               %poke  %file-server-action
@@ -43,13 +47,19 @@
           ::  Add tile to %launch
           ::
           :*  %pass
-              /launch/canvas
+              /launch/canvas-view
               %agent
               [our.bowl %launch]
               %poke
               %launch-action 
-              !>([%add %canvas [[%basic 'canvas' '/~canvas/img/tile.png' '/~canvas'] %.y]])
+              !>([%add %canvas-view [[%basic 'canvas-view' '/~canvas/img/tile.png' '/~canvas'] %.y]])
      ==   ==
+    ::
+    ++  on-save  !>(state)
+    :: 
+    ++  on-load
+      |=  old=vase
+      [~ this(state !<(state-zero old))]
     ::
     ++  on-poke
       |=  [=mark =vase]
@@ -77,6 +87,7 @@
         [%give %fact ~ %json !>(*json)]~
       ::
           [%primary *]
+        ~&  %primary
         =^  cards  state
           (handle-canvas-view:cv [%init ~])
         cards
@@ -111,8 +122,6 @@
         [~ this]
       (on-arvo:def wire sign-arvo)
     ::
-    ++  on-save   on-save:def
-    ++  on-load   on-load:def
     ++  on-leave  on-leave:def
     ++  on-peek   on-peek:def
     ++  on-fail   on-fail:def
@@ -159,6 +168,7 @@
 ++  send-frontend
   |=  =json
   ^-  (list card)
+  ~&  %give-data
   [%give %fact [/primary]~ %json !>(json)]~
 ::
 ++  handle-json
@@ -185,7 +195,7 @@
   ==
   ::
   ++  handle-init
-    ^-  (list card)
+    ^-  (list card) 
     %-  send-frontend
     %-  canvas-view-response-to-json
     [%init-frontend [(welcome ~ 'welcome' our.bowl &) gallery-scry] chats-scry]

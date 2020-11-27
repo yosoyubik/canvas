@@ -1,0 +1,11 @@
+{
+  "useTabs": false,
+  "trailingComma": "all",
+  "proseWrap": "always",
+  "endOfLine": "lf",
+  "svelteSortOrder" : "styles-scripts-markup",
+  "svelteStrictMode": true,
+  "svelteBracketNewLine": true,
+  "svelteAllowShorthand": false,
+  "svelteIndentScriptAndStyle": false
+}

@@ -133,13 +133,6 @@
       ?:  ?=(%bound +<.sign-arvo)
         [~ this]
       ?+    wire  (on-arvo:def wire sign-arvo)
-        ::  FIXME: this should be called when a new image is created
-        ::   [%read %images ~]
-        :: ?>  ?=([?(%b %c) %writ *] sign-arvo)
-        :: =/  rot=riot:clay  +>.sign-arvo
-        :: ?>  ?=(^ rot)
-        :: [(send-updated-files u.rot) this]
-      ::
           [%write @t @t @t ~]
         =^  cards  state
           (check-file i.t.wire i.t.t.wire i.t.t.t.wire (scot %da now.bowl))
@@ -246,16 +239,6 @@
   =+  (need +.buffer)
   =/  contents=cage  [%svg !>(svg)]
   [%pass /write-file %arvo %c %info (foal:space:userlib path contents)]~
-::
-:: ++  send-updated-files
-::   |=  ran=rant:clay
-::   ^-  (list card)
-::   ~&  "send-updated-files"
-::   =/  next  [%next %t [%da now.bowl] /app/canvas/images]
-::   =/  files  !>([%files !<((list path) q.r.ran)])
-::   :~  [%give %fact [/updates]~ %canvas-view files]
-::       [%pass /read/images %arvo %c %warp our.bowl q.byk.bowl `next]
-::   ==
 ::
 ++  update-remote-canvas
   |=  [location=@p name=@t strokes=(list stroke)]
