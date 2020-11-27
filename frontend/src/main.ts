@@ -1,12 +1,15 @@
 import App from './App.svelte';
+import type { Patp } from './types/noun';
 
-window.urb = new window.channel();
+declare global {
+  interface Window {
+    channel: () => void;
+    ship: Patp;
+  }
+}
 
 const app = new App({
 	target: document.body,
-	props: {
-		name: 'world',
-	}
 });
 
 export default app;

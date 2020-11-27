@@ -1,7 +1,7 @@
-import _ from "lodash";
-import type { Patp, Path } from "./noun";
+import _ from 'lodash';
+import type { Patp, Path } from '../types/noun';
 
-export default class BaseApi<S extends object> {
+export default class Api {
   bindPaths: Path[] = [];
   constructor(
     public ship: Patp,
@@ -82,7 +82,7 @@ export default class BaseApi<S extends object> {
     const res = await fetch(
       `/spider/${inputMark}/${threadName}/${outputMark}.json`,
       {
-        method: "POST",
+        method: 'POST',
         body: JSON.stringify(body),
       }
     );

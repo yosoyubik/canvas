@@ -1,36 +1,37 @@
 <script lang="ts">
-	export let name: string;
-	export let urb: any;
-	console.log(urb);
+  import Subscription from './lib/subscription';
+  import Api from './lib/api';
+
+  import Header from './components/Header.svelte';
+  import Hexagons from './Hexagons.svelte';
+
+  const width = 1024;
+  const height = 1024;
+
+  const appChannel = new window.channel();
+  const api = new Api(window.ship, appChannel);
+  const subscription = new Subscription(api, appChannel);
+
+  subscription.subscribe('/primary', 'canvas-view');
+
 </script>
 
 <main>
-	<h1>Hello {name}!</h1>
-	<p>Visit the <a href="https://svelte.dev/tutorial">Svelte tutorial</a> to learn how to build Svelte apps.</p>
+  <Header />
+  <Hexagons {width} {height} />
 </main>
 
-<p>
-
-</p>
-
 <style>
-	main {
-		text-align: center;
-		padding: 1em;
-		max-width: 240px;
-		margin: 0 auto;
-	}
+  main {
+    text-align: center;
+    padding: 1em;
+    max-width: 240px;
+    margin: 0 auto;
+  }
 
-	h1 {
-		color: #ff3e00;
-		text-transform: uppercase;
-		font-size: 4em;
-		font-weight: 100;
-	}
-
-	@media (min-width: 640px) {
-		main {
-			max-width: none;
-		}
-	}
+  @media (min-width: 640px) {
+    main {
+      max-width: none;
+    }
+  }
 </style>
