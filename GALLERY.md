@@ -1,5 +1,6 @@
 # Templates Gallery
 
+- All
 - Cryptonomicon
 - Easel
 - Guybrush Threepwood
@@ -8,6 +9,10 @@
 - <sub>friendly</sub> Martian
 - Urbit Sigil <sub>~norsyr-torryn!</sub> <sub>~larsen!</sub>
 - Hacker News Logo
+
+#### All
+
+![All](/images/mesh.png)
 
 #### Cryptonomicon
 ![Crypto](/images/crypto.png)
