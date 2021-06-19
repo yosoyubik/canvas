@@ -1,5 +1,4 @@
 /-  *canvas
-/+  base64
 |%
 ++  json-to-canvas-view
   |=  jon=json
@@ -32,10 +31,12 @@
           :-  'metadata'
           %-  ot
           :~  ['name' so]
-              ['type' (cu canvas-type so)]
+              ['template' (cu template so)]
               ['location' (su ;~(pfix sig fed:ag))]
               ['saved' bo]
               ['private' bo]
+              ['width' ni]
+              ['height' ni]
       ==  ==
     ::
     --
@@ -54,7 +55,7 @@
     ==  ==
     ::
     ++  arc-data
-      (ot ~[['id' so] ['filled' bo] ['color' so]])
+      (ot ~[['id' so] ['fill' bo] ['color' so]])
     ::
     ++  form-data
       %-  ot
@@ -170,9 +171,11 @@
     ^-  (list [@t json])
     :~  ['name' s+name.metadata]
         ['location' s+(scot %p location.metadata)]
-        ['type' s+type.metadata]
+        ['template' s+template.metadata]
         ['saved' b+saved.metadata]
         ['private' b+private.metadata]
+        ['width' (numb:enjs:format width.metadata)]
+        ['height' (numb:enjs:format height.metadata)]
     ==
   ::
   ++  arc-to-json
