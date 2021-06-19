@@ -1,5 +1,5 @@
 |%
-+$  canvas-type
++$  template
   $?  %mesh
       %mesh-welcome
       %mesh-martian
@@ -25,7 +25,16 @@
 +$  form         [strokes=(list [@t @t]) line-width=@t style-stroke=@t]
 +$  mesh         (map @t arc)
 +$  draw         (list form)
-+$  metadata     [name=@t type=canvas-type location=ship saved=? private=?]
++$  metadata
+  $:  name=@t
+      =template
+      location=ship
+      saved=?
+      private=?
+      width=@ud
+      height=@ud
+  ==
+::
 +$  location     [host=ship canvas=@t]
 ::
 +$  canvas
