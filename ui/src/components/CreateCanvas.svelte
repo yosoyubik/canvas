@@ -76,11 +76,11 @@
   kind="ghost"
   size='small'
   on:click={() => (open = true)} >
-  Create Canvas
+  New
 </Button>
 
 <Modal
-  size='xs'
+  size='sm'
   bind:open
   passiveModal
   modalHeading="Create new canvas"

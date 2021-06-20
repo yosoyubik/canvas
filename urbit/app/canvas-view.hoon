@@ -1,10 +1,10 @@
 ::  canvas-view: A Canvas app for Urbit
 ::
 ::
-/-  *canvas, 
+/-  *canvas,
     *chat-store
-/+  *server, default-agent, verb, 
-    *canvas, 
+/+  *server, default-agent, verb,
+    *canvas,
     *canvas-templates
 ::  State
 ::
@@ -32,16 +32,15 @@
     ::
     ++  on-init
       ^-  (quip card _this)
-      ~&  %init
       :_  this
-      :~  ::  Connect to %eyre
+      :~  ::  Subscribe to %canvas
           ::
-          :: [%pass /bind/canvas-view %arvo %e %connect [~ /'~canvas'] dap.bowl]
+          [%pass /updates %agent [our.bowl %canvas] %watch /updates]
           ::  Serve Web content
-          :: 
+          ::
           :*  %pass  /srv  %agent  [our.bowl %file-server]
               %poke  %file-server-action
-              !>([%serve-dir /'~canvas' /app/canvas %.n %.n])
+              !>([%serve-dir /'~canvas' /app/canvas %.n %.y])
           ==
         ::
           ::  Add tile to %launch
@@ -51,12 +50,12 @@
               %agent
               [our.bowl %launch]
               %poke
-              %launch-action 
+              %launch-action
               !>([%add %canvas-view [[%basic 'canvas-view' '/~canvas/img/tile.png' '/~canvas'] %.y]])
      ==   ==
     ::
     ++  on-save  !>(state)
-    :: 
+    ::
     ++  on-load
       |=  old=vase
       [~ this(state !<(state-zero old))]
@@ -83,11 +82,9 @@
       :_  this
       ?+    path  ~|([%peer-canvas-strange path] !!)
           [%canvastile ~]
-        ~&  "canvas-tile"
         [%give %fact ~ %json !>(*json)]~
       ::
           [%primary *]
-        ~&  %primary
         =^  cards  state
           (handle-canvas-view:cv [%init ~])
         cards
@@ -110,6 +107,7 @@
           ^-  (quip card _state)
           ?+    p.cage.sign  ~|([%canvas-bad-update-mark wire vase] !!)
               %canvas-view
+            ~&  %canvas-view-update
             (handle-view-update:cv !<(canvas-view q.cage.sign))
           ==
         [cards this]
@@ -168,7 +166,6 @@
 ++  send-frontend
   |=  =json
   ^-  (list card)
-  ~&  %give-data
   [%give %fact [/primary]~ %json !>(json)]~
 ::
 ++  handle-json
@@ -195,14 +192,19 @@
   ==
   ::
   ++  handle-init
-    ^-  (list card) 
+    ^-  (list card)
     %-  send-frontend
     %-  canvas-view-response-to-json
-    [%init-frontend [(welcome ~ 'welcome' our.bowl &) gallery-scry] chats-scry]
+    ~&  'test'
+    :+  %init-frontend
+      [(welcome ~ 'welcome' our.bowl &) gallery-scry]
+    ~
+    :: chats-scry
   ::
   ++  handle-paint
     |=  [location=@p name=@t strokes=(list stroke)]
     ^-  (list card)
+    ~&  paint+name
     [(send-canvas-action [%paint name ~] [%paint +<])]~
   ::
   ++  handle-join
@@ -259,12 +261,14 @@
   ++  handle-paint
     |=  [location=@p name=@t strokes=(list stroke)]
     ^-  (list card)
+    ~&  %frontend-update
     %-  send-frontend
     (canvas-view-response-to-json [%paint +<])
   ::
   ++  handle-load
     |=  [name=@t =canvas]
     ^-  (list card)
+    ~&  "send-frontend"
     (send-frontend (canvas-view-response-to-json [%load +<]))
   ::
   ++  handle-file

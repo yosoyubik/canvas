@@ -15,15 +15,15 @@
   export let width: number;
   export let height: number;
   export let canvas: CanvasData;
-
+  console.log(height);
   const radius = 10;
 
-  let geometries, topology
-      , apiPaints = {}
-      , mousing = 0
-      , colors = d3.range(18)
-      , showPalette = true
-      , color = '#d53e4f';
+  let geometries, topology, menu = false
+    , apiPaints = {}
+    , mousing = 0
+    , colors = d3.range(18)
+    , showPalette = true
+    , color = '#d53e4f';
 
   //  $ allows to render hexagons on route change
   $: if (canvas.data) {
@@ -94,27 +94,31 @@
   <rect {width} height={height + 2.5*radius} class='border' />
 </svg>
 
-<ContextMenu>
-  {#if $store.gcp || $store.s3.credentials}
-    <ContextMenuOption indented
-      labelText="Export canvas..."
-      on:click={()=> console.log('exporting') }
+{#if canvas.data}
+  <ContextMenu open={menu}>
+    {#if $store.gcp || $store.s3.credentials}
+      <ContextMenuOption indented
+        labelText="Export canvas..."
+        on:click={()=> console.log('exporting') }
+      />
+      <ContextMenuDivider />
+    {/if}
+    <ContextMenuOption
+      labelText="Show color palette"
+      selected={showPalette}
+      on:click={()=> showPalette = !showPalette }
     />
-    <ContextMenuDivider />
-  {/if}
-  <ContextMenuOption
-    labelText="Show color palette"
-    selected={showPalette}
-    on:click={()=> showPalette = !showPalette }
-  />
-</ContextMenu>
+  </ContextMenu>
+{/if}
 
 <style>
   svg {
     overflow: hidden;
     max-width: 1024px;
     min-width: 320px;
-    max-height: 1024px;
+    display: block;
+    margin: auto;
+    height: 100%;
   }
 
   .border {
