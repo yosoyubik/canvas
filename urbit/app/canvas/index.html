@@ -1,20 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-	<meta charset='utf-8'>
-	<meta name='viewport' content='width=device-width,initial-scale=1'>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="/favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="/~landscape/js/channel.js" /></script>
+    <script src="/~landscape/js/session.js" /></script>
+    
 
-	<title>Canvas</title>
+		
 
-	<link rel='icon' type='image/png' href='/~canvas/favicon.png'>
-	<link rel='stylesheet' href='/~canvas/global.css'>
-	<link rel='stylesheet' href='/~canvas/build/bundle.css'>
+		<link rel="modulepreload" href="/~canvas/_app/start-793e51f1.js">
+		<link rel="modulepreload" href="/~canvas/_app/chunks/vendor-4a259baa.js">
+		<link rel="modulepreload" href="/~canvas/_app/chunks/paths-7dc55c62.js">
+		<link rel="stylesheet" href="/~canvas/_app/assets/start-a8cd1609.css">
 
-	<script defer src='/~canvas/build/bundle.js'></script>
-	<script src="/~landscape/js/channel.js"></script>
-	<script src="/~landscape/js/session.js"></script>
-</head>
+		<script type="module">
+			import { start } from "/~canvas/_app/start-793e51f1.js";
+			start({
+				target: document.querySelector("#svelte"),
+				paths: {"base":"/~canvas","assets":"/~canvas"},
+				session: {},
+				host: location.host,
+				route: true,
+				spa: true,
+				trailing_slash: "never",
+				hydrate: null
+			});
+		</script>
+  </head>
+  <body>
+    <div id="svelte">
 
-<body>
-</body>
+	
+</div>
+  </body>
 </html>

@@ -7,11 +7,10 @@
 ::
 ::  State
 ::
-/-  *canvas, *chat-store
+/-  *canvas
 /+  *server, default-agent, verb, dbug,
-    *canvas, 
-    *canvas-templates, 
-    base=base64
+    *canvas,
+    *canvas-templates
 ::
 =>  |%
     +$  card  card:agent:gall
@@ -179,24 +178,27 @@
     %join    (handle-join +.act)
     %leave   (handle-leave +.act)
     %create  (handle-create +.act)
-    %share   (handle-share +.act)
+    :: %share   (handle-share +.act)
     %save    (handle-save +.act)
   ==
   ::
   ++  handle-paint
     |=  [location=@p name=@t strokes=(list stroke)]
     ^-  (quip card _state)
+    ~&  "[ paint ]"
     (process-remote-paint location name strokes)
   ::
   ++  handle-join
     |=  [=ship name=@t]
     ^-  (quip card _state)
     ?>  (team:title our.bowl src.bowl)
+    ~&  "[ join ]"
     [[(subscribe ship name)]~ state]
   ::
   ++  handle-leave
     |=  [=ship name=@t]
     ^-  (quip card _state)
+    ~&  "[ leave ]"
     ?>  (team:title our.bowl src.bowl)
     =/  =canvas  (~(got by gallery) [ship name])
     ::  the canvas becomes local
@@ -211,11 +213,12 @@
     |=  =canvas
     ^-  (quip card _state)
     ?>  (team:title our.bowl src.bowl)
+    ~&  "[ create ]"
     =*  name  name.metadata.canvas
     =*  private  private.metadata.canvas
     =.  canvas
       %.  [canvas name our.bowl private]
-      ?+  type.metadata.canvas  blank
+      ?+  template.metadata.canvas  blank
         %mesh-welcome  tmdw
         %mesh-martian  martian
         %mesh-bitcoin  bitcoin
@@ -234,46 +237,46 @@
       (~(put by gallery) [[our.bowl name.metadata.canvas] canvas])
     ==
   ::
-  ++  handle-share
-   |=  [name=@t chat=path type=image-type]
-   ^-  (quip card _state)
-   ?>  (team:title our.bowl src.bowl)
-   :_  state
-   ::  TODO: check if file has been created already?
-   ::  now we disable share on browser if not
-   ::
-   =/  serial=@uvH  (shaf %msg-uid eny.bowl)
-   =/  =hart:eyre  .^(hart:eyre %e /(scot %p our.bowl)/host/real)
-   =/  port=(unit @ud)  q.hart
-   =/  domain-port=tape
-     ;:  weld
-         ?:(p.hart "https://" "http://")
-       ::
-         ?-  -.r.hart
-           %.y  (trip (en-turf:html p.r.hart))
-           %.n  (slag 1 (scow %if p.r.hart))
-         ==
-      ::
-        ":"
-        ?~(port "" ((d-co:co 1) u.port))
-     ==
-   =/  =letter
-     :-  %url
-     %-  crip
-     ::  TODO: add avg as option to preview in chat
-     ::        for now, using png as an extension works
-     ::
-     "{domain-port}/~canvas/images/{(trip type)}/{(trip name)}.png"
-   =/  =envelope  [serial *@ our.bowl now.bowl letter]
-   :_  ~
-   :*  %pass
-       ~[%chat %share name]
-       %agent
-       [our.bowl %chat-hook]
-       %poke
-       %chat-action
-       !>([%message chat envelope])
-   ==
+  :: ++  handle-share
+  ::  |=  [name=@t chat=path type=image-type]
+  ::  ^-  (quip card _state)
+  ::  ?>  (team:title our.bowl src.bowl)
+  ::  :_  state
+  ::  ::  TODO: check if file has been created already?
+  ::  ::  now we disable share on browser if not
+  ::  ::
+  ::  =/  serial=@uvH  (shaf %msg-uid eny.bowl)
+  ::  =/  =hart:eyre  .^(hart:eyre %e /(scot %p our.bowl)/host/real)
+  ::  =/  port=(unit @ud)  q.hart
+  ::  =/  domain-port=tape
+  ::    ;:  weld
+  ::        ?:(p.hart "https://" "http://")
+  ::      ::
+  ::        ?-  -.r.hart
+  ::          %.y  (trip (en-turf:html p.r.hart))
+  ::          %.n  (slag 1 (scow %if p.r.hart))
+  ::        ==
+  ::     ::
+  ::       ":"
+  ::       ?~(port "" ((d-co:co 1) u.port))
+  ::    ==
+  ::  =/  =letter
+  ::    :-  %url
+  ::    %-  crip
+  ::    ::  TODO: add avg as option to preview in chat
+  ::    ::        for now, using png as an extension works
+  ::    ::
+  ::    "{domain-port}/~canvas/images/{(trip type)}/{(trip name)}.png"
+  ::  =/  =envelope  [serial *@ our.bowl now.bowl letter]
+  ::  :_  ~
+  ::  :*  %pass
+  ::      ~[%chat %share name]
+  ::      %agent
+  ::      [our.bowl %chat-hook]
+  ::      %poke
+  ::      %chat-action
+  ::      !>([%message chat envelope])
+  ::  ==
   ::
   ++  handle-save
     |=  [=ship file=@t chunk=@t last=? type=image-type]
@@ -311,8 +314,8 @@
   ^-  (quip card _state)
   ?>  ?=(^ strokes)
   =/  canvas=(unit canvas)  (~(get by gallery) [location name])
-  ?~  canvas  `state
-  ?.  =(-.i.strokes -.u.canvas)  `state
+  ?~  canvas  ~&  %out-1  `state
+  ?.  =(-.i.strokes -.u.canvas)  ~&  %out-2  `state
   |^
   =*  meta  metadata.u.canvas
   :-  (send-effects strokes)
@@ -339,8 +342,13 @@
       ==
     ::  stroke from frontend
     ::
+    ~&  ['frontend' location our.bowl]
     ?:  =(location our.bowl)
       [(send-paint-update name strokes our.bowl)]~
+      :: =/  paint  !>([%paint location name strokes])
+      :: :~  [%give %fact [/updates]~ %canvas-view paint]
+      ::     [(send-paint-update name strokes src.bowl)]
+      :: ==
     [(update-remote-canvas location name strokes)]~
   ::
   ++  update-mesh
@@ -365,9 +373,9 @@
     |-
     ?~  strokes  draw
     ?>  ?=([%draw *] i.strokes)
-    %_    $
-        draw     (snoc draw form.i.strokes)
-        strokes  t.strokes
+    %_  $
+      draw     (snoc draw form.i.strokes)
+      strokes  t.strokes
     ==
   --
 --
