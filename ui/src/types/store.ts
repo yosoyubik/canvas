@@ -11,6 +11,7 @@ export interface StoreState {
   canvas?: Canvas;
   width: number;
   height: number;
+  name: string;
   // Urbit
   chats: [];
   connection: ConnectionStatus;

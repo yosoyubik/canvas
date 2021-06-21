@@ -1,34 +1,19 @@
 <script lang="ts">
-  import { goto } from '$app/navigation';
+  import store from '../store';
+  import { createEventDispatcher } from 'svelte';
 
   import { Modal, FormGroup, Button } from "carbon-components-svelte";
-  import Add16 from "carbon-icons-svelte/lib/Add16";
+  import UserFollow32 from "carbon-icons-svelte/lib/UserFollow32";
   import { Sveltik, Form, Field, ErrorMessage } from 'sveltik'
-  import store from '../store';
   import type { CanvasForm } from '../types/canvas';
 
-  const templates = {
-    'mesh': 'Hexagon Mesh',
-    'mesh-welcome': 'Canvas Logo',
-    'mesh-bitcoin': 'Bitcoin',
-    'mesh-sigil': 'Sigil',
-    'mesh-martian': 'Martian',
-    'mesh-crypto': 'Cryptonomicon',
-    'mesh-yc-hn': 'Hacker News',
-    'mesh-tile': 'Easel',
-    'mesh-guy': 'Guybrush Threepwood',
-    'mesh-life': 'Other Life',
-    'mesh-public': 'Public Moon',
-  };
+  const dispatch = createEventDispatcher();
 
-  let open = false;
 
-  let initialValues: CanvasForm = {
+  let open = false, isSubmitting = false;
+
+  let initialValues = {
       name: '',
-      private:  true,
-      template: 'mesh',
-      width: 1500,
-      height: 1000,
   }
 
   let validate = (values: CanvasForm) => {
@@ -36,79 +21,48 @@
       if (values.name === '') {
           errors.name = 'Name Required'
       }
-      if (values.width < 648) {
-          errors.width = 'Min width 648'
-      }
-      if (values.width > 1500) {
-          errors.width = 'Max width 1500'
-      }
-      if (values.height < 648) {
-          errors.height = 'Min height 648'
-      }
-      if (values.height > 1000) {
-          errors.height = 'Max height 1000'
-      }
       console.log(errors);
       return errors
   }
 
   let onSubmit = (values: CanvasForm, { setSubmitting }) => {
-      $store.api.create(
-        values.name,
-        '~' + $store.ship,
-        values.template,
-        values.private,
-        values.width,
-        values.height,
-      ).then(() => {
-        setSubmitting(false);
-        goto(`/canvas/${values.name}`);
-      })
+    const [location, name] = values.name.split('/')
+    $store.api.join(location, name
+    ).then(() => {
+      console.log('[ success join canvas... ]', values.name);
+      dispatch('joincanvas', { name: values.name } );
+      open = false;
+      isSubmitting = false;
+    })
+    console.log(values);
   }
 </script>
 
 
 <Button
-  icon={Add16}
+  icon={UserFollow32}
   kind="ghost"
   size='small'
   on:click={() => (open = true)} >
-  Create Canvas
+  Join
 </Button>
 
 <Modal
   size='xs'
   bind:open
   passiveModal
-  modalHeading="Create new canvas"
+  modalHeading=''
   on:click:button--secondary={() => (open = false)}
   on:open
   on:close
 >
-  <Sveltik {initialValues} {validate} {onSubmit} let:isSubmitting>
+  <Sveltik {initialValues} {validate} {onSubmit} bind:isSubmitting>
     <Form>
-      <FormGroup legendText="Name">
-        <Field type="name" name="name" />
+      <FormGroup legendText="Remote Canvas Name ">
+        <Field type="name" name="name" placeholder='~sampel-palnet/canvas'/>
         <ErrorMessage name="name" as="span" />
       </FormGroup>
-      <FormGroup legendText="Dimensions">
-        <Field as='TextInput' type="number" name="width" />
-        <Field as='TextInput' type="number" name="height" />
-          <ErrorMessage name="width" as="div" />
-          <ErrorMessage name="height" as="div" />
-      </FormGroup>
-      <FormGroup legendText="Options">
-        <Field as="select" name="template">
-          {#each Object.keys(templates) as template}
-            <option value={template}>
-              {template}
-            </option>
-          {/each}
-        </Field>
-        <Field type="checkbox" name="private" checked />
-        <span>Private</span>
-      </FormGroup>
-       <Button size='small' type="submit" disabled={isSubmitting}>Submit</Button>
+       <Button size='small' type="submit" disabled={isSubmitting}>Join</Button>
     </Form>
   </Sveltik>
 </Modal>

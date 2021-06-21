@@ -10,8 +10,10 @@ export type Create = (
 ) => Promise<unknown>;
 
 export type Send = (location: string, name: string, strokes) => Promise<unknown>;
+export type Join = (location: string, name: string) => Promise<unknown>;
 
 export default interface Api {
   create: Create;
   send: Send;
+  join: Join;
 }

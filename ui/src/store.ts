@@ -12,6 +12,7 @@ const initStore: StoreState = {
   chats: [],
   connection: 'disconnected',
   canvasList: [],
+  name: 'welcome',
   ship: browser ? window.ship : '~zod',
   width: 1500,
   height: 1000,
@@ -64,7 +65,7 @@ export function saveGCPToken(token: unknown): void {
 }
 
 export function loadCanvas(canvas: LoadCanvas): void {
-  console.log('[loadCanvas]', canvas);
+  console.log('[loadCanvas]', canvas, canvas.name);
   update(
     ($store): StoreState => {
       return {
@@ -84,6 +85,7 @@ export function loadCanvas(canvas: LoadCanvas): void {
           },
           ...$store.canvas
         },
+        name: canvas.name,
         canvasList: [canvas.name, ...$store.canvasList]
       };
     }
@@ -153,6 +155,15 @@ export function addSubscription(subscription: unknown): void {
         ...$store,
         subscription
       };
+    }
+  );
+}
+
+export function updateCurrentCanvas(name: string): void {
+  console.log(name);
+  update(
+    ($store): StoreState => {
+      return { ...$store, name };
     }
   );
 }
