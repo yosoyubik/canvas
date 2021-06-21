@@ -44,6 +44,18 @@ export default class CanvasApi extends Api {
     return this.sendPoke({ paint });
   }
 
+  /**
+   * Join a remote canvas
+   */
+  async join(location: Patp, name: string): Promise<unknown> {
+    console.log('join', location, name);
+    const join = {
+      'canvas-name': name,
+      ship: location
+    };
+    return this.sendPoke({ join });
+  }
+
   private async sendPoke(action: unknown): Promise<unknown> {
     return this.action('canvas-view', 'json', action);
   }

@@ -1,6 +1,6 @@
 <script lang="ts">
   import 'carbon-components-svelte/css/all.css';
-
+  import store from '../store';
   import { onMount } from 'svelte';
   import { base } from '$app/paths';
   import { addApi, addSubscription } from '../store';

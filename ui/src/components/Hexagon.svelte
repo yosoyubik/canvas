@@ -1,7 +1,7 @@
 <script lang='ts'>
   import * as d3 from 'd3';
   import * as topojson from 'topojson-client';
-  import {createEventDispatcher} from 'svelte';
+  import { createEventDispatcher } from 'svelte';
 
   import { hexProjection } from "../lib/hexTopology";
 
