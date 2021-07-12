@@ -150,6 +150,7 @@
   ^-  (quip card _state)
   =/  canvas=(unit canvas)  (~(get by gallery) [our.bowl name])
   ?~  canvas  `state
+  ~&  >  ['subscribing...' src.bowl private.metadata.u.canvas]
   ?:  private.metadata.u.canvas
     ~|([%subs-not-allowed name] !!)
   :_  state
