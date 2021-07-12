@@ -16,7 +16,6 @@ function translate(coord, offset) {
 }
 
 export function topology(type) {
-  console.log(type);
   return type === 'hexa' ? hexTopology : squareTopology;
 }
 
@@ -67,8 +66,6 @@ function squareTopology(
     // nOld = Math.ceil(width / oldDx) + 1,
     geometries = [],
     arcs = [];
-  // console.log(width, height, m, n, Math.ceil(width / (radius * 2 * Math.sin(Math.PI / 3))) + 1)
-  console.log(width, height, m, n, oldN);
 
   for (let j = -1; j <= m; ++j) {
     for (let i = -1; i <= n; ++i) {
@@ -90,7 +87,8 @@ function squareTopology(
   const hexKeys = Object.keys(hexagons);
   const indexMap = {};
   hexKeys.map(index => {
-    if (n !== oldN) {
+    //  FIXME: turn off reindex of pixels
+    if (n !== oldN && false) {
       indexMap[transformIndex(index, oldN, n)] = index;
     } else {
     indexMap[index] = index;
@@ -138,7 +136,6 @@ function hexTopology(
     // nOld = oldWidth ? Math.ceil(oldWidth / dx) + 1 : width,
     geometries = [],
     arcs = [];
-  console.log(width, height, m, n, oldN)
 
   let total = 0;
 

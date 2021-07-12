@@ -16,12 +16,10 @@
     inline
     selected={selectedCanvas}
     on:change={event => {
-      console.log('canvasMenu', event, event.detail, $store.name);
       if (event.detail) {
         updateCurrentCanvas(event.detail);
       }
-    }}
-  >
+    }}>
     {#if $store.publicCanvas.length > 0}
       <SelectItemGroup label="Public">
         {#each $store.publicCanvas as canvas}
