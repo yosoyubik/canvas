@@ -68,7 +68,7 @@ class GcpManager {
     if (!this.#configured) {
       this.#api
         ?.isConfigured()
-        .then((configured) => {
+        .then(configured => {
           if (configured === undefined) {
             throw new Error("can't check whether GCP is configured?");
           }
@@ -80,7 +80,7 @@ class GcpManager {
             this.stop();
           }
         })
-        .catch((reason) => {
+        .catch(reason => {
           console.error('GcpManager failure; stopping.', reason);
           this.stop();
         });
@@ -130,7 +130,9 @@ class GcpManager {
     // exponential backoff.
     const slotMs = 5_000;
     const maxSlot = 60; // 5 minutes
-    const backoffSlots = Math.floor(Math.random() * Math.min(maxSlot, this.#consecutiveFailures));
+    const backoffSlots = Math.floor(
+      Math.random() * Math.min(maxSlot, this.#consecutiveFailures)
+    );
     return slotMs * backoffSlots;
   }
 }

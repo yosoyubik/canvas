@@ -10,5 +10,6 @@
 ++  grow
   |%
   ++  noun  act
+  ++  json  json-to-canvas-view
   --
 --

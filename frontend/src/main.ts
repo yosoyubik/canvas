@@ -1,12 +1,5 @@
 import App from './App.svelte';
-import type { Patp } from './types/noun';
-
-declare global {
-  interface Window {
-    channel: () => void;
-    ship: Patp;
-  }
-}
+import 'carbon-components-svelte/css/all.css';
 
 const app = new App({
 	target: document.body,

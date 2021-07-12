@@ -11,9 +11,11 @@ export default class CanvasApi extends Api {
     template: string,
     access: boolean,
     width: number,
-    height: number
+    height: number,
+    columns: number,
+    mesh?: string,
   ): Promise<unknown> {
-    console.log(name, location, template, access, width, height);
+    console.log(name, location, template, access, width, height, columns, mesh);
     const create = {
       mesh: {
         canvas: null,
@@ -24,7 +26,9 @@ export default class CanvasApi extends Api {
           private: access,
           template,
           width,
-          height
+          height,
+          columns,
+          mesh
         }
       }
     };
@@ -35,13 +39,26 @@ export default class CanvasApi extends Api {
    * Send a stroke to a canvas in a location
    */
   async send(location: Patp, name: string, strokes: unknown): Promise<unknown> {
-    console.log('paint', location, name);
+    // console.log('paint', location, name, strokes);
     const paint = {
       'canvas-name': name,
       location,
       strokes
     };
     return this.sendPoke({ paint });
+  }
+
+  /**
+   * Saves the exported Canvas URl
+   */
+  async save(location: Patp, name: string, file: string): Promise<unknown> {
+    // console.log('paint', location, name, strokes);
+    const save = {
+      'canvas-name': name,
+      location,
+      file
+    };
+    return this.sendPoke({ save });
   }
 
   /**

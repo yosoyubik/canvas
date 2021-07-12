@@ -96,7 +96,7 @@ export default {
         extend(app, modules) {
           // middleware
           app.use(
-            proxy("**", {
+            proxy("/~/**", {
               target: "http://localhost:8080",
               changeOrigin: true,
               logs: true,

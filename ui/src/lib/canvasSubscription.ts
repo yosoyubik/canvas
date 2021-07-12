@@ -7,7 +7,9 @@ import {
   updateConnection,
   paintCanvas,
   loadCanvas,
-  saveGCPToken
+  saveGCPToken,
+  saveS3credentials,
+  saveS3config
 } from '../store';
 
 /**
@@ -21,12 +23,11 @@ const appSubscriptions: Record<AppName, AppSubscription[]> = {
 };
 
 export default class CanvasSubscription extends Subscription {
-  openSubscriptions: Record<AppName, number[]> = {
-    'canvas-view': []
-  };
+  openSubscriptions: any = {};
 
   start(): void {
     this.subscribe('/primary', 'canvas-view');
+    this.subscribe('/all', 's3-store');
   }
 
   restart(): void {
@@ -50,7 +51,7 @@ export default class CanvasSubscription extends Subscription {
   }
 
   stopApp(app: AppName): void {
-    this.openSubscriptions[app].map((id) => this.unsubscribe(id));
+    this.openSubscriptions[app].map(id => this.unsubscribe(id));
     this.openSubscriptions[app] = [];
   }
 
@@ -74,6 +75,12 @@ export default class CanvasSubscription extends Subscription {
       paintCanvas(json['paint']);
     } else if ('gcp-token' in json) {
       saveGCPToken(json['gcp-token']);
+    } else if ('s3-update' in json) {
+      if ('credentials' in json['s3-update']) {
+        saveS3credentials(json['s3-update']['credentials']);
+      } else if ('configuration' in json['s3-update']) {
+        saveS3config(json['s3-update']['configuration']);
+      }
     }
     return;
   }

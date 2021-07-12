@@ -1,37 +1,19 @@
 <script lang="ts">
-  import Subscription from './lib/subscription';
-  import Api from './lib/api';
-
+  import Router  from 'svelte-spa-router';
+  import routes from './routes';
+  import store from './store';
   import Header from './components/Header.svelte';
-  import Hexagons from './Hexagons.svelte';
-
-  const width = 1024;
-  const height = 1024;
-
-  const appChannel = new window.channel();
-  const api = new Api(window.ship, appChannel);
-  const subscription = new Subscription(api, appChannel);
-
-  subscription.subscribe('/primary', 'canvas-view');
+  import HexagonMesh from './components/HexagonMesh.svelte';
+  import CreateCanvas from './components/CreateCanvas.svelte';
 
 </script>
 
 <main>
   <Header />
-  <Hexagons {width} {height} />
+  <CreateCanvas />
+  <Router {routes} />
+  <HexagonMesh width={$store.width} height={$store.height}  />
 </main>
 
 <style>
-  main {
-    text-align: center;
-    padding: 1em;
-    max-width: 240px;
-    margin: 0 auto;
-  }
-
-  @media (min-width: 640px) {
-    main {
-      max-width: none;
-    }
-  }
 </style>

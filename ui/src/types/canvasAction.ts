@@ -1,5 +1,5 @@
 import type { Patp } from './noun';
-import type { Canvas, Strokes } from './canvas';
+import type { Canvas } from './canvas';
 
 export type CanvasAction = Load | Paint | Join | Leave | Create;
 // | Share
@@ -14,8 +14,10 @@ export interface Paint {
   name: string;
   strokes: {
     id: number;
-    fill: boolean;
+    // fill: boolean;
     color: string;
+    who?:  Patp;
+    when?: number;
   }[];
 }
 

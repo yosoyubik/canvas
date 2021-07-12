@@ -14,11 +14,11 @@ export interface S3State {
   credentials: S3Credentials | null;
 }
 
-interface S3UpdateCredentials {
+export interface S3UpdateCredentials {
   credentials: S3Credentials;
 }
 
-interface S3UpdateConfiguration {
+export interface S3UpdateConfiguration {
   configuration: {
     buckets: string[];
     currentBucket: string;

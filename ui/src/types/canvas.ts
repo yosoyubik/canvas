@@ -1,35 +1,23 @@
-import type { Path } from './noun';
-
-export enum Template {
-  Empty,
-  Welcome,
-  Martian,
-  Bitcoin,
-  Hashtag,
-  Sigil,
-  TMDW,
-  Tile,
-  YCHN,
-  Crypto,
-  Guy,
-  Public,
-  Life
-}
+import type { Patp } from './noun';
 
 export interface Metadata {
   name: string;
-  location: Path;
-  saved: boolean;
+  location: Patp;
+  file?: string;
   private: boolean;
   template: string;
   width: number;
   height: number;
+  columns: number;
+  mesh?: string;
 }
 
 export interface Strokes {
   [id: number]: {
-    fill: boolean;
+    // fill: boolean;
     color: string;
+    who?:  Patp;
+    when?: number;
   };
 }
 
@@ -55,4 +43,6 @@ export interface CanvasForm {
   template: string;
   width: number;
   height: number;
+  radius: number;
+  mesh?: string;
 }

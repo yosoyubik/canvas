@@ -20,9 +20,10 @@ export default function createColorPicker(width, legend) {
       selectedColor = 0;
 
   function clicklegend(d) {
+    console.log(d);
     let legend = d3.select('.legend').selectAll('rect');
     let colors = legend.nodes();
-    colors[selectedColor].style.stroke = null;
+    colors[selectedColor].style.stroke = 'gray';
     colors[(selectedColor = d)].style.stroke = '#000';
   }
 
@@ -42,7 +43,7 @@ export default function createColorPicker(width, legend) {
     })
     .attr('width', 24 - 3)
     .attr('height', 24 - 3)
-    .style('stroke', function(d) { return d ? null : '#000'; })
+    .style('stroke', function(d) { return d ? 'gray' : '#000'; })
     .style('fill', function (d) {
       if (d < 9) {
         return color(d);

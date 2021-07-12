@@ -1,27 +1,42 @@
 <script lang="ts">
-  import { goto } from '$app/navigation';
+  import store, { updateCurrentCanvas } from '../store';
+  import {
+    Select,
+    SelectItem,
+    SelectItemGroup
+  } from 'carbon-components-svelte';
 
-  export let canvasList;
-
-  let open = true;
-	let selected = "";
-
-  console.log(canvasList);
-
+  export let selectedCanvas: string;
 </script>
 
-<!-- svelte-ignore a11y-no-onchange -->
-<select on:change={(event) => goto(`/~canvas/${event.currentTarget.value}`, {
-  "replaceState": true
-})}>
-  {#each canvasList as canvas}
-    <option value={canvas}>
-      {canvas}
-    </option>
-  {/each}
-</select>
-
-<style>
-
-</style>
-
+{#if $store.privateCanvas || $store.publicCanvas}
+  <Select
+    light
+    size="sm"
+    inline
+    selected={selectedCanvas}
+    on:change={event => {
+      console.log('canvasMenu', event, event.detail, $store.name);
+      if (event.detail) {
+        updateCurrentCanvas(event.detail);
+      }
+    }}
+  >
+    {#if $store.publicCanvas.length > 0}
+      <SelectItemGroup label="Public">
+        {#each $store.publicCanvas as canvas}
+          <SelectItem value={canvas} text={canvas} />
+        {/each}
+      </SelectItemGroup>
+    {/if}
+    {#if $store.privateCanvas.length > 0}
+      <SelectItemGroup label="Private">
+        {#each $store.privateCanvas as canvas}
+          <SelectItem value={canvas} text={canvas} />
+        {/each}
+      </SelectItemGroup>
+    {/if}
+  </Select>
+{:else}
+  <Select light size="sm" inline />
+{/if}
