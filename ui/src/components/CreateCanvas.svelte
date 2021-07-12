@@ -58,7 +58,6 @@
   };
 
   function validate(values: CanvasForm) {
-    // console.log($store.privateCanvas);
     const errors = { name: '', width: '', height: '' };
     if (values.name === '') {
       errors.name = 'Name Required';
@@ -91,7 +90,6 @@
     if (values.template == 'mesh' && !values.height) {
       errors.height = 'Height required';
     }
-    // console.log(values, errors);
     return errors;
   }
 
@@ -100,7 +98,6 @@
     const canvasName = stringToSymbol(values.name);
     const dx = $store.radius * 2 * Math.sin(Math.PI / 3);
     const columns = values.width ? Math.ceil(values.width / dx) + 1 : 0;
-    console.log(columns);
     $store.api
       .create(
         canvasName,
@@ -124,14 +121,7 @@
   New
 </Button>
 
-<Modal
-  bind:open
-  modalHeading=""
-  passiveModal
-  size="sm"
-  hasForm={true}
-  on:close={vals => console.log('close', vals)}
->
+<Modal bind:open modalHeading="" passiveModal size="sm" hasForm={true}>
   <Grid padding>
     <Sveltik
       let:props
@@ -141,8 +131,7 @@
       {initialWarnings}
       {validate}
       {onSubmit}
-      bind:isSubmitting
-    >
+      bind:isSubmitting>
       <Form on:submit={props.handleSubmit} {...props}>
         <FormGroup legendText="Canvas">
           <Row>
@@ -159,8 +148,7 @@
                   type="text"
                   invalidText={meta.error}
                   on:input={field.handleInput}
-                  on:blur={field.handleBlur}
-                />
+                  on:blur={field.handleBlur} />
               </Field>
             </Column>
             <Column padding lg={4}>
@@ -173,8 +161,7 @@
                   {...field}
                   title="Uncheck if you want others to join"
                   on:change={field.handleInput}
-                  on:blur={field.handleBlur}
-                />
+                  on:blur={field.handleBlur} />
               </Field>
             </Column>
           </Row>
@@ -189,19 +176,16 @@
                   selected={initialValues.mesh}
                   on:change={vals => {
                     if (!vals.detail) return;
-                    console.log(vals.detail);
                     const target = { name: 'mesh', value: vals.detail };
                     return field.handleInput({ target });
-                  }}
-                >
+                  }}>
                   <MeshPreview
                     width="48"
                     height="44"
                     stroke="black"
                     strokeWidth="0.7"
                     fill="none"
-                    type="squa"
-                  />
+                    type="squa" />
                   <RadioButton type="radio" labelText="Squares" value="squa" />
                   <MeshPreview
                     width="48"
@@ -209,8 +193,7 @@
                     stroke="black"
                     strokeWidth="0.8"
                     fill="none"
-                    type="hexa"
-                  />
+                    type="hexa" />
                   <RadioButton type="radio" labelText="Hexagons" value="hexa" />
                 </RadioButtonGroup>
               </Field>
@@ -230,8 +213,7 @@
                   warn={field.value > 1500}
                   warnText={meta.warning}
                   on:input={field.handleInput}
-                  on:blur={field.handleBlur}
-                />
+                  on:blur={field.handleBlur} />
               </Field>
             </Column>
             <Column>
@@ -239,8 +221,7 @@
                 let:field
                 let:meta
                 name="height"
-                initialWarning={performanceWarning}
-              >
+                initialWarning={performanceWarning}>
                 <TextInput
                   type="number"
                   size="sm"
@@ -252,8 +233,7 @@
                   invalid={meta.error}
                   invalidText={meta.error}
                   on:input={field.handleInput}
-                  on:blur={field.handleBlur}
-                />
+                  on:blur={field.handleBlur} />
               </Field>
             </Column>
           </Row>
@@ -276,8 +256,7 @@
                     if (!vals.detail) return;
                     const target = { name: 'template', value: vals.detail };
                     return field.handleInput({ target });
-                  }}
-                >
+                  }}>
                   <SelectItem value="mesh" text="No Template" />
                   <SelectItemGroup label="Hexagonal">
                     {#each Object.entries(hexaTemplates) as [template, name]}

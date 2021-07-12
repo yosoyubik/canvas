@@ -15,7 +15,6 @@ export default class CanvasApi extends Api {
     columns: number,
     mesh?: string,
   ): Promise<unknown> {
-    console.log(name, location, template, access, width, height, columns, mesh);
     const create = {
       mesh: {
         canvas: null,
@@ -39,7 +38,6 @@ export default class CanvasApi extends Api {
    * Send a stroke to a canvas in a location
    */
   async send(location: Patp, name: string, strokes: unknown): Promise<unknown> {
-    // console.log('paint', location, name, strokes);
     const paint = {
       'canvas-name': name,
       location,
@@ -52,7 +50,6 @@ export default class CanvasApi extends Api {
    * Saves the exported Canvas URl
    */
   async save(location: Patp, name: string, file: string): Promise<unknown> {
-    // console.log('paint', location, name, strokes);
     const save = {
       'canvas-name': name,
       location,
@@ -65,7 +62,6 @@ export default class CanvasApi extends Api {
    * Join a remote canvas
    */
   async join(location: Patp, name: string): Promise<unknown> {
-    console.log('join', location, name);
     const join = {
       'canvas-name': name,
       ship: location

@@ -57,7 +57,7 @@ export default class CanvasSubscription extends Subscription {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   handleEvent(data: { data: any }): void {
-    console.log(data);
+
     const json = data.data;
     if (json === null) {
       return;

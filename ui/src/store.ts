@@ -56,10 +56,8 @@ function groupCanvasListKeys(canvas: Canvas) {
 export function createCanvasStore(canvas: Canvas): void {
   console.log('[createCanvasStore]', canvas);
   const [privateCanvas, publicCanvas] = groupCanvasListKeys(canvas);
-  console.log(privateCanvas, publicCanvas);
   update(
     ($store): StoreState => {
-      console.log("createCanvasStore", $store.name);
       return {
         ...$store,
         canvas,
@@ -72,10 +70,9 @@ export function createCanvasStore(canvas: Canvas): void {
 
 export function saveGCPToken(token: unknown): void {
   if (isToken(token)) {
-    console.log('[loadGCPToken]', token);
+    console.log('[loadGCPToken]');
     update(
       ($store): StoreState => {
-console.log("saveGCPToken", $store.name);
         return {
           ...$store,
           gcp: { gcpToken: token as GcpToken }
@@ -86,12 +83,10 @@ console.log("saveGCPToken", $store.name);
 }
 
 export function saveS3credentials(credentials: S3Credentials): void {
-  console.log('[loadS3Creds]', credentials);
+  console.log('[loadS3Creds]');
 
-  // a client can be shared by different commands.
   update(
     ($store): StoreState => {
-console.log("saveS3credentials", $store.name);
       return {
         ...$store,
         s3: {
@@ -110,11 +105,9 @@ console.log("saveS3credentials", $store.name);
 }
 
 export function saveS3config(configuration: S3Configuration): void {
-  console.log('[loadS3Config]', configuration);
-  // a client can be shared by different commands.
+  console.log('[loadS3Config]');
   update(
     ($store): StoreState => {
-console.log("saveS3config", $store.name);
       return {
         ...$store,
         s3: {
@@ -128,7 +121,7 @@ console.log("saveS3config", $store.name);
 
 export function loadCanvas(canvas: LoadCanvas): void {
   const name = `${canvas.location}/${canvas.name}`;
-  console.log('[loadCanvas]', canvas, canvas.name, name);
+  console.log('[loadCanvas]', canvas, canvas.name);
 
   update(
     ($store): StoreState => {
@@ -186,7 +179,6 @@ export function paintCanvas(paint: Paint): void {
     ($store): StoreState => {
       const name = `${paint.location}/${paint.name}`;
       paint.strokes.forEach((stroke) => {
-        console.log(stroke);
         // $store.canvas[paint.name].data = {
         //   ...$store.canvas[paint.name].data,
         //   [stroke.id]: {
@@ -249,7 +241,6 @@ export function addSubscription(subscription: unknown): void {
 }
 
 export function updateCurrentCanvas(name: string): void {
-console.log("updateCurrentCanvas", name);
   update(
     ($store): StoreState => {
       return { ...$store, name };
