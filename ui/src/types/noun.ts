@@ -18,18 +18,18 @@ export type Serial = string;
 export type Jug<K, V> = Map<K, Set<V>>;
 
 // name of app
-export type AppName = "chat" | "link" | "contacts" | "publish" | "graph";
+export type AppName = 'chat' | 'link' | 'contacts' | 'publish' | 'graph';
 
 export function getTagFromFrond<O>(frond: O): keyof O {
   const tags = Object.keys(frond) as Array<keyof O>;
   const tag = tags[0];
   if (!tag) {
-    throw new Error("bad frond");
+    throw new Error('bad frond');
   }
   return tag;
 }
 
-export type ShipRank = "czar" | "king" | "duke" | "earl" | "pawn";
+export type ShipRank = 'czar' | 'king' | 'duke' | 'earl' | 'pawn';
 
 export type SetElement<S> = S extends Set<infer T> ? T : never;
 export type MapKey<M> = M extends Map<infer K, any> ? K : never;

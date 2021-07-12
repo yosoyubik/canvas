@@ -29,7 +29,12 @@ const config = {
         },
         cors: true
       },
-      build: {}
+      build: {},
+      resolve: {
+        alias: {
+          "./runtimeConfig": "./runtimeConfig.browser"
+        }
+      }
     },
     paths: { base: '/~canvas' },
     ssr: false,

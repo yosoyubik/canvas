@@ -32,7 +32,8 @@ class GcpUpload implements StorageUpload {
       predefinedAcl: 'publicRead'
     };
     const url =
-      `https://${ENDPOINT}/upload/storage/v1/b/${Bucket}/o?` + querystring.stringify(urlParams);
+      `https://${ENDPOINT}/upload/storage/v1/b/${Bucket}/o?` +
+      querystring.stringify(urlParams);
     const headers = new Headers();
     headers.append('Authorization', `Bearer ${this.#accessKey}`);
     headers.append('Content-Type', ContentType);

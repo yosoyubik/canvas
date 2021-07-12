@@ -28,12 +28,19 @@
 %-  agent:dbug
 ^-  agent:gall
 =<  |_  =bowl:gall
-    +*  this       .
+    +*  this         .
         canvas-core  +>
-        cc         ~(. canvas-core bowl)
-        def        ~(. (default-agent this %|) bowl)
+        cc           ~(. canvas-core bowl)
+        def          ~(. (default-agent this %|) bowl)
     ::
-    ++  on-init  on-init:def
+    ++  on-init
+      ^-  (quip card _this)
+      ~&  >  "[ init canvas - / welcome / ]"
+      =/  name=@t  'welcome'
+      =/  =canvas  (welcome ~ name our.bowl &)
+      =.  gallery.state  (~(put by gallery) [[our.bowl name] canvas])
+      `this
+    ::
     ++  on-save  !>(state)
     ::
     ++  on-load
@@ -97,7 +104,9 @@
       ?.  (team:title our.bowl src.bowl)  ~
       ?+    path  (on-peek:def path)
           [%x %canvas @t @t ~]
-        ``noun+!>((~(got by gallery) (extract-location t.t.path)))
+
+        =+  out=(~(got by gallery) (extract-location t.t.path))
+        ``noun+!>(out)
       ::
           [%x %gallery ~]
         ``noun+!>(~(val by gallery))
@@ -185,20 +194,19 @@
   ++  handle-paint
     |=  [location=@p name=@t strokes=(list stroke)]
     ^-  (quip card _state)
-    ~&  "[ paint ]"
     (process-remote-paint location name strokes)
   ::
   ++  handle-join
     |=  [=ship name=@t]
     ^-  (quip card _state)
     ?>  (team:title our.bowl src.bowl)
-    ~&  "[ join ]"
+    ~&  >  "[ join ]"
     [[(subscribe ship name)]~ state]
   ::
   ++  handle-leave
     |=  [=ship name=@t]
     ^-  (quip card _state)
-    ~&  "[ leave ]"
+    ~&  >>  "[ leave ]"
     ?>  (team:title our.bowl src.bowl)
     =/  =canvas  (~(got by gallery) [ship name])
     ::  the canvas becomes local
@@ -206,82 +214,41 @@
     =.  location.metadata.canvas  our.bowl
     :_  state(gallery (~(put by gallery) [ship name] canvas))
     :~  (leave ship name)
-        [%give %fact [/updates]~ %canvas-view !>([%load name canvas])]
+        [%give %fact [/updates]~ %canvas-action !>([%load name canvas])]
     ==
   ::
   ++  handle-create
     |=  =canvas
     ^-  (quip card _state)
     ?>  (team:title our.bowl src.bowl)
-    ~&  "[ create ]"
+    ~&  >  "[ create ]"
     =*  name  name.metadata.canvas
     =*  private  private.metadata.canvas
     =.  canvas
       %.  [canvas name our.bowl private]
       ?+  template.metadata.canvas  blank
-        %mesh-welcome  tmdw
-        %mesh-martian  martian
-        %mesh-bitcoin  bitcoin
-        %mesh-crypto   crypto
-        %mesh-guy      guybrush
-        %mesh-yc-hn    yc-hn
-        %mesh-sigil    larsen
-        %mesh-tile     tile
-        %mesh-life     life
-        %mesh-public   public
+        %mesh-welcome    welcome
+        %mesh-monkey     monkey
+        %mesh-homer      homer
+        %mesh-dumas      dumas-dutil
+        %mesh-hackathon  hackathon
       ==
-    =/  load=canvas-view  [%load name.metadata.canvas canvas]
-    :-  [%give %fact [/updates]~ %canvas-view !>(load)]~
+    =/  load=canvas-action  [%load name.metadata.canvas canvas]
+    :-  [%give %fact [/updates]~ %canvas-action !>(load)]~
     %_    state
         gallery
       (~(put by gallery) [[our.bowl name.metadata.canvas] canvas])
     ==
   ::
-  :: ++  handle-share
-  ::  |=  [name=@t chat=path type=image-type]
-  ::  ^-  (quip card _state)
-  ::  ?>  (team:title our.bowl src.bowl)
-  ::  :_  state
-  ::  ::  TODO: check if file has been created already?
-  ::  ::  now we disable share on browser if not
-  ::  ::
-  ::  =/  serial=@uvH  (shaf %msg-uid eny.bowl)
-  ::  =/  =hart:eyre  .^(hart:eyre %e /(scot %p our.bowl)/host/real)
-  ::  =/  port=(unit @ud)  q.hart
-  ::  =/  domain-port=tape
-  ::    ;:  weld
-  ::        ?:(p.hart "https://" "http://")
-  ::      ::
-  ::        ?-  -.r.hart
-  ::          %.y  (trip (en-turf:html p.r.hart))
-  ::          %.n  (slag 1 (scow %if p.r.hart))
-  ::        ==
-  ::     ::
-  ::       ":"
-  ::       ?~(port "" ((d-co:co 1) u.port))
-  ::    ==
-  ::  =/  =letter
-  ::    :-  %url
-  ::    %-  crip
-  ::    ::  TODO: add avg as option to preview in chat
-  ::    ::        for now, using png as an extension works
-  ::    ::
-  ::    "{domain-port}/~canvas/images/{(trip type)}/{(trip name)}.png"
-  ::  =/  =envelope  [serial *@ our.bowl now.bowl letter]
-  ::  :_  ~
-  ::  :*  %pass
-  ::      ~[%chat %share name]
-  ::      %agent
-  ::      [our.bowl %chat-hook]
-  ::      %poke
-  ::      %chat-action
-  ::      !>([%message chat envelope])
-  ::  ==
-  ::
   ++  handle-save
-    |=  [=ship file=@t chunk=@t last=? type=image-type]
+    |=  [=ship name=@t file=@t]
     ^-  (quip card _state)
-    [~ state]
+    ?>  (team:title our.bowl src.bowl)
+    =/  canvas=(unit canvas)  (~(get by gallery) [ship name])
+    :-  ~
+    ?~  canvas  state
+    =.  file.metadata.u.canvas  `file
+    state(gallery (~(put by gallery) [ship name] u.canvas))
   --
 ::
 ++  handle-canvas-update
@@ -297,7 +264,7 @@
     |=  [name=@t =canvas]
     ^-  (quip card _state)
     :_  state(gallery (~(put by gallery) [[src.bowl name] canvas]))
-    [%give %fact [/updates]~ %canvas-view !>([%load name canvas])]~
+    [%give %fact [/updates]~ %canvas-action !>([%load name canvas])]~
   ::
   ++  handle-paint
     |=  [location=@p name=@t strokes=(list stroke) who=@p]
@@ -314,8 +281,8 @@
   ^-  (quip card _state)
   ?>  ?=(^ strokes)
   =/  canvas=(unit canvas)  (~(get by gallery) [location name])
-  ?~  canvas  ~&  %out-1  `state
-  ?.  =(-.i.strokes -.u.canvas)  ~&  %out-2  `state
+  ?~  canvas  `state
+  ?.  =(-.i.strokes -.u.canvas)  `state
   |^
   =*  meta  metadata.u.canvas
   :-  (send-effects strokes)
@@ -337,12 +304,11 @@
       ::  stroke from a remote ship
       ::
       =/  paint  !>([%paint location name strokes])
-      :~  [%give %fact [/updates]~ %canvas-view paint]
+      :~  [%give %fact [/updates]~ %canvas-action paint]
           [(send-paint-update name strokes src.bowl)]
       ==
     ::  stroke from frontend
     ::
-    ~&  ['frontend' location our.bowl]
     ?:  =(location our.bowl)
       [(send-paint-update name strokes our.bowl)]~
       :: =/  paint  !>([%paint location name strokes])
@@ -356,15 +322,15 @@
     ^-  ^mesh
     |-
     ?~  strokes  mesh
-    ?>  ?=([%mesh @t =arc] i.strokes)
+    ?>  ?=(%mesh -.i.strokes)
     %_    $
         strokes
       t.strokes
     ::
         mesh
-      ?.  filled.arc.i.strokes
+      ?~  arc.i.strokes
         (~(del by mesh) id.i.strokes)
-      (~(put by mesh) [id.i.strokes arc.i.strokes])
+      (~(put by mesh) [id.i.strokes u.arc.i.strokes])
     ==
   ::
   ++  update-draw

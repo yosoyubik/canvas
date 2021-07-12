@@ -72,7 +72,7 @@
       ::
           %canvas-view
         =^  cards  state
-          (handle-canvas-view:cv !<(canvas-view vase))
+          (handle-canvas-view:cv !<(canvas-action vase))
         [cards this]
       ==
     ::
@@ -106,9 +106,8 @@
           =*  vase  q.cage.sign
           ^-  (quip card _state)
           ?+    p.cage.sign  ~|([%canvas-bad-update-mark wire vase] !!)
-              %canvas-view
-            ~&  %canvas-view-update
-            (handle-view-update:cv !<(canvas-view q.cage.sign))
+              %canvas-action
+            (handle-view-update:cv !<(canvas-action q.cage.sign))
           ==
         [cards this]
       ==
@@ -177,7 +176,7 @@
   (handle-canvas-view (json-to-canvas-view jon))
 ::
 ++  handle-canvas-view
-  |=  act=canvas-view
+  |=  act=canvas-action
   ^-  (quip card _state)
   :_  state
   |^
@@ -193,18 +192,20 @@
   ::
   ++  handle-init
     ^-  (list card)
+    ~&
+      .^  canvas
+        %gx
+        (scot %p our.bowl)
+        %canvas
+        (scot %da now.bowl)
+        ~[%canvas (scot %p our.bowl) 'welcome' %noun]
+      ==
     %-  send-frontend
-    %-  canvas-view-response-to-json
-    ~&  'test'
-    :+  %init-frontend
-      [(welcome ~ 'welcome' our.bowl &) gallery-scry]
-    ~
-    :: chats-scry
+    (canvas-view-response-to-json %init-frontend gallery-scry ~)
   ::
   ++  handle-paint
     |=  [location=@p name=@t strokes=(list stroke)]
     ^-  (list card)
-    ~&  paint+name
     [(send-canvas-action [%paint name ~] [%paint +<])]~
   ::
   ++  handle-join
@@ -242,39 +243,32 @@
    [(send-canvas-action [%share name ~] [%share +<])]~
   ::
   ++  handle-save
-    |=  [=ship name=@t svg=@t last=? =image-type]
+    |=  [=ship name=@t file=@t]
     ^-  (list card)
     [(send-canvas-action [%save name ~] [%save +<])]~
   --
 ::
 ++  handle-view-update
-  |=  act=canvas-view
+  |=  act=canvas-action
   ^-  (quip card _state)
   :_  state
   |^
   ?+  -.act  !!
     %paint   (handle-paint +.act)
     %load    (handle-load +.act)
-    %file    (handle-file +.act)
+    :: %file    (handle-file +.act)
   ==
   ::
   ++  handle-paint
     |=  [location=@p name=@t strokes=(list stroke)]
     ^-  (list card)
-    ~&  %frontend-update
     %-  send-frontend
     (canvas-view-response-to-json [%paint +<])
   ::
   ++  handle-load
     |=  [name=@t =canvas]
     ^-  (list card)
-    ~&  "send-frontend"
     (send-frontend (canvas-view-response-to-json [%load +<]))
-  ::
-  ++  handle-file
-    |=  file=@t
-    ^-  (list card)
-    (send-frontend (canvas-view-response-to-json [%file file]))
   --
 ::
 --

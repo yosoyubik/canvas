@@ -1,23 +1,23 @@
 <!-- From: https://github.com/IBM/carbon-components-svelte/blob/master/examples/rollup-typescript/src/components/Theme.svelte -->
 <script lang="ts">
-  type Theme = "white" | "g10" | "g90" | "g100";
+  type Theme = 'white' | 'g10' | 'g90' | 'g100';
   export let persist: boolean = false;
-  export let persistKey: string = "theme";
-  export let theme: Theme = "white";
-  export const themes: Theme[] = ["white", "g10", "g90", "g100"];
-  import { onMount, afterUpdate, setContext } from "svelte";
-  import { writable, derived } from "svelte/store";
-  const isValidTheme = (value) => themes.includes(value);
-  const isDark = (value) =>
-    isValidTheme(value) && (value === "g90" || value === "g100");
+  export let persistKey: string = 'theme';
+  export let theme: Theme = 'white';
+  export const themes: Theme[] = ['white', 'g10', 'g90', 'g100'];
+  import { onMount, afterUpdate, setContext } from 'svelte';
+  import { writable, derived } from 'svelte/store';
+  const isValidTheme = value => themes.includes(value);
+  const isDark = value =>
+    isValidTheme(value) && (value === 'g90' || value === 'g100');
   const dark = writable(isDark(theme));
-  const light = derived(dark, (_) => !_);
-  setContext("Theme", {
+  const light = derived(dark, _ => !_);
+  setContext('Theme', {
     updateVar: (name: string, value: string) => {
       document.documentElement.style.setProperty(name, value);
     },
     dark,
-    light,
+    light
   });
   onMount(() => {
     try {
@@ -31,7 +31,7 @@
   });
   afterUpdate(() => {
     if (isValidTheme(theme)) {
-      document.documentElement.setAttribute("theme", theme);
+      document.documentElement.setAttribute('theme', theme);
       if (persist) {
         localStorage.setItem(persistKey, theme);
       }

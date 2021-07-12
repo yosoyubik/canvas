@@ -1,37 +1,33 @@
-
 <script lang="ts">
+  import store from '../store';
+  import Select from './CanvasMenu.svelte';
   let title = document.title === "Home" ? "" : document.title;
 </script>
 
-<div class='bg-white bg-gray0-d w-100 justify-between relative tc pt3 db'>
-  <a
-    class="dib gray2 f9 inter absolute left-0"
-    href="/"
-    style="top: 14">
-    <span
-      class="ml2 white-d v-top lh-title"
-      style="paddingTop: 3">
+<div>
+  <a href="/">
+    <span>
       Home
     </span>
   </a>
-  <span
-    class="f9 white-d inter dib"
-    style="
-      verticalAlign: text-top,
-      paddingTop: 3
-    ">
+  <span>
     {title}
   </span>
-  <div class="absolute right-0 lh-copy" style="top: 8">
-    <span class="mono white-d f9 ml2 c-default">~norsyr-torryn</span>
-  </div>
+  <Select canvasList={$store.canvasList} />
 </div>
 
-<p>
-
-</p>
-
 <style>
-
+  div {
+    width: 100%;
+    /* position: fixed; */
+    color: white;
+    top: 0;
+    display: flex;
+    float: left;
+    place-content: center;
+    background: #3b3a3a;
+    font-size: x-large;
+    opacity: .9;
+  }
 </style>
 

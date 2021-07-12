@@ -2,3 +2,4 @@ node_modules
 dist/*
 .urbitrc
 old
+out

@@ -1,21 +1,25 @@
 import { writable } from 'svelte/store';
 import type { StoreState } from './types/store';
-import type Api from './types/api';
-import type { Canvas, LoadCanvas } from './types/canvas';
+import type Api from './lib/canvasApi';
+import type { Canvas, LoadCanvas, CanvasData } from './types/canvas';
 import type { Paint } from './types/canvasAction';
 import type { ConnectionStatus } from './types/connection';
 import type { GcpToken } from './types/gcp-state';
+import type { S3Configuration, S3Credentials } from './types/s3';
+
+import { S3Client } from '@aws-sdk/client-s3';
 
 import { browser } from '$app/env';
+import type { StringChain } from 'lodash';
 
 const initStore: StoreState = {
   chats: [],
   connection: 'disconnected',
-  canvasList: [],
-  name: 'welcome',
+  // publicCanvas: [],
+  // privateCanvas: [],
   ship: browser ? window.ship : '~zod',
-  width: 1500,
-  height: 1000,
+  name: browser ? `~${window.ship}/welcome` : 'welcome',
+  radius: 10,
   gcp: null,
   s3: {
     configuration: {
@@ -37,14 +41,30 @@ export function wipeStore(): void {
   return;
 }
 
+function groupCanvasListKeys(canvas: Canvas) {
+  const priv = [], pub = [];
+  Object.entries(canvas).map(([name, data]) => {
+    if (data.metadata.private) {
+      priv.push(name);
+    } else {
+      pub.push(name);
+    }
+  });
+  return [priv,pub];
+}
+
 export function createCanvasStore(canvas: Canvas): void {
   console.log('[createCanvasStore]', canvas);
+  const [privateCanvas, publicCanvas] = groupCanvasListKeys(canvas);
+  console.log(privateCanvas, publicCanvas);
   update(
     ($store): StoreState => {
+      console.log("createCanvasStore", $store.name);
       return {
         ...$store,
         canvas,
-        canvasList: Object.keys(canvas).filter((d) => d !== 'welcome')
+        privateCanvas,
+        publicCanvas
       };
     }
   );
@@ -55,6 +75,7 @@ export function saveGCPToken(token: unknown): void {
     console.log('[loadGCPToken]', token);
     update(
       ($store): StoreState => {
+console.log("saveGCPToken", $store.name);
         return {
           ...$store,
           gcp: { gcpToken: token as GcpToken }
@@ -64,30 +85,97 @@ export function saveGCPToken(token: unknown): void {
   }
 }
 
+export function saveS3credentials(credentials: S3Credentials): void {
+  console.log('[loadS3Creds]', credentials);
+
+  // a client can be shared by different commands.
+  update(
+    ($store): StoreState => {
+console.log("saveS3credentials", $store.name);
+      return {
+        ...$store,
+        s3: {
+          ...$store.s3,
+          credentials,
+          client: new S3Client({
+            credentials: credentials,
+            endpoint: credentials.endpoint,
+            //https://github.com/aws/aws-sdk-js-v3/issues/1845#issuecomment-754832210
+            region: 'us-east-1'
+          })
+        }
+      };
+    }
+  );
+}
+
+export function saveS3config(configuration: S3Configuration): void {
+  console.log('[loadS3Config]', configuration);
+  // a client can be shared by different commands.
+  update(
+    ($store): StoreState => {
+console.log("saveS3config", $store.name);
+      return {
+        ...$store,
+        s3: {
+          ...$store.s3,
+          configuration
+        }
+      };
+    }
+  );
+}
+
 export function loadCanvas(canvas: LoadCanvas): void {
-  console.log('[loadCanvas]', canvas, canvas.name);
+  const name = `${canvas.location}/${canvas.name}`;
+  console.log('[loadCanvas]', canvas, canvas.name, name);
+
   update(
     ($store): StoreState => {
       return {
         ...$store,
         canvas: {
-          [canvas.name]: {
+          [name]: {
             metadata: {
-              name: canvas.name,
-              template: canvas.template,
-              location: canvas.location,
-              saved: canvas.saved,
-              width: canvas.width,
-              height: canvas.height,
-              private: canvas.private
+              // name: canvas.name,
+              // template: canvas.template,
+              // location: canvas.location,
+              // saved: canvas.saved,
+              // width: canvas.width,
+              // height: canvas.height,
+              // private: canvas.private
+              ...canvas
             },
             data: canvas.data
           },
           ...$store.canvas
         },
-        name: canvas.name,
-        canvasList: [canvas.name, ...$store.canvasList]
-      };
+        publicCanvas: !canvas.private ? [name, ...$store.publicCanvas] : $store.publicCanvas,
+        privateCanvas: canvas.private ? [name, ...$store.privateCanvas] : $store.privateCanvas,
+        name
+    };
+    }
+  );
+}
+
+export function updatePublic(name: string): void {
+  update(
+    ($store): StoreState => {
+      return {
+        ...$store,
+        publicCanvas: [name, ...$store.publicCanvas]
+      }
+    }
+  );
+}
+
+export function updatePrivate(name: string): void {
+  update(
+    ($store): StoreState => {
+      return {
+        ...$store,
+        privateCanvas: [name, ...$store.privateCanvas]
+      }
     }
   );
 }
@@ -96,6 +184,7 @@ export function paintCanvas(paint: Paint): void {
   console.log('[painting]', paint);
   update(
     ($store): StoreState => {
+      const name = `${paint.location}/${paint.name}`;
       paint.strokes.forEach((stroke) => {
         console.log(stroke);
         // $store.canvas[paint.name].data = {
@@ -104,7 +193,7 @@ export function paintCanvas(paint: Paint): void {
         //     ...stroke
         //   }
         // };
-        $store.canvas[paint.name].data[stroke.id] = {
+        $store.canvas[name].data[stroke.id] = {
           ...stroke
         };
       });
@@ -160,7 +249,7 @@ export function addSubscription(subscription: unknown): void {
 }
 
 export function updateCurrentCanvas(name: string): void {
-  console.log(name);
+console.log("updateCurrentCanvas", name);
   update(
     ($store): StoreState => {
       return { ...$store, name };
