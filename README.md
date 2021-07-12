@@ -1,5 +1,7 @@
 # *Canvas* for \~Urbit
 
+[![awesome urbit badge](https://img.shields.io/badge/~-awesome%20urbit-lightgrey)](https://github.com/urbit/awesome-urbit)
+
 [![Header](/images/canvas.png)](https://www.youtube.com/watch?v=S6DySv730Hw)
 
 [Video Demo](https://yosoyubik.fra1.digitaloceanspaces.com/norsyr-torryn/2021.7.06..15.37.33-Jul-06-2021%2017-36-28.mp4)
