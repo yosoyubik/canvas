@@ -3,7 +3,6 @@
 ++  json-to-canvas-view
   |=  jon=json
   ^-  canvas-action
-  :: ~&  jon
   =,  dejs:format
   |^  (parse-json jon)
   ::
@@ -58,18 +57,6 @@
     ==  ==
     ::
     ++  arc-data
-      :: %-  ou
-      :: |=  jon=json
-      :: ?>  ?=([%o *] jon)
-      :: %.  p.jon
-      :: %-  ou-raw
-      :: :~  ['id' (un so)]
-      ::     ['fill' (un bo)]
-      ::     ['color' (un so)]
-      ::     ['when' (uf ~ (mu (cu from-unix-ms:chrono:userlib ni)))]
-      ::     ['who' (uf ~ (mu (su fed:ag)))]
-      :: ==
-      :: %-  ou
       |=  =json
       ?>  ?=(%o -.json)
       ^-  [@t (unit arc)]
@@ -80,27 +67,10 @@
       %-  some
       %.  json
       %-  ou
-      :~  ::['fill' (un bo)]
-          ['color' (un so)]
+      :~  ['color' (un so)]
           ['when' (uf ~ (mu (cu from-unix-ms:chrono:userlib ni)))]
           ['who' (uf ~ (mu (su fed:ag)))]
       ==
-
-      :: %-  ou-raw
-      :: :~  ['id' (un so)]
-      ::     :: ['fill' (un bo)]
-      ::     ['color' (un so)]
-      ::     ['when' (uf ~ (mu (cu from-unix-ms:chrono:userlib ni)))]
-      ::     ['who' (uf ~ (mu (su fed:ag)))]
-      :: ==
-    ::
-      :: %-  ou
-      :: :~  ['id' (un so)]
-      ::     ['fill' (un bo)]
-      ::     ['color' (un so)]
-      ::     ['when' (uf ~ (mu (cu from-unix-ms:chrono:userlib ni)))]
-      ::     ['who' (uf ~ (mu (su fed:ag)))]
-      :: ==
     ::
     ++  form-data
       %-  ot
@@ -168,11 +138,6 @@
       (canvas-to-json canvas.act)
     (metadata-to-json metadata.canvas.act)
   ::
-    ::   %file
-    :: :: FIXME: from the failed attempt of watching the image directory
-    :: :: a+(turn files.act path)
-    :: s+file.act
-  ::
       %paint
     %-  pairs
     ^-  (list [@t json])
@@ -235,8 +200,7 @@
     :-  id
     %-  pairs
     ^-  (list [@t json])
-    :~  ::['fill' b+filled.arc]
-        ['color' s+color.arc]
+    :~  ['color' s+color.arc]
         ['when' ?~(when.arc ~ (time u.when.arc))]
         ['who' ?~(who.arc ~ (ship u.who.arc))]
     ==
@@ -250,7 +214,6 @@
         ['id' s+id.stroke]~
       =*  arc  u.arc.stroke
       :~  ['id' s+id.stroke]
-          ::['fill' b+filled.arc]
           ['color' s+color.arc]
           ['when' ?~(when.arc ~ (time u.when.arc))]
           ['who' ?~(who.arc ~ (ship u.who.arc))]
