@@ -192,14 +192,6 @@
   ::
   ++  handle-init
     ^-  (list card)
-    ~&
-      .^  canvas
-        %gx
-        (scot %p our.bowl)
-        %canvas
-        (scot %da now.bowl)
-        ~[%canvas (scot %p our.bowl) 'welcome' %noun]
-      ==
     %-  send-frontend
     (canvas-view-response-to-json %init-frontend gallery-scry ~)
   ::
