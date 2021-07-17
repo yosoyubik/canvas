@@ -288,12 +288,19 @@ export function makePublic(name: string): void {
       };
     }
   );
+}
+
+export function updateImageURL(
+  location: string,
+  name: string,
+  url: string
+): void {
   update(
     ($store): StoreState => {
-      const canvas = `~${$store.ship}/${name}`;
+      const canvas = `${location}/${name}`;
+      $store.canvas[canvas].metadata.file = url;
       return {
-        ...$store,
-        name: canvas
+        ...$store
       };
     }
   );

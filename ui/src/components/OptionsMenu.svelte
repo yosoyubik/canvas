@@ -1,5 +1,5 @@
 <script lang="ts">
-  import store, { leaveCanvas, makePublic } from '../store';
+  import store, { leaveCanvas, makePublic, updateImageURL } from '../store';
   import { PutObjectCommand } from '@aws-sdk/client-s3';
   import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
   import copy from 'clipboard-copy';
@@ -125,9 +125,11 @@
         const { $metadata } = await $store.s3.client.send(params);
         if ($metadata.httpStatusCode === 200) {
           const signedUrl = await getSignedUrl($store.s3.client, params);
-          console.log(signedUrl);
           fileURL = signedUrl.split('?')[0];
-          $store.api.save(location, name, fileURL);
+          $store.api.save(location, name, fileURL).then(() => {
+            console.log('[image file saved]', signedUrl);
+            updateImageURL(location, name, fileURL);
+          });
         } else {
           console.log('error');
         }
