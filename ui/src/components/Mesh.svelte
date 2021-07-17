@@ -19,6 +19,12 @@
     stroke-width: 0.3px;
     pointer-events: none;
   }
+
+  /* .notification {
+    position: absolute;
+    right: 10%;
+    margin: auto;
+  } */
 </style>
 
 <script lang="ts">
@@ -34,7 +40,7 @@
     transformIndex,
     columns as calculateColumns
   } from '$lib/topology';
-
+  import { InlineNotification } from 'carbon-components-svelte';
   import Pixel from '././Pixel.svelte';
   import OptionsMenu from './OptionsMenu.svelte';
 
@@ -115,6 +121,9 @@
   }
 </script>
 
+<!-- <div class="notification">
+  <InlineNotification lowContrast kind="success" title="Success:" />
+</div> -->
 <svg
   bind:this={canvasNode}
   {width}
