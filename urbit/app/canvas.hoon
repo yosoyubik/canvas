@@ -1,4 +1,4 @@
-::  canvas: A p2p drawings app
+::  canvas: A p2p drawing app
 ::
 ::    data:            scry command:
 ::    ------------    ----------------------------------------------
@@ -188,8 +188,8 @@
     %join    (handle-join +.act)
     %leave   (handle-leave +.act)
     %create  (handle-create +.act)
-    :: %share   (handle-share +.act)
     %save    (handle-save +.act)
+    %unlock  (handle-unlock +.act)
   ==
   ::
   ++  handle-paint
@@ -207,24 +207,35 @@
   ++  handle-leave
     |=  [=ship name=@t]
     ^-  (quip card _state)
-    ~&  >>  "[ leave ]"
+    ~&  >>  ["[ leave ]" ship name]
     ?>  (team:title our.bowl src.bowl)
+    =/  new-name=@t
+      (crip "{(trip name)}-{(trip (scot %da now.bowl))}")
     =/  =canvas  (~(got by gallery) [ship name])
-    ::  the canvas becomes local
+    ::  the canvas becomes local and private
+    ::  and it's archived under the old name and the date
     ::
-    =.  location.metadata.canvas  our.bowl
-    :_  state(gallery (~(put by gallery) [ship name] canvas))
-    :~  (leave ship name)
-        [%give %fact [/updates]~ %canvas-action !>([%load name canvas])]
+    =.  metadata.canvas
+      %_  metadata.canvas
+        private   &
+        location  our.bowl
+        name      new-name
+      ==
+    =/  load
+      [%give %fact [/updates]~ %canvas-action !>([%load new-name canvas])]
+    :-  ~[load (leave ship name)]
+    %_    state
+        gallery
+      (~(put by (~(del by gallery) [ship name])) [our.bowl new-name] canvas)
     ==
   ::
   ++  handle-create
     |=  =canvas
     ^-  (quip card _state)
     ?>  (team:title our.bowl src.bowl)
-    ~&  >  "[ create ]"
     =*  name  name.metadata.canvas
     =*  private  private.metadata.canvas
+    ~&  >  ["[ create ]" name]
     =.  canvas
       %.  [canvas name our.bowl private]
       ?+  template.metadata.canvas  blank
@@ -250,6 +261,19 @@
     ?~  canvas  state
     =.  file.metadata.u.canvas  `file
     state(gallery (~(put by gallery) [ship name] u.canvas))
+  ::
+  ++  handle-unlock
+    |=  name=@t
+    ^-  (quip card _state)
+    ?>  (team:title our.bowl src.bowl)
+    ~&  >>  "[ unlock ] / TBA"
+    ?:  &  `state
+    ?>  (team:title our.bowl src.bowl)
+    =/  =canvas  (~(got by gallery) [our.bowl name])
+    =.  private.metadata.canvas  |
+    :-  ~
+    state(gallery (~(put by gallery) [our.bowl name] canvas))
+  ::
   --
 ::
 ++  handle-canvas-update
@@ -264,6 +288,7 @@
   ++  handle-load
     |=  [name=@t =canvas]
     ^-  (quip card _state)
+    ~&  >  "loading canvas..."
     :_  state(gallery (~(put by gallery) [[src.bowl name] canvas]))
     [%give %fact [/updates]~ %canvas-action !>([%load name canvas])]~
   ::

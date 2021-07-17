@@ -94,7 +94,6 @@
   // mesh on (?)
   //
   $: {
-    console.log(width, height);
     viewBox = calculateViewBox(radius, canvas.metadata.mesh);
 
     topology = calculateTopology(canvas.metadata.mesh)(
@@ -125,22 +124,19 @@
   preserveAspectRatio="xMaxYMin meet"
   on:mouseleave={() => {
     mousing = 0;
-  }}
->
+  }}>
   <g
     id="hexagons"
     class="hexagon"
     transform={`translate(${radius}, ${
       canvas.metadata.mesh === 'hexa' ? radius : radius + 1
-    })`}
-  >
+    })`}>
     {#if showMesh}
       <path
         shape-rendering="crispEdges"
         class="mesh"
         id="mesh"
-        d={path(topojson.mesh(topology, topology.objects.pixels))}
-      />
+        d={path(topojson.mesh(topology, topology.objects.pixels))} />
     {/if}
     <!-- {#if topology && geometries} -->
     {#each geometries as d}
@@ -152,8 +148,7 @@
         bind:mousing
         on:update={handleUpdate}
         on:save={handleSave}
-        on:flush={handleFlush}
-      />
+        on:flush={handleFlush} />
     {/each}
     <!-- {/if} -->
   </g>
@@ -164,7 +159,7 @@
     name={canvas.metadata.name}
     location={canvas.metadata.location}
     fileURL={canvas.metadata.file}
+    privateCanvas={canvas.metadata.private}
     bind:showMesh
-    {canvasNode}
-  />
+    {canvasNode} />
 {/if}

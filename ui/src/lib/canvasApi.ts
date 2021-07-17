@@ -13,7 +13,7 @@ export default class CanvasApi extends Api {
     width: number,
     height: number,
     columns: number,
-    mesh?: string,
+    mesh?: string
   ): Promise<unknown> {
     const create = {
       mesh: {
@@ -71,5 +71,28 @@ export default class CanvasApi extends Api {
 
   private async sendPoke(action: unknown): Promise<unknown> {
     return this.action('canvas-view', 'json', action);
+  }
+
+  /**
+   * Unsubscribes from remote canvas and makes it local
+   */
+  async leave(location: Patp, name: string): Promise<unknown> {
+    const leave = {
+      'canvas-name': name,
+      ship: location
+    };
+    return this.sendPoke({ leave });
+  }
+
+  /**
+   * Makes a private canvas public:
+   *
+   *    [Currently not exposed to the UI. see OptionsMenu.svelte]
+   */
+  async makePublic(name: string): Promise<unknown> {
+    const unlock = {
+      'canvas-name': name
+    };
+    return this.sendPoke({ unlock });
   }
 }

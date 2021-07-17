@@ -48,6 +48,7 @@
       [%create =canvas]
       [%share name=@t =path type=image-type]
       [%save =ship name=@t file=@t]
+      [%unlock name=@t]
   ==
 ::
 +$  canvas-update

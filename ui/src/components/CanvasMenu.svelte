@@ -5,8 +5,18 @@
     SelectItem,
     SelectItemGroup
   } from 'carbon-components-svelte';
+  import { daToDate, dateToShortDa } from '$lib/utils';
 
   export let selectedCanvas: string;
+
+  function parseCanvasName(name: string) {
+    const parse = name.split('-');
+    if (parse.length === 1) return name;
+    const date = daToDate(parse[parse.length - 1]);
+    if (date === null) return name;
+    parse.pop();
+    return `${parse.join('-')} [${dateToShortDa(date)}] `;
+  }
 </script>
 
 {#if $store.privateCanvas || $store.publicCanvas}
@@ -23,14 +33,14 @@
     {#if $store.publicCanvas.length > 0}
       <SelectItemGroup label="Public">
         {#each $store.publicCanvas as canvas}
-          <SelectItem value={canvas} text={canvas} />
+          <SelectItem value={canvas} text={parseCanvasName(canvas)} />
         {/each}
       </SelectItemGroup>
     {/if}
     {#if $store.privateCanvas.length > 0}
       <SelectItemGroup label="Private">
         {#each $store.privateCanvas as canvas}
-          <SelectItem value={canvas} text={canvas} />
+          <SelectItem value={canvas} text={parseCanvasName(canvas)} />
         {/each}
       </SelectItemGroup>
     {/if}
