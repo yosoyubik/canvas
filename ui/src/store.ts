@@ -88,7 +88,11 @@ export function saveGCPToken(token: unknown): void {
 
 export function saveS3credentials(credentials: S3Credentials): void {
   console.log('[loadS3Creds]');
-
+  const endpoint =
+    credentials.endpoint.search('http://') !== -1
+      ? credentials.endpoint
+      : `https://${credentials.endpoint}`;
+  console.log(endpoint);
   update(
     ($store): StoreState => {
       return {
@@ -97,8 +101,8 @@ export function saveS3credentials(credentials: S3Credentials): void {
           ...$store.s3,
           credentials,
           client: new S3Client({
-            credentials: credentials,
-            endpoint: credentials.endpoint,
+            credentials,
+            endpoint,
             //https://github.com/aws/aws-sdk-js-v3/issues/1845#issuecomment-754832210
             region: 'us-east-1'
           })
