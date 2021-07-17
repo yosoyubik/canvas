@@ -14,6 +14,7 @@ export type Send = (
   name: string,
   strokes
 ) => Promise<unknown>;
+
 export type Join = (location: string, name: string) => Promise<unknown>;
 
 export type Save = (
@@ -22,9 +23,11 @@ export type Save = (
   file: string
 ) => Promise<unknown>;
 
+export type Unlock = (name: string) => Promise<unknown>;
 export default interface Api {
   create: Create;
   send: Send;
   join: Join;
   save: Save;
+  unlock: Unlock;
 }

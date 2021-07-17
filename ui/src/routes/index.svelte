@@ -34,13 +34,7 @@
 
   import type { Metadata } from '../types/canvas';
   // import FreeHand from '../components/FreeHand.svelte';
-  import {
-    Loading,
-    Row,
-    Column,
-    Tooltip,
-    TooltipFooter
-  } from 'carbon-components-svelte';
+  import { Loading, Row, Column, Tooltip } from 'carbon-components-svelte';
   import ColorPalette from 'carbon-icons-svelte/lib/ColorPalette16';
 
   import Mesh from '../components/Mesh.svelte';
@@ -53,11 +47,6 @@
   let colors = d3.range(18),
     color = '#d53e4f',
     startColor = color;
-
-  function splitCanvasName(name) {
-    const [title, location] = name.split('-');
-    return `${title} on ${location}`;
-  }
 
   function isMesh(metadata: Metadata) {
     return metadata.template !== 'draw';
@@ -80,8 +69,7 @@
   {#if $store.canvas}
     <Row>
       <Column padding
-        ><Row><CanvasMenu selectedCanvas={$store.name} /></Row></Column
-      >
+        ><Row><CanvasMenu selectedCanvas={$store.name} /></Row></Column>
       <Column padding><Row><CreateCanvas /></Row></Column>
       <Column padding><Row><JoinCanvas /></Row></Column>
       <Column>
@@ -101,8 +89,7 @@
                 color = event.detail.color;
                 startColor = color;
               }}
-              size={12}
-            />
+              size={12} />
           </g>
         </svg>
       </Column>
@@ -112,14 +99,13 @@
 <Row padding>
   <Column>
     <div>
-      {#if $store.canvas && $store.name}
+      {#if $store.canvas && $store.name && !$store.leaving}
         {#if isMesh($store.canvas[$store.name].metadata)}
           <Mesh
             canvas={$store.canvas[$store.name]}
             {color}
             width={$store.canvas[$store.name].metadata.width}
-            height={$store.canvas[$store.name].metadata.height}
-          />
+            height={$store.canvas[$store.name].metadata.height} />
           <!-- {:else if $store.canvas[$store.name] && isFreeHand($store.canvas[$store.name].metadata)}
           <FreeHand
             canvas={$store.canvas[$store.name]}

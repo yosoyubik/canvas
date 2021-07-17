@@ -1,5 +1,5 @@
 <script lang="ts">
-  import store from '../store';
+  import store, { leaveCanvas, makePublic } from '../store';
   import { PutObjectCommand } from '@aws-sdk/client-s3';
   import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
   import copy from 'clipboard-copy';
@@ -9,19 +9,18 @@
     ContextMenuDivider,
     ContextMenuGroup
   } from 'carbon-components-svelte';
-  import Copy16 from 'carbon-icons-svelte/lib/CopyFile16';
-  import Share16 from 'carbon-icons-svelte/lib/Share16';
+  import Copy from 'carbon-icons-svelte/lib/CopyFile16';
+  import Leave from 'carbon-icons-svelte/lib/Unlink16';
+  import Share from 'carbon-icons-svelte/lib/Share16';
+  import Public from 'carbon-icons-svelte/lib/Unlocked16';
+
   import exportSvg from '../lib/exportCanvas';
-
-  import { createEventDispatcher } from 'svelte';
-
-  const dispatch = createEventDispatcher();
-  // export let canvas: CanvasData;
 
   export let name: string;
   export let fileURL: string;
   export let location: string;
   export let showMesh: boolean;
+  export let privateCanvas: boolean;
   export let canvasNode;
 
   let menu = false;
@@ -58,29 +57,54 @@
       `${mil ? '..0000' : ''}`
     );
   }
+
+  function leave(location: string, name: string) {
+    $store.api.leave(location, name).then(() => {
+      console.log('[ success leave canvas... ]', location, name);
+      leaveCanvas(location, name);
+    });
+  }
+
+  function unlock(name: string) {
+    $store.api.makePublic(name).then(() => {
+      console.log('[ success unlocking canvas... ]', name);
+      makePublic(name);
+    });
+  }
 </script>
 
 <ContextMenu open={menu}>
   <ContextMenuOption
     labelText="Copy Canvas path..."
-    icon={Share16}
+    icon={Share}
     indented
-    on:click={() => copy(`~${$store.ship}/${name}`)}
-  />
+    on:click={() => copy(`~${$store.ship}/${name}`)} />
+  {#if location !== `~${$store.ship}`}
+    <ContextMenuOption
+      labelText="Leave Canvas..."
+      icon={Leave}
+      indented
+      on:click={() => leave(location, name)} />
+  {/if}
+  <!-- {#if privateCanvas}
+    <ContextMenuOption
+      labelText="Make Public"
+      icon={Public}
+      indented
+      on:click={() => unlock(name)} />
+  {/if} -->
   {#if fileURL}
     <ContextMenuOption
-      icon={Copy16}
+      icon={Copy}
       indented
       labelText="Copy Image URL..."
-      on:click={() => copy(fileURL)}
-    />
+      on:click={() => copy(fileURL)} />
   {/if}
   {#if $store.gcp || hasS3($store.s3)}
     <ContextMenuOption
       indented
       labelText="Export canvas..."
       on:click={async () => {
-        console.log('exporting', $store.s3.credentials);
         const svgData = exportSvg(canvasNode);
         if (!$store.s3.client) {
           throw new Error('Storage not ready');
@@ -102,21 +126,18 @@
         if ($metadata.httpStatusCode === 200) {
           const signedUrl = await getSignedUrl($store.s3.client, params);
           console.log(signedUrl);
-          // const { location, name } = canvas.metadata;
           fileURL = signedUrl.split('?')[0];
           $store.api.save(location, name, fileURL);
         } else {
           console.log('error');
         }
-      }}
-    />
+      }} />
   {/if}
   <ContextMenuDivider />
   <ContextMenuGroup>
     <ContextMenuOption
       labelText="Show mesh"
       selected={showMesh}
-      on:click={() => (showMesh = !showMesh)}
-    />
+      on:click={() => (showMesh = !showMesh)} />
   </ContextMenuGroup>
 </ContextMenu>

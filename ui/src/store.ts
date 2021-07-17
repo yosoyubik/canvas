@@ -27,14 +27,17 @@ const initStore: StoreState = {
       currentBucket: ''
     },
     credentials: null
-  }
+  },
+  leaving: false
 };
 
 const { subscribe, update } = writable(initStore);
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function isToken(token: any): token is GcpToken {
-  return typeof token.accessKey === 'string' && typeof token.expiresIn === 'number';
+  return (
+    typeof token.accessKey === 'string' && typeof token.expiresIn === 'number'
+  );
 }
 
 export function wipeStore(): void {
@@ -42,7 +45,8 @@ export function wipeStore(): void {
 }
 
 function groupCanvasListKeys(canvas: Canvas) {
-  const priv = [], pub = [];
+  const priv = [],
+    pub = [];
   Object.entries(canvas).map(([name, data]) => {
     if (data.metadata.private) {
       priv.push(name);
@@ -50,7 +54,7 @@ function groupCanvasListKeys(canvas: Canvas) {
       pub.push(name);
     }
   });
-  return [priv,pub];
+  return [priv, pub];
 }
 
 export function createCanvasStore(canvas: Canvas): void {
@@ -143,10 +147,15 @@ export function loadCanvas(canvas: LoadCanvas): void {
           },
           ...$store.canvas
         },
-        publicCanvas: !canvas.private ? [name, ...$store.publicCanvas] : $store.publicCanvas,
-        privateCanvas: canvas.private ? [name, ...$store.privateCanvas] : $store.privateCanvas,
-        name
-    };
+        publicCanvas: !canvas.private
+          ? [name, ...$store.publicCanvas]
+          : $store.publicCanvas,
+        privateCanvas: canvas.private
+          ? [name, ...$store.privateCanvas]
+          : $store.privateCanvas,
+        name,
+        leaving: false
+      };
     }
   );
 }
@@ -157,7 +166,7 @@ export function updatePublic(name: string): void {
       return {
         ...$store,
         publicCanvas: [name, ...$store.publicCanvas]
-      }
+      };
     }
   );
 }
@@ -168,7 +177,7 @@ export function updatePrivate(name: string): void {
       return {
         ...$store,
         privateCanvas: [name, ...$store.privateCanvas]
-      }
+      };
     }
   );
 }
@@ -178,7 +187,7 @@ export function paintCanvas(paint: Paint): void {
   update(
     ($store): StoreState => {
       const name = `${paint.location}/${paint.name}`;
-      paint.strokes.forEach((stroke) => {
+      paint.strokes.forEach(stroke => {
         // $store.canvas[paint.name].data = {
         //   ...$store.canvas[paint.name].data,
         //   [stroke.id]: {
@@ -244,6 +253,44 @@ export function updateCurrentCanvas(name: string): void {
   update(
     ($store): StoreState => {
       return { ...$store, name };
+    }
+  );
+}
+
+export function leaveCanvas(oldLocation: string, name: string): void {
+  update(
+    ($store): StoreState => {
+      const oldCanvas = `${oldLocation}/${name}`;
+      delete $store.canvas[oldCanvas];
+      return {
+        ...$store,
+        leaving: true,
+        publicCanvas: $store.publicCanvas.filter(name => name !== oldCanvas)
+      };
+    }
+  );
+}
+
+export function makePublic(name: string): void {
+  update(
+    ($store): StoreState => {
+      const canvas = `~${$store.ship}/${name}`;
+      $store.canvas[canvas].metadata.private = false;
+      return {
+        ...$store,
+        privateCanvas: $store.privateCanvas.filter(name => name !== canvas),
+        publicCanvas: [canvas, ...$store.publicCanvas],
+        name: `~${$store.ship}/welcome`
+      };
+    }
+  );
+  update(
+    ($store): StoreState => {
+      const canvas = `~${$store.ship}/${name}`;
+      return {
+        ...$store,
+        name: canvas
+      };
     }
   );
 }

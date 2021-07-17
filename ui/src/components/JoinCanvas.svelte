@@ -43,7 +43,6 @@
       open = false;
       isSubmitting = false;
     });
-    console.log(values);
   };
 </script>
 
@@ -51,8 +50,7 @@
   icon={UserFollow32}
   kind="ghost"
   size="small"
-  on:click={() => (open = true)}
->
+  on:click={() => (open = true)}>
   Join
 </Button>
 
@@ -75,16 +73,14 @@
                   type="text"
                   invalidText={meta.error}
                   on:input={field.handleInput}
-                  on:blur={field.handleBlur}
-                />
+                  on:blur={field.handleBlur} />
               </Field>
             </Column>
           </Row>
         </FormGroup>
         <ButtonSet>
           <Button on:click={() => (open = false)} kind="secondary"
-            >Cancel</Button
-          >
+            >Cancel</Button>
           <Button type="submit" disabled={isSubmitting}>Join</Button>
         </ButtonSet>
       </Form>

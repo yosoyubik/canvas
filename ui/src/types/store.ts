@@ -12,11 +12,12 @@ export interface StoreState {
   canvas?: Canvas;
   radius: number;
   name: string;
+  publicCanvas?: string[];
+  privateCanvas?: string[];
+  leaving: boolean;
   // Urbit
   chats: [];
   connection: ConnectionStatus;
-  publicCanvas?: string[]
-  privateCanvas?: string[];
   api?: Api;
   subscription?: unknown;
   ship: Patp;

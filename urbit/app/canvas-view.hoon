@@ -188,6 +188,7 @@
     %create  (handle-create +.act)
     %share   (handle-share +.act)
     %save    (handle-save +.act)
+    %unlock  (handle-unlock +.act)
   ==
   ::
   ++  handle-init
@@ -238,6 +239,11 @@
     |=  [=ship name=@t file=@t]
     ^-  (list card)
     [(send-canvas-action [%save name ~] [%save +<])]~
+  ::
+  ++  handle-unlock
+    |=  name=@t
+    ^-  (list card)
+    [(send-canvas-action [%unlock name ~] [%unlock +<])]~
   --
 ::
 ++  handle-view-update
