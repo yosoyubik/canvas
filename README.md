@@ -22,7 +22,7 @@ A public canvas is hosted at
 ~master-norsyr-torryn/canvas
 ```
 
-Come and join the first collaborative Urbit Canvas!
+Come and join the first public Urbit Canvas!
 
 ## Installation
 
