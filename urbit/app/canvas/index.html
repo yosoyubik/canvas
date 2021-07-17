@@ -1,16 +1,36 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
   <head>
-    <title>canvas</title>
     <meta charset="utf-8" />
-    <meta name="viewport"
-      content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
-      <link rel="stylesheet" href="/~canvas/css/index.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="/~landscape/js/channel.js"></script>
+    <script src="/~landscape/js/session.js"></script>
+    
+
+		
+
+		<link rel="modulepreload" href="/~canvas/_app/start-8dee07d8.js">
+		<link rel="modulepreload" href="/~canvas/_app/chunks/vendor-e24d3430.js">
+		<link rel="stylesheet" href="/~canvas/_app/assets/start-a8cd1609.css">
+
+		<script type="module">
+			import { start } from "/~canvas/_app/start-8dee07d8.js";
+			start({
+				target: document.querySelector("#svelte"),
+				paths: {"base":"/~canvas","assets":"/~canvas"},
+				session: {},
+				host: location.host,
+				route: true,
+				spa: true,
+				trailing_slash: "never",
+				hydrate: null
+			});
+		</script>
   </head>
   <body>
-    <div id="root" />
-    <script src="/~/channel/channel.js"></script>
-    <script src="/~modulo/session.js"></script>
-    <script src="/~canvas/js/index.js"></script>
+    <div id="svelte">
+
+	
+</div>
   </body>
 </html>

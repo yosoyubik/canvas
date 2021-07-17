@@ -1,29 +1,32 @@
 |%
-+$  canvas-type
-  $?  %mesh
++$  template
+  $?  %draw
+      %mesh
       %mesh-welcome
-      %mesh-martian
-      %mesh-bitcoin
-      %mesh-hashtag
-      %mesh-sigil
-      %mesh-tmdw
-      %mesh-tile
-      %mesh-yc-hn
-      %mesh-crypto
-      %mesh-guy
-      %draw
-      %map-europe-europe
-      %map-africa-africa
-      %map-us-counties
-      %map-us-states
+      %mesh-homer
+      %mesh-monkey
+      %mesh-hackathon
+      %mesh-dumas
   ==
 ::
 +$  image-type   ?(%svg %png)
-+$  arc          [filled=? color=@t]
++$  arc          [color=@t when=(unit time) who=(unit @p)]
 +$  form         [strokes=(list [@t @t]) line-width=@t style-stroke=@t]
 +$  mesh         (map @t arc)
 +$  draw         (list form)
-+$  metadata     [name=@t type=canvas-type location=ship saved=? private=?]
++$  mesh-pixel   ?(%hexa %squa)
++$  metadata
+  $:  name=@t
+      =template
+      location=ship
+      file=(unit @t)
+      private=?
+      width=@ud
+      height=@ud
+      columns=@ud
+      mesh=(unit mesh-pixel)
+  ==
+::
 +$  location     [host=ship canvas=@t]
 ::
 +$  canvas
@@ -32,7 +35,7 @@
   ==
 ::
 +$  stroke
-  $%  [%mesh id=@t =arc]
+  $%  [%mesh id=@t arc=(unit arc)]
       [%draw =form]
   ==
 ::
@@ -44,7 +47,8 @@
       [%leave =ship name=@t]
       [%create =canvas]
       [%share name=@t =path type=image-type]
-      [%save =ship name=@t image=@t last=? type=image-type]
+      [%save =ship name=@t file=@t]
+      [%unlock name=@t]
   ==
 ::
 +$  canvas-update
@@ -52,21 +56,8 @@
       [%load name=@t =canvas]
   ==
 ::
-+$  canvas-view
-  $%  [%init ~]
-      [%load name=@t =canvas]
-      [%paint location=@p name=@t strokes=(list stroke)]
-      [%join =ship name=@t]
-      [%leave =ship name=@t]
-      [%create =canvas]
-      [%file file=@t]
-      [%share name=@t =path type=image-type]
-      [%save =ship name=@t image=@t last=? type=image-type]
-  ==
-::
 +$  canvas-view-response
   $%  canvas-action
-      [%file file=@t]
       [%init-frontend gallery=(list canvas) chats=(list path)]
   ==
 --

@@ -1,9 +1,8 @@
 /-  *canvas
-/+  base64
 |%
 ++  json-to-canvas-view
   |=  jon=json
-  ^-  canvas-view
+  ^-  canvas-action
   =,  dejs:format
   |^  (parse-json jon)
   ::
@@ -16,6 +15,7 @@
         [%create create]
         [%share share]
         [%save save]
+        [%unlock unlock]
     ==
   ::
   ++  create
@@ -30,12 +30,16 @@
       :~  ['canvas' ul]
         ::
           :-  'metadata'
-          %-  ot
-          :~  ['name' so]
-              ['type' (cu canvas-type so)]
-              ['location' (su ;~(pfix sig fed:ag))]
-              ['saved' bo]
-              ['private' bo]
+          %-  ou
+          :~  ['name' (un so)]
+              ['template' (un (cu template so))]
+              ['location' (un (su ;~(pfix sig fed:ag)))]
+              ['file' (uf ~ (mu so))]
+              ['private' (un bo)]
+              ['width' (un ni)]
+              ['height' (un ni)]
+              ['columns' (un ni)]
+              ['mesh' (uf ~ (mu (cu mesh-pixel so)))]
       ==  ==
     ::
     --
@@ -54,7 +58,20 @@
     ==  ==
     ::
     ++  arc-data
-      (ot ~[['id' so] ['filled' bo] ['color' so]])
+      |=  =json
+      ?>  ?=(%o -.json)
+      ^-  [@t (unit arc)]
+      ?:  =(~(wyt by p.json) 1)
+        %.  json
+        (ou ~[['id' (un so)] [*@t (uf ~ ul)]])
+      :-  ((ou ['id' (un so)]~) json)
+      %-  some
+      %.  json
+      %-  ou
+      :~  ['color' (un so)]
+          ['when' (uf ~ (mu (cu from-unix-ms:chrono:userlib ni)))]
+          ['who' (uf ~ (mu (su fed:ag)))]
+      ==
     ::
     ++  form-data
       %-  ot
@@ -76,13 +93,14 @@
   ++  subscription
     (ot ~[['ship' (su ;~(pfix sig fed:ag))] ['canvas-name' so]])
   ::
+  ++  unlock
+    (ot ['canvas-name' so]~)
+  ::
   ++  save
     %-  ot
     :~  ['location' (su ;~(pfix sig fed:ag))]
         ['canvas-name' so]
-        ['svg' so]
-        ['last' bo]
-        ['type' (cu image-type so)]
+        ['file' so]
     ==
   ::
   ++  share
@@ -107,7 +125,12 @@
       gallery.act
     |=  =canvas
     ^-  [@t json]
-    :-  name.metadata.canvas
+    :-  %-  crip
+        ;:  weld
+          (trip (scot %p location.metadata.canvas))
+          "/"
+          (trip name.metadata.canvas)
+        ==
     %-  pairs
     %+  weld
       (canvas-to-json canvas)
@@ -118,11 +141,6 @@
     %+  weld
       (canvas-to-json canvas.act)
     (metadata-to-json metadata.canvas.act)
-  ::
-      %file
-    :: FIXME: from the failed attempt of watching the image directory
-    :: a+(turn files.act path)
-    s+file.act
   ::
       %paint
     %-  pairs
@@ -166,13 +184,17 @@
     ==
   ::
   ++  metadata-to-json
-    |=  =metadata
+    |=  metadata
     ^-  (list [@t json])
-    :~  ['name' s+name.metadata]
-        ['location' s+(scot %p location.metadata)]
-        ['type' s+type.metadata]
-        ['saved' b+saved.metadata]
-        ['private' b+private.metadata]
+    :~  ['name' s+name]
+        ['location' s+(scot %p location)]
+        ['template' s+template]
+        ['file' ?~(file ~ s+u.file)]
+        ['private' b+private]
+        ['width' (numb width)]
+        ['height' (numb height)]
+        ['columns' (numb columns)]
+        ['mesh' ?~(mesh ~ s+u.mesh)]
     ==
   ::
   ++  arc-to-json
@@ -180,18 +202,25 @@
     ^-  (list [@t json])
     :_  ~
     :-  id
-    %-  pairs:enjs:format
+    %-  pairs
     ^-  (list [@t json])
-    ~[['fill' b+filled.arc] ['color' s+color.arc]]
+    :~  ['color' s+color.arc]
+        ['when' ?~(when.arc ~ (time u.when.arc))]
+        ['who' ?~(who.arc ~ (ship u.who.arc))]
+    ==
   ::
   ++  stroke-to-json
     |=  =stroke
     ^-  (list [@t json])
     ?-    -.stroke
         %mesh
+      ?~  arc.stroke
+        ['id' s+id.stroke]~
+      =*  arc  u.arc.stroke
       :~  ['id' s+id.stroke]
-          ['fill' b+filled.arc.stroke]
-          ['color' s+color.arc.stroke]
+          ['color' s+color.arc]
+          ['when' ?~(when.arc ~ (time u.when.arc))]
+          ['who' ?~(who.arc ~ (ship u.who.arc))]
       ==
     ::
         %draw
