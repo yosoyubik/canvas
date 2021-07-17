@@ -20,6 +20,17 @@
   $: color = selectedColor;
 
   const dispatch = createEventDispatcher();
+  const oneDay = 1000 * 3600 * 24;
+
+  function canPaint() {
+    if (!d.attr.when || !d.attr.who) {
+      return true;
+    } else if (d.attr.who === $store.ship) {
+      return true;
+    } else {
+      return Math.abs(Date.now() - d.attr.when) >= oneDay;
+    }
+  }
 
   function mousedown(event) {
     //  right click
@@ -29,14 +40,15 @@
   }
 
   function mousemove() {
+    // if (mousing && canPaint()) {  // Keeps pixels for at least oneDay
     if (mousing) {
-      const fill = mousing > 0;
       const paint = { color, when: Date.now(), who: $store.ship };
+      const fill = mousing > 0;
       let stroke = {
         id: d.id
       };
       // d.attr = { ...d.attr, color: fill ? color : null };
-      if (mousing > 0) Object.assign(stroke, paint);
+      if (fill) Object.assign(stroke, paint);
 
       // Save stroke locally
       dispatch('update', {
@@ -67,5 +79,4 @@
   stroke-width={1}
   on:mousedown={mousedown}
   on:mouseup={mouseup}
-  on:mousemove={mousemove}
-/>
+  on:mousemove={mousemove} />
