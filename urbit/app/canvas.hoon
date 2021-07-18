@@ -7,7 +7,7 @@
 ::
 ::  State
 ::
-/-  *canvas
+/-  *canvas, file-server, launch-store
 /+  *server, default-agent, verb, dbug,
     *canvas,
     *canvas-templates
@@ -36,17 +36,49 @@
     ++  on-init
       ^-  (quip card _this)
       ~&  >  "[ init canvas - / welcome / ]"
+      =|  cards=(list card)
       =/  name=@t  'welcome'
       =/  =canvas  (welcome ~ name our.bowl &)
       =.  gallery.state  (~(put by gallery) [[our.bowl name] canvas])
-      `this
+      =/  has-file=?
+        (gall-scry:cc ? %file-server /url/'~canvas'/noun)
+      =/  has-tile=?
+        (~(has in (gall-scry:cc (set @tas) %launch /keys/noun)) %canvas)
+      =?  cards  !has-file
+        =/  file=action:file-server
+          [%serve-dir /'~canvas' /app/btc-wallet %.n %.y]
+        :_  cards
+        (poke-our:cc %file-server %file-server-action !>(file))
+      =?  cards  !has-tile
+        =/  tile=action:launch-store
+          [%add %canvas [%custom `'/~canvas' `'/~canvas/img/tile.svg'] %.y]
+        :_  cards
+        (poke-our:cc %launch %launch-action !>(tile))
+      ::
+      [cards this]
     ::
     ++  on-save  !>(state)
     ::
     ++  on-load
       |=  old=vase
       ^-  (quip card _this)
-      [~ this(state !<(state-zero old))]
+      =|  cards=(list card)
+      =/  has-file=?
+        (gall-scry:cc ? %file-server /url/'~canvas'/noun)
+      =/  has-tile=?
+        (~(has in (gall-scry:cc (set @tas) %launch /keys/noun)) %canvas)
+      =?  cards  !has-file
+        =/  file=action:file-server
+          [%serve-dir /'~canvas' /app/btc-wallet %.n %.y]
+        :_  cards
+        (poke-our:cc %file-server %file-server-action !>(file))
+      =?  cards  !has-tile
+        =/  tile=action:launch-store
+          [%add %canvas [%custom `'/~canvas' `'/~canvas/img/tile.svg'] %.y]
+        :_  cards
+        (poke-our:cc %launch %launch-action !>(tile))
+      ::
+      [cards this(state !<(state-zero old))]
     ::
     ++  on-poke
       |=  [=mark =vase]
@@ -56,6 +88,13 @@
         =^  cards  state
           (handle-canvas-action:cc !<(canvas-action vase))
         [cards this]
+      ::
+          %json
+        ?>  (team:title our.bowl src.bowl)
+        =^  cards  state
+          %-  handle-canvas-action:cc
+          (json-to-canvas-view !<(json vase))
+        [cards this]
       ==
     ::
     ++  on-watch
@@ -63,12 +102,15 @@
       ^-  (quip card _this)
       :_  this
       ?+    path  ~|([%peer-canvas-strange path] !!)
-          [%updates ~]  ~
+          [%frontend *]
+        =^  cards  state
+          (handle-canvas-action:cc [%init ~])
+        cards
       ::
           [%canvas ^]
         =^  cards  state
            (send-init-canvas:cc i.t.path)
-         cards
+        cards
       ==
     ::
     ++  on-agent
@@ -116,74 +158,13 @@
     --
 ::
 |_  =bowl:gall
-++  extract-location
-  |=  =path
-  ^-  [ship @t]
-  ?>  ?=([@t @t ~] path)
-  :_  i.t.path
-  (rash i.path ;~(pfix sig fed:ag))
-::
-++  subscribe
-  |=  [=ship name=@t]
-  ^-  card
-  :*  %pass
-      /subscribe/(scot %p ship)/(scot %tas name)
-      %agent
-      [ship %canvas]
-      %watch
-      /canvas/(scot %tas name)
-  ==
-::
-++  leave
-  |=  [=ship name=@t]
-  ^-  card
-  :*  %pass
-      /subscribe/(scot %p ship)/(scot %tas name)
-      %agent
-      [ship %canvas]
-      %leave
-      ~
-  ==
-::
-++  send-init-canvas
-  |=  name=@t
-  ^-  (quip card _state)
-  =/  canvas=(unit canvas)  (~(get by gallery) [our.bowl name])
-  ?~  canvas  `state
-  ~&  >  ['subscribing...' src.bowl private.metadata.u.canvas]
-  ?:  private.metadata.u.canvas
-    ~|([%subs-not-allowed name] !!)
-  :_  state
-  [%give %fact ~ %canvas-update !>([%load name u.canvas])]~
-::
-++  send-paint-update
-  |=  [name=@t strokes=(list stroke) who=@p]
-  ^-  card
-  :*  %give
-      %fact
-      [/canvas/(scot %tas name)]~
-      %canvas-update
-      !>([%paint our.bowl name strokes who])
-  ==
-::
-++  update-remote-canvas
-  |=  [location=@p name=@t strokes=(list stroke)]
-  ^-  card
-  ?>  ?=(^ strokes)
-  :*  %pass
-      [%paint name ~]
-      %agent
-      [location %canvas]
-      %poke
-      %canvas-action
-      !>([%paint location name strokes])
-  ==
 ::
 ++  handle-canvas-action
   |=  act=canvas-action
   ^-  (quip card _state)
   |^
   ?+  -.act  !!
+    %init    [handle-init state]
     %paint   (handle-paint +.act)
     %join    (handle-join +.act)
     %leave   (handle-leave +.act)
@@ -191,6 +172,11 @@
     %save    (handle-save +.act)
     %unlock  (handle-unlock +.act)
   ==
+  ::
+  ++  handle-init
+    ^-  (list card)
+    %-  send-frontend
+    (canvas-view-response-to-json %init-frontend ~(val by gallery) ~)
   ::
   ++  handle-paint
     |=  [location=@p name=@t strokes=(list stroke)]
@@ -222,8 +208,9 @@
         name      new-name
       ==
     =/  load
-      [%give %fact [/updates]~ %canvas-action !>([%load new-name canvas])]
-    :-  ~[load (leave ship name)]
+      ::[%give %fact [/updates]~ %canvas-action !>([%load new-name canvas])]
+      (send-frontend (canvas-view-response-to-json %load new-name canvas))
+    :-  [(leave ship name) load]
     %_    state
         gallery
       (~(put by (~(del by gallery) [ship name])) [our.bowl new-name] canvas)
@@ -245,8 +232,9 @@
         %mesh-dumas      dumas-dutil
         %mesh-hackathon  hackathon
       ==
-    =/  load=canvas-action  [%load name.metadata.canvas canvas]
-    :-  [%give %fact [/updates]~ %canvas-action !>(load)]~
+    =/  load=canvas-view-response
+      [%load name.metadata.canvas canvas]
+    :-  (send-frontend (canvas-view-response-to-json load))
     %_    state
         gallery
       (~(put by gallery) [[our.bowl name.metadata.canvas] canvas])
@@ -290,7 +278,7 @@
     ^-  (quip card _state)
     ~&  >  "loading canvas..."
     :_  state(gallery (~(put by gallery) [[src.bowl name] canvas]))
-    [%give %fact [/updates]~ %canvas-action !>([%load name canvas])]~
+    (send-frontend (canvas-view-response-to-json %load +<))
   ::
   ++  handle-paint
     |=  [location=@p name=@t strokes=(list stroke) who=@p]
@@ -329,10 +317,10 @@
     ?.  (team:title our.bowl src.bowl)
       ::  stroke from a remote ship
       ::
-      =/  paint  !>([%paint location name strokes])
-      :~  [%give %fact [/updates]~ %canvas-action paint]
-          [(send-paint-update name strokes src.bowl)]
-      ==
+      :-  [(send-paint-update name strokes src.bowl)]
+      %-  send-frontend
+      %-  canvas-view-response-to-json
+      [%paint location name strokes]
     ::  stroke from frontend
     ::
     ?:  =(location our.bowl)
@@ -370,4 +358,81 @@
       strokes  t.strokes
     ==
   --
+::
+++  extract-location
+  |=  =path
+  ^-  [ship @t]
+  ?>  ?=([@t @t ~] path)
+  :_  i.t.path
+  (rash i.path ;~(pfix sig fed:ag))
+::
+++  subscribe
+  |=  [=ship name=@t]
+  ^-  card
+  :*  %pass
+      /subscribe/(scot %p ship)/(scot %tas name)
+      %agent
+      [ship %canvas]
+      %watch
+      /canvas/(scot %tas name)
+  ==
+::
+++  poke-our
+  |=  [app=term =cage]
+  ^-  card
+  [%pass / %agent [our.bowl app] %poke cage]
+::
+++  gall-scry
+  |*  [=mold app=@tas =path]
+  .^(mold %gx (weld /(scot %p our.bowl)/[app]/(scot %da now.bowl) path))
+::
+++  leave
+  |=  [=ship name=@t]
+  ^-  card
+  :*  %pass
+      /subscribe/(scot %p ship)/(scot %tas name)
+      %agent
+      [ship %canvas]
+      %leave
+      ~
+  ==
+::
+++  send-init-canvas
+  |=  name=@t
+  ^-  (quip card _state)
+  =/  canvas=(unit canvas)  (~(get by gallery) [our.bowl name])
+  ?~  canvas  `state
+  ~&  >  ['subscribing...' src.bowl private.metadata.u.canvas]
+  ?:  private.metadata.u.canvas
+    ~|([%subs-not-allowed name] !!)
+  :_  state
+  [%give %fact ~ %canvas-update !>([%load name u.canvas])]~
+::
+++  send-paint-update
+  |=  [name=@t strokes=(list stroke) who=@p]
+  ^-  card
+  :*  %give
+      %fact
+      [/canvas/(scot %tas name)]~
+      %canvas-update
+      !>([%paint our.bowl name strokes who])
+  ==
+::
+++  send-frontend
+  |=  =json
+  ^-  (list card)
+  [%give %fact [/frontend]~ %json !>(json)]~
+::
+++  update-remote-canvas
+  |=  [location=@p name=@t strokes=(list stroke)]
+  ^-  card
+  ?>  ?=(^ strokes)
+  :*  %pass
+      [%paint name ~]
+      %agent
+      [location %canvas]
+      %poke
+      %canvas-action
+      !>([%paint location name strokes])
+  ==
 --

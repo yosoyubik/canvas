@@ -58,12 +58,14 @@
             <svg
               width="35"
               height="34"
-              viewBox={`1 1 48 44`}
-              style={'margin-right: 5px;'}>
+              viewBox={`0 0 128 128`}
+              style={'margin-right: 5px;'}
+              transform={'scale(2.3, 2.3)'}>
+              >
               <path
-                d="m 5 13 l 6 -10 l 12 0 l 6 10 l -6 10 l -12 0 l 0 0 t 0 0 l 0 0 m 0 0 l -6 -10 m 24 0 h 11 l 6 10 l -6 10 h -11 l -6 -10 m -12 0 l -6 10 l 5 10 l 15 0 l 4 -10 l -6 -10 z"
+                d="m48 57 6-10 12 0 6 10-6 10-12 0 0 0t0 0l0 0m0 0-6-10m24 0h12l6 10-6 10h-12l-6-10m-12 0-6 10 6-10L66 67zM72 77 84 77 90 87 84 97 72 97 66 87ZM54 67 48 57H36L31 67 36 77 48 77ZM72 57 66 47 72 37 84 37 90 47 84 57 72 57 66 47ZM48 77 54 87 66 87 72 77 66 67 54 67Z"
                 stroke="white"
-                stroke-width="0.6"
+                stroke-width="0.7"
                 fill="none" />
             </svg>
           {/if}

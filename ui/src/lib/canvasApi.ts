@@ -69,10 +69,6 @@ export default class CanvasApi extends Api {
     return this.sendPoke({ join });
   }
 
-  private async sendPoke(action: unknown): Promise<unknown> {
-    return this.action('canvas-view', 'json', action);
-  }
-
   /**
    * Unsubscribes from remote canvas and makes it local
    */
@@ -94,5 +90,9 @@ export default class CanvasApi extends Api {
       'canvas-name': name
     };
     return this.sendPoke({ unlock });
+  }
+
+  private async sendPoke(action: unknown): Promise<unknown> {
+    return this.action('canvas', 'json', action);
   }
 }
