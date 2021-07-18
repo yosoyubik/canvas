@@ -17,7 +17,7 @@ import {
  */
 type AppSubscription = [Path, string];
 type AppName = 'canvas-view';
-const canvasSubscriptions: AppSubscription[] = [['/primary', 'canvas-view']];
+const canvasSubscriptions: AppSubscription[] = [['/frontend', 'canvas']];
 const appSubscriptions: Record<AppName, AppSubscription[]> = {
   'canvas-view': canvasSubscriptions
 };
@@ -26,7 +26,7 @@ export default class CanvasSubscription extends Subscription {
   openSubscriptions: any = {};
 
   start(): void {
-    this.subscribe('/primary', 'canvas-view');
+    this.subscribe('/frontend', 'canvas');
     this.subscribe('/all', 's3-store');
   }
 
@@ -57,7 +57,6 @@ export default class CanvasSubscription extends Subscription {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   handleEvent(data: { data: any }): void {
-
     const json = data.data;
     if (json === null) {
       return;
