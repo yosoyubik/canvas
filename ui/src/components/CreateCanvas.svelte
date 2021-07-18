@@ -191,7 +191,7 @@
                     width="48"
                     height="44"
                     stroke="black"
-                    strokeWidth="0.8"
+                    strokeWidth="0.9"
                     fill="none"
                     type="hexa" />
                   <RadioButton type="radio" labelText="Hexagons" value="hexa" />
