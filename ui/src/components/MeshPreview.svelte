@@ -16,11 +16,11 @@
     {height}
     viewBox={`0 0 128 128`}
     style={'margin-right: 5px;'}
-    transform={'scale(1.2, 1.2)'}>
+    transform={'scale(2, 2)'}>
     <path
       d="m 48 57 l 6 -10 l 12 0 l 6 10 l -6 10 l -12 0 l 0 0 t 0 0 l 0 0 m 0 0 l -6 -10 m 24 0 h 12 l 6 10 l -6 10 h -12 l -6 -10 m -12 0 l -6 10 l 6 -10 L 66 67 z M 72 77 L 84 77 L 90 87 L 84 97 L 72 97 L 66 87 L 72 77 Z M 54 67 L 48 57 H 36 L 31 67 L 36 77 L 48 77 L 54 67 Z M 72 57 L 66 47 L 72 37 L 84 37 L 90 47 L 84 57 L 72 57 L 66 47 Z M 48 77 L 54 87 L 66 87 L 72 77 L 66 67 L 54 67 L 48 77 Z"
       {stroke}
-      stroke-width={strokeWidth + 0.5}
+      stroke-width={strokeWidth}
       {fill} />
   </svg>
 {/if}
