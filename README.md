@@ -35,7 +35,6 @@ Copy and commit the contents of the urbit folder to your pier.
 
 ```dojo
 > |start %canvas
-> |start %canvas-view
 ```
 
 Then navigate to `YOUR_URBIT_URL/~canvas` (if you are running locally, this is usually: `http://localhost:8080/~canvas`)
