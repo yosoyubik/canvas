@@ -46,7 +46,7 @@
         (~(has in (gall-scry:cc (set @tas) %launch /keys/noun)) %canvas)
       =?  cards  !has-file
         =/  file=action:file-server
-          [%serve-dir /'~canvas' /app/btc-wallet %.n %.y]
+          [%serve-dir /'~canvas' /app/canvas %.n %.y]
         :_  cards
         (poke-our:cc %file-server %file-server-action !>(file))
       =?  cards  !has-tile
@@ -69,7 +69,7 @@
         (~(has in (gall-scry:cc (set @tas) %launch /keys/noun)) %canvas)
       =?  cards  !has-file
         =/  file=action:file-server
-          [%serve-dir /'~canvas' /app/btc-wallet %.n %.y]
+          [%serve-dir /'~canvas' /app/canvas %.n %.y]
         :_  cards
         (poke-our:cc %file-server %file-server-action !>(file))
       =?  cards  !has-tile
