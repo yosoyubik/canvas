@@ -31,7 +31,15 @@ Copy and commit the contents of the urbit folder to your pier.
 - First you need to mount the desk from where you will run canvas (e.g. by running `> |mount /=home=` from your urbit
 - You copy all the frontend and backend files using the `install.sh` script: `install.sh <PATH_TO_THE_MOUNTED_DESK>`
 
+You can also sync from the moon's home desk, without interacting with the file system (this is still experimental, so trying this on a planet is not recommended—use a comet or a moon instead)
+
+```hoon
+|sync %home ~master-norsyr-torryn %home
+```
+
 ## Running
+
+Once you have all the source code downloaded:
 
 ```dojo
 > |start %canvas
