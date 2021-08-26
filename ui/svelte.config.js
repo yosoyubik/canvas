@@ -36,10 +36,10 @@ const config = {
         }
       }
     },
-    paths: { base: '/~canvas' },
+    paths: { base: '/apps/canvas' },
     ssr: false,
     adapter: adapter({
-      pages: '../urbit/app/canvas'
+      pages: 'dist'
     })
   }
 };
