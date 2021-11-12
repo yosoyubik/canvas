@@ -1,0 +1,10 @@
+:~
+  title+'Canvas'
+  info+'Drawing app for urbit'
+  color+0xc2.d6be
+  glob+'https://bootstrap.urbit.org/glob-0v7.m1i81.cgaef.qd9h7.l05kj.5gq6n.glob'
+  base+'canvas'
+  version+[0 0 1]
+  license+'MIT'
+  website+'https://tlon.io'
+==

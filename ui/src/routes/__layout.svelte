@@ -1,5 +1,6 @@
 <script lang="ts">
   import 'carbon-components-svelte/css/all.css';
+  import Channel from '../channel';
   import { onMount } from 'svelte';
   import { addApi, addSubscription } from '../store';
   import { Content, Grid } from 'carbon-components-svelte';
@@ -11,7 +12,7 @@
   import Header from '../components/Header.svelte';
 
   onMount(async () => {
-    const channel = new window.channel();
+    const channel = new Channel();
     const api = new Api(window.ship, channel);
     const gcpApi = new GCP(window.ship, channel);
     const subscription = new Subscription(api, channel);

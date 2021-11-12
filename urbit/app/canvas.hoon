@@ -7,7 +7,7 @@
 ::
 ::  State
 ::
-/-  *canvas, file-server, launch-store
+/-  *canvas
 /+  *server, default-agent, verb, dbug,
     *canvas,
     *canvas-templates
@@ -40,21 +40,6 @@
       =/  name=@t  'welcome'
       =/  =canvas  (welcome ~ name our.bowl &)
       =.  gallery.state  (~(put by gallery) [[our.bowl name] canvas])
-      =/  has-file=?
-        (gall-scry:cc ? %file-server /url/'~canvas'/noun)
-      =/  has-tile=?
-        (~(has in (gall-scry:cc (set @tas) %launch /keys/noun)) %canvas)
-      =?  cards  !has-file
-        =/  file=action:file-server
-          [%serve-dir /'~canvas' /app/canvas %.n %.y]
-        :_  cards
-        (poke-our:cc %file-server %file-server-action !>(file))
-      =?  cards  !has-tile
-        =/  tile=action:launch-store
-          [%add %canvas [%custom `'/~canvas' `'/~canvas/img/tile.svg'] %.y]
-        :_  cards
-        (poke-our:cc %launch %launch-action !>(tile))
-      ::
       [cards this]
     ::
     ++  on-save  !>(state)
@@ -63,21 +48,6 @@
       |=  old=vase
       ^-  (quip card _this)
       =|  cards=(list card)
-      =/  has-file=?
-        (gall-scry:cc ? %file-server /url/'~canvas'/noun)
-      =/  has-tile=?
-        (~(has in (gall-scry:cc (set @tas) %launch /keys/noun)) %canvas)
-      =?  cards  !has-file
-        =/  file=action:file-server
-          [%serve-dir /'~canvas' /app/canvas %.n %.y]
-        :_  cards
-        (poke-our:cc %file-server %file-server-action !>(file))
-      =?  cards  !has-tile
-        =/  tile=action:launch-store
-          [%add %canvas [%custom `'/~canvas' `'/~canvas/img/tile.svg'] %.y]
-        :_  cards
-        (poke-our:cc %launch %launch-action !>(tile))
-      ::
       [cards this(state !<(state-zero old))]
     ::
     ++  on-poke
