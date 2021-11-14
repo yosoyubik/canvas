@@ -1,0 +1,11 @@
+:~  title+'Canvas'
+    info+'P2P paint app for Urbit.'
+    color+0x32.88bd
+    image+'http://localhost:9999/tile.svg'
+    base+'canvas'
+    glob-ames+[~zod 0v0]
+    version+[0 0 1]
+    website+'https://urbit.org/docs/userspace/dist/guide'
+    license+'MIT'
+==
+
