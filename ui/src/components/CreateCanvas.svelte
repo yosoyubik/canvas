@@ -184,7 +184,11 @@
                     strokeWidth="0.7"
                     fill="none"
                     type="squa" />
-                  <RadioButton type="radio" labelText="Squares" value="squa" />
+                  <RadioButton
+                    style={'margin-left: 20px;'}
+                    type="radio"
+                    labelText="Squares"
+                    value="squa" />
                   <MeshPreview
                     width="48"
                     height="44"
@@ -192,7 +196,11 @@
                     strokeWidth="0.9"
                     fill="none"
                     type="hexa" />
-                  <RadioButton type="radio" labelText="Hexagons" value="hexa" />
+                  <RadioButton
+                    style={'margin-left: 20px;'}
+                    type="radio"
+                    labelText="Hexagons"
+                    value="hexa" />
                 </RadioButtonGroup>
               </Field>
             </Column>
@@ -273,7 +281,8 @@
             </Column>
           </Row>
         </FormGroup> -->
-        <FormGroup legendText="Choose from a custom template">
+        <FormGroup
+          legendText="Choose from a custom template (current options will be ignored)">
           <Row>
             <Column>
               <Field let:field name="template">
