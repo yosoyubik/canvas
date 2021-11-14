@@ -6,12 +6,13 @@ export default class Channel {
     //  a way to handle channel errors
     //
     //
-    this.onChannelError = (err) => {
+    this.onChannelError = err => {
       console.error('event source error: ', err);
     };
-    this.onChannelOpen = (e) => {
+    this.onChannelOpen = e => {
       console.log('open', e);
     };
+    this.ackTimer = undefined;
   }
 
   init() {
@@ -20,7 +21,7 @@ export default class Channel {
     //
     this.uid =
       new Date().getTime().toString() +
-      "-" +
+      '-' +
       Math.random().toString(16).slice(-6);
 
     this.requestId = 1;
@@ -69,24 +70,24 @@ export default class Channel {
     }
     this.debounceTimer = setTimeout(() => {
       this.sendJSONToChannel();
-    }, this.debounceInterval)
+    }, this.debounceInterval);
   }
 
-  setOnChannelError(onError = (err) => {}) {
+  setOnChannelError(onError = err => {}) {
     this.onChannelError = onError;
   }
 
-  setOnChannelOpen(onOpen = (e) => {}) {
+  setOnChannelOpen(onOpen = e => {}) {
     this.onChannelOpen = onOpen;
   }
 
   deleteOnUnload() {
-    window.addEventListener("beforeunload", (event) => {
+    window.addEventListener('beforeunload', event => {
       this.delete();
     });
   }
 
-  clearQueue() { 
+  clearQueue() {
     clearTimeout(this.debounceTimer);
     this.debounceTimer = null;
     this.sendJSONToChannel();
@@ -96,17 +97,14 @@ export default class Channel {
   //
   poke(ship, app, mark, json, successFunc, failureFunc) {
     let id = this.nextId();
-    this.outstandingPokes.set(
-      id,
-      {
-        success: successFunc,
-        fail: failureFunc
-      }
-    );
+    this.outstandingPokes.set(id, {
+      success: successFunc,
+      fail: failureFunc
+    });
 
     const j = {
       id,
-      action: "poke",
+      action: 'poke',
       ship,
       app,
       mark,
@@ -121,32 +119,29 @@ export default class Channel {
   //    Returns a subscription id, which is the same as the same internal id
   //    passed to your Urbit.
   subscribe(
-      ship,
-      app,
-      path,
-      connectionErrFunc = () => {},
-      eventFunc = () => {},
-      quitFunc = () => {},
-      subAckFunc = () => {},
+    ship,
+    app,
+    path,
+    connectionErrFunc = () => {},
+    eventFunc = () => {},
+    quitFunc = () => {},
+    subAckFunc = () => {}
   ) {
     let id = this.nextId();
-    this.outstandingSubscriptions.set(
-      id,
-      {
-        err: connectionErrFunc,
-        event: eventFunc,
-        quit: quitFunc,
-        subAck: subAckFunc
-      }
-    );
+    this.outstandingSubscriptions.set(id, {
+      err: connectionErrFunc,
+      event: eventFunc,
+      quit: quitFunc,
+      subAck: subAckFunc
+    });
 
     const json = {
       id,
-      action: "subscribe",
+      action: 'subscribe',
       ship,
       app,
       path
-    }
+    };
 
     this.resetDebounceTimer();
 
@@ -159,10 +154,15 @@ export default class Channel {
   delete() {
     let id = this.nextId();
     clearInterval(this.ackTimer);
-    navigator.sendBeacon(this.channelURL(), JSON.stringify([{
-      id,
-      action: "delete"
-    }]));
+    navigator.sendBeacon(
+      this.channelURL(),
+      JSON.stringify([
+        {
+          id,
+          action: 'delete'
+        }
+      ])
+    );
     if (this.eventSource) {
       this.eventSource.close();
     }
@@ -174,7 +174,7 @@ export default class Channel {
     let id = this.nextId();
     this.sendJSONToChannel({
       id,
-      action: "unsubscribe",
+      action: 'unsubscribe',
       subscription
     });
   }
@@ -183,8 +183,8 @@ export default class Channel {
   //
   sendJSONToChannel(j) {
     let req = new XMLHttpRequest();
-    req.open("PUT", this.channelURL());
-    req.setRequestHeader("Content-Type", "application/json");
+    req.open('PUT', this.channelURL());
+    req.setRequestHeader('Content-Type', 'application/json');
 
     if (this.lastEventId == this.lastAcknowledgedEventId) {
       if (j) {
@@ -202,11 +202,11 @@ export default class Channel {
       //    acknowledge that we received it.
       //
       let payload = [
-        ...this.outstandingJSON, 
-        {action: "ack", "event-id": this.lastEventId}
+        ...this.outstandingJSON,
+        { action: 'ack', 'event-id': this.lastEventId }
       ];
       if (j) {
-        payload.push(j)
+        payload.push(j);
       }
       let x = JSON.stringify(payload);
       req.send(x);
@@ -225,7 +225,9 @@ export default class Channel {
       return;
     }
 
-    this.eventSource = new EventSource(this.channelURL(), {withCredentials:true});
+    this.eventSource = new EventSource(this.channelURL(), {
+      withCredentials: true
+    });
     this.eventSource.onmessage = e => {
       this.lastEventId = parseInt(e.lastEventId, 10);
 
@@ -233,43 +235,44 @@ export default class Channel {
       let pokeFuncs = this.outstandingPokes.get(obj.id);
       let subFuncs = this.outstandingSubscriptions.get(obj.id);
 
-      if (obj.response == "poke" && !!pokeFuncs) {
+      if (obj.response == 'poke' && !!pokeFuncs) {
         let funcs = pokeFuncs;
-        if (obj.hasOwnProperty("ok")) {
-          funcs["success"]();
-        } else if (obj.hasOwnProperty("err")) {
-          funcs["fail"](obj.err);
+        if (obj.hasOwnProperty('ok')) {
+          funcs['success']();
+        } else if (obj.hasOwnProperty('err')) {
+          funcs['fail'](obj.err);
         } else {
-          console.error("Invalid poke response: ", obj);
+          console.error('Invalid poke response: ', obj);
         }
         this.outstandingPokes.delete(obj.id);
-
-      } else if (obj.response == "subscribe" ||
-                (obj.response == "poke" && !!subFuncs)) {
+      } else if (
+        obj.response == 'subscribe' ||
+        (obj.response == 'poke' && !!subFuncs)
+      ) {
         let funcs = subFuncs;
 
-        if (obj.hasOwnProperty("err")) {
-          funcs["err"](obj.err);
+        if (obj.hasOwnProperty('err')) {
+          funcs['err'](obj.err);
           this.outstandingSubscriptions.delete(obj.id);
-        } else if (obj.hasOwnProperty("ok")) {
-          funcs["subAck"](obj);
+        } else if (obj.hasOwnProperty('ok')) {
+          funcs['subAck'](obj);
         }
-      } else if (obj.response == "diff") {
+      } else if (obj.response == 'diff') {
         // ensure we ack before channel clogs
-        if((this.lastEventId - this.lastAcknowledgedEventId) > 30) {
+        if (this.lastEventId - this.lastAcknowledgedEventId > 30) {
           this.clearQueue();
         }
 
         let funcs = subFuncs;
-        funcs["event"](obj.json);
-      } else if (obj.response == "quit") {
+        funcs['event'](obj.json);
+      } else if (obj.response == 'quit') {
         let funcs = subFuncs;
-        funcs["quit"](obj);
+        funcs['quit'](obj);
         this.outstandingSubscriptions.delete(obj.id);
       } else {
-        console.log("Unrecognized response: ", e);
+        console.log('Unrecognized response: ', e);
       }
-    }
+    };
 
     this.eventSource.onopen = this.onChannelOpen;
 
@@ -277,11 +280,11 @@ export default class Channel {
       this.delete();
       this.init();
       this.onChannelError(e);
-    }
+    };
   }
 
   channelURL() {
-    return "/~/channel/" + this.uid;
+    return '/~/channel/' + this.uid;
   }
 
   nextId() {

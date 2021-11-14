@@ -12,11 +12,25 @@ export interface Metadata {
   mesh?: string;
 }
 
+export interface Topology {
+  transform: {
+    translate: number[];
+    scale: number[];
+  };
+  objects: {
+    pixels: {
+      type: string;
+      geometries: any[];
+    };
+  };
+  arcs: any[];
+}
+
 export interface Strokes {
   [id: number]: {
     // fill: boolean;
     color: string;
-    who?:  Patp;
+    who?: Patp;
     when?: number;
   };
 }

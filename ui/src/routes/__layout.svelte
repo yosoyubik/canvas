@@ -1,6 +1,6 @@
 <script lang="ts">
   import 'carbon-components-svelte/css/all.css';
-  import Channel from '../channel';
+  import Channel from '../lib/channel';
   import { onMount } from 'svelte';
   import { addApi, addSubscription } from '../store';
   import { Content, Grid } from 'carbon-components-svelte';

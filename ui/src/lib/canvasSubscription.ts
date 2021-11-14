@@ -10,6 +10,10 @@ import {
   saveGCPToken,
   saveS3credentials,
   saveS3config
+  // createGroups,
+  // addGroup,
+  // removeGroup,
+  // decodeGroup
 } from '../store';
 
 /**
@@ -28,6 +32,7 @@ export default class CanvasSubscription extends Subscription {
   start(): void {
     this.subscribe('/frontend', 'canvas');
     this.subscribe('/all', 's3-store');
+    this.subscribe('/groups', 'group-store');
   }
 
   restart(): void {
@@ -58,11 +63,27 @@ export default class CanvasSubscription extends Subscription {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   handleEvent(data: { data: any }): void {
     const json = data.data;
+    console.log(json);
     if (json === null) {
       return;
     }
 
-    if ('clear' in json && json.clear) {
+    if ('groupUpdate' in json) {
+      console.log('groupUpdate', json.groupUpdate);
+
+      // if ('initial' in json.groupUpdate && json.groupUpdate['initial']) {
+      //   createGroups(json.groupUpdate['initial']);
+      //   // updateGroups()
+      // } else if ('add-group' in json.groupUpdate) {
+      //   const { resource, group } = json.groupUpdate['add-group'];
+      //   addGroup(resource, decodeGroup(group));
+      // } else if ('remove-group' in json.groupUpdate) {
+      //   const { resource, group } = json.groupUpdate['remove-group'];
+      //   removeGroup(resource, decodeGroup(group));
+      // }
+    }
+
+    if ('clear' in json) {
       wipeStore();
     } else if ('connection' in json) {
       updateConnection(json.connection);

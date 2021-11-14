@@ -1,8 +1,14 @@
+import _ from 'lodash';
 import { writable } from 'svelte/store';
 import type { StoreState } from './types/store';
+
 import type Api from './lib/canvasApi';
 import type { Canvas, LoadCanvas, CanvasData } from './types/canvas';
 import type { Paint } from './types/canvasAction';
+
+import type { Path, Patp, Enc } from '@urbit/api';
+import type { Group, Resource, Tags, GroupPolicy } from '@urbit/api/groups';
+
 import type { ConnectionStatus } from './types/connection';
 import type { GcpToken } from './types/gcp-state';
 import type { S3Configuration, S3Credentials } from './types/s3';
@@ -10,10 +16,11 @@ import type { S3Configuration, S3Credentials } from './types/s3';
 import { S3Client } from '@aws-sdk/client-s3';
 
 import { browser } from '$app/env';
-import type { StringChain } from 'lodash';
+// import type { StringChain } from 'lodash';
 
 const initStore: StoreState = {
   chats: [],
+  groups: {},
   connection: 'disconnected',
   // publicCanvas: [],
   // privateCanvas: [],
@@ -39,6 +46,51 @@ function isToken(token: any): token is GcpToken {
     typeof token.accessKey === 'string' && typeof token.expiresIn === 'number'
   );
 }
+
+// function resourceFromPath(path: Path): Resource {
+//   const [, , ship, name] = path.split('/');
+//   return { ship, name };
+// }
+
+// export function decodeGroup(group: Enc<Group>): Group {
+//   const members = new Set(group.members);
+//   const res = {
+//     ...group,
+//     members,
+//     tags: decodeTags(group.tags),
+//     policy: decodePolicy(group.policy)
+//   };
+//   return res;
+// }
+
+// function decodePolicy(policy: Enc<GroupPolicy>): GroupPolicy {
+//   if ('invite' in policy) {
+//     const { invite } = policy;
+//     return { invite: { pending: new Set(invite.pending) } };
+//   } else {
+//     const { open } = policy;
+//     return {
+//       open: { banned: new Set(open.banned), banRanks: new Set(open.banRanks) }
+//     };
+//   }
+// }
+
+// function decodeTags(tags: Enc<Tags>): Tags {
+//   return _.reduce(
+//     tags,
+//     (acc, ships: any, key): Tags => {
+//       if (key.search(/\\/) === -1) {
+//         acc.role[key] = new Set(ships);
+//         return acc;
+//       } else {
+//         const [app, tag, resource] = key.split('\\');
+//         _.set(acc, [app, resource, tag], new Set(ships));
+//         return acc;
+//       }
+//     },
+//     { role: {} }
+//   );
+// }
 
 export function wipeStore(): void {
   return;
@@ -92,7 +144,7 @@ export function saveS3credentials(credentials: S3Credentials): void {
     credentials.endpoint.search('http://') !== -1
       ? credentials.endpoint
       : `https://${credentials.endpoint}`;
-  console.log(endpoint);
+
   update(
     ($store): StoreState => {
       return {
@@ -305,5 +357,20 @@ export function updateImageURL(
     }
   );
 }
+
+// export function createGroups(data: any): void {
+//   const groups = _.mapValues(data, decodeGroup);
+//   console.log(data, groups);
+//   update(
+//     ($store): StoreState => {
+//       return {
+//         ...$store,
+//         groups
+//       };
+//     }
+//   );
+// }
+// export function addGroup(resource: Resource, group: Group): void {}
+// export function removeGroup(resource: Resource, group: Group): void {}
 
 export default { subscribe };

@@ -32,28 +32,20 @@
   import * as topojson from 'topojson-client';
 
   import store from '../store';
-  import type { CanvasData } from '../types/canvas';
+  import type { CanvasData, Metadata, Topology } from '../types/canvas';
 
-  import {
-    topology as calculateTopology,
-    projection as calculateProjection,
-    transformIndex,
-    columns as calculateColumns
-  } from '$lib/topology';
+  import { columns as calculateColumns } from '$lib/topology';
   import { InlineNotification } from 'carbon-components-svelte';
   import Pixel from '././Pixel.svelte';
   import OptionsMenu from './OptionsMenu.svelte';
 
   export let canvas: CanvasData;
-  export let width: number;
-  export let height: number;
+  export let topology: Topology;
+  export let metadata: Metadata;
   export let color: string;
+  export let path: any;
 
-  let topology,
-    geometries,
-    canvasNode,
-    projection,
-    path,
+  let canvasNode,
     apiPaints = {},
     mousing = 0,
     showMesh = false,
@@ -86,39 +78,15 @@
 
   function handleFlush() {
     const strokes = Object.values(apiPaints);
-    const { location, name } = canvas.metadata;
+    const { location, name } = metadata;
     if (strokes.length > 0) {
       $store.api.send(location, name, strokes);
     }
     apiPaints = {};
   }
 
-  // FIXME: this is called for every stroke... (performance issues?)
-  // but needs to be added for switching between canvas
-  //
-  // The only noticeable performance issue is drawing with the
-  // mesh on (?)
-  //
-  $: {
-    viewBox = calculateViewBox(radius, canvas.metadata.mesh);
-
-    topology = calculateTopology(canvas.metadata.mesh)(
-      canvas.metadata.name,
-      radius,
-      width,
-      height,
-      canvas.data,
-      canvas.metadata.columns
-    );
-    geometries = topology.objects.pixels.geometries;
-    projection = calculateProjection(radius, canvas.metadata.mesh);
-    path = d3.geoPath().projection(projection);
-    columns = calculateColumns(
-      width,
-      canvas.metadata.columns,
-      canvas.metadata.mesh
-    );
-  }
+  viewBox = calculateViewBox(radius, metadata.mesh);
+  columns = calculateColumns(metadata.width, metadata.columns, metadata.mesh);
 </script>
 
 <!-- <div class="notification">
@@ -126,10 +94,12 @@
 </div> -->
 <svg
   bind:this={canvasNode}
-  {width}
-  {height}
+  width={metadata.width}
+  height={metadata.height}
   id="canvas"
-  viewBox={`0 0 ${width + viewBox.width} ${height + viewBox.height}`}
+  viewBox={`0 0 ${metadata.width + viewBox.width} ${
+    metadata.height + viewBox.height
+  }`}
   preserveAspectRatio="xMaxYMin meet"
   on:mouseleave={() => {
     mousing = 0;
@@ -138,7 +108,7 @@
     id="hexagons"
     class="hexagon"
     transform={`translate(${radius}, ${
-      canvas.metadata.mesh === 'hexa' ? radius : radius + 1
+      metadata.mesh === 'hexa' ? radius : radius + 1
     })`}>
     {#if showMesh}
       <path
@@ -147,28 +117,24 @@
         id="mesh"
         d={path(topojson.mesh(topology, topology.objects.pixels))} />
     {/if}
-    <!-- {#if topology && geometries} -->
-    {#each geometries as d}
+    {#each topology.objects.pixels.geometries as d}
       <Pixel
-        {topology}
-        {d}
-        {path}
+        id={d.id}
+        d={path(topojson.feature(topology, d))}
+        attr={d.attr}
         selectedColor={color}
         bind:mousing
         on:update={handleUpdate}
         on:save={handleSave}
         on:flush={handleFlush} />
     {/each}
-    <!-- {/if} -->
   </g>
 </svg>
 
-{#if canvas.metadata}
-  <OptionsMenu
-    name={canvas.metadata.name}
-    location={canvas.metadata.location}
-    fileURL={canvas.metadata.file}
-    privateCanvas={canvas.metadata.private}
-    bind:showMesh
-    {canvasNode} />
-{/if}
+<OptionsMenu
+  name={metadata.name}
+  location={metadata.location}
+  fileURL={metadata.file}
+  privateCanvas={metadata.private}
+  bind:showMesh
+  {canvasNode} />

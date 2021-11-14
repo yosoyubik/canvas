@@ -32,6 +32,11 @@
   import * as d3 from 'd3';
   import store from '../store';
 
+  import {
+    topology as calculateTopology,
+    projection as calculateProjection
+  } from '$lib/topology';
+
   import type { Metadata } from '../types/canvas';
   // import FreeHand from '../components/FreeHand.svelte';
   import { Loading, Row, Column, Tooltip } from 'carbon-components-svelte';
@@ -46,7 +51,8 @@
 
   let colors = d3.range(18),
     color = '#d53e4f',
-    startColor = color;
+    startColor = color,
+    currentCanvas = $store.name;
 
   function isMesh(metadata: Metadata) {
     return metadata.template !== 'draw';
@@ -62,6 +68,27 @@
       color = d3.rgb(r, g, b, a).formatRgb();
     }
     startColor = d3.rgb(r, g, b, a).formatHex();
+  }
+
+  let topology,
+    projection,
+    canvas,
+    path,
+    radius = $store.radius;
+
+  $: if ($store.name && $store.canvas) {
+    const { width, height, mesh } = $store.canvas[$store.name].metadata;
+    canvas = $store.canvas[$store.name];
+    topology = calculateTopology(canvas.metadata.mesh)(
+      canvas.metadata.name,
+      radius,
+      width,
+      height,
+      canvas.data,
+      canvas.metadata.columns
+    );
+    projection = calculateProjection(radius, mesh);
+    path = d3.geoPath().projection(projection);
   }
 </script>
 
@@ -99,13 +126,16 @@
 <Row padding>
   <Column>
     <div>
-      {#if $store.canvas && $store.name && !$store.leaving}
+      {#if canvas && !$store.leaving && topology}
         {#if isMesh($store.canvas[$store.name].metadata)}
-          <Mesh
-            canvas={$store.canvas[$store.name]}
-            {color}
-            width={$store.canvas[$store.name].metadata.width}
-            height={$store.canvas[$store.name].metadata.height} />
+          {#key canvas}
+            <Mesh
+              {canvas}
+              {topology}
+              {color}
+              {path}
+              metadata={$store.canvas[$store.name].metadata} />
+          {/key}
           <!-- {:else if $store.canvas[$store.name] && isFreeHand($store.canvas[$store.name].metadata)}
           <FreeHand
             canvas={$store.canvas[$store.name]}

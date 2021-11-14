@@ -11,11 +11,15 @@
 
   import store from '../store';
 
-  export let topology;
+  // export let topology;
   export let d;
+  export let id;
+  export let attr;
   export let selectedColor;
   export let mousing;
-  export let path;
+  // export let path;
+
+  // $: console.log(topology, d);
 
   $: color = selectedColor;
 
@@ -23,36 +27,38 @@
   const oneDay = 1000 * 3600 * 24;
 
   function canPaint() {
-    if (!d.attr.when || !d.attr.who) {
+    if (!attr.when || !attr.who) {
       return true;
-    } else if (d.attr.who === $store.ship) {
+    } else if (attr.who === $store.ship) {
       return true;
     } else {
-      return Math.abs(Date.now() - d.attr.when) >= oneDay;
+      return Math.abs(Date.now() - attr.when) >= oneDay;
     }
   }
 
   function mousedown(event) {
-    //  right click
-    if (event.which === 3) return;
-    mousing = d.attr.color === color ? -1 : +1;
+    // console.log('mousedown');
+    if (event.which === 3) return; //  right click
+    mousing = attr.color === color ? -1 : +1;
     mousemove();
   }
 
   function mousemove() {
+    // console.log('mousemove');
     // if (mousing && canPaint()) {  // Keeps pixels for at least oneDay
     if (mousing) {
       const paint = { color, when: Date.now(), who: $store.ship };
       const fill = mousing > 0;
       let stroke = {
-        id: d.id
+        id
       };
-      // d.attr = { ...d.attr, color: fill ? color : null };
+      // this updates the color right away, making it very fast
+      attr = { ...attr, color: fill ? color : null };
       if (fill) Object.assign(stroke, paint);
 
       // Save stroke locally
       dispatch('update', {
-        id: d.id,
+        id,
         data: {
           color: fill ? color : null
         }
@@ -64,6 +70,7 @@
   }
 
   function mouseup() {
+    // console.log('mouseup');
     mousemove();
     mousing = 0;
     dispatch('flush');
@@ -71,9 +78,9 @@
 </script>
 
 <path
-  d={path(topojson.feature(topology, d))}
-  fill={d.attr && d.attr.color
-    ? d.attr.color
+  {d}
+  fill={attr && attr.color
+    ? attr.color
     : // 'white' instead?
       '#fff0'}
   stroke-width={1}

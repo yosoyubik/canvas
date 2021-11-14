@@ -24,6 +24,7 @@
   import type { CanvasForm } from '../types/canvas';
 
   import MeshPreview from './MeshPreview.svelte';
+  // import { resourceAsPath, resourceFromPath } from '@urbit/api';
 
   const hexaTemplates = {
     'mesh-welcome': 'Canvas ~ Urbit',
@@ -36,6 +37,8 @@
     'mesh-dumas': 'Dumas-Dutil Cosmic Call'
   };
 
+  const groups = Object.keys($store.groups);
+
   const performanceWarning =
     'Mesh grids with many pixels could affect performance';
 
@@ -47,7 +50,8 @@
     name: '',
     mesh: 'squa',
     private: true,
-    template: 'mesh'
+    template: 'mesh',
+    group: ''
     // width: 1500,
     // height: 1000
   };
@@ -115,6 +119,13 @@
         isSubmitting = false;
       });
   }
+
+  // function parsePath(resource: string): string {
+  //   const { ship, name } = resourceFromPath(resource);
+  //   return `${name} on ${ship}`;
+  // }
+
+  // $: console.log(Object.entries($store.groups));
 </script>
 
 <Button icon={Paint32} kind="ghost" size="small" on:click={() => (open = true)}>
@@ -148,19 +159,6 @@
                   type="text"
                   invalidText={meta.error}
                   on:input={field.handleInput}
-                  on:blur={field.handleBlur} />
-              </Field>
-            </Column>
-            <Column padding lg={4}>
-              <Field let:field let:meta name="private">
-                <Checkbox
-                  style={'display: inline-block;'}
-                  labelText="Private"
-                  ref={checkbox}
-                  checked={initialValues.private}
-                  {...field}
-                  title="Uncheck if you want others to join"
-                  on:change={field.handleInput}
                   on:blur={field.handleBlur} />
               </Field>
             </Column>
@@ -238,6 +236,43 @@
             </Column>
           </Row>
         </FormGroup>
+        <!-- <FormGroup legendText="Access">
+          <Row>
+            <Column padding>
+              <Field let:field let:meta name="group">
+                <Select
+                  light
+                  size="sm"
+                  inline
+                  on:change={vals => {
+                    if (!vals.detail) return;
+                    const target = { name: 'group', value: vals.detail };
+                    return field.handleInput({ target });
+                  }}>
+                  <SelectItemGroup label="Groups">
+                    {#each Object.entries($store.groups) as [resource, group]}
+                      <SelectItem value={resource} text={parsePath(resource)} />
+                    {/each}
+                  </SelectItemGroup>
+                </Select>
+              </Field>
+            </Column>
+            <Column padding lg={4}>
+              <Field let:field let:meta name="private">
+                <Checkbox
+                  disabled={values.group}
+                  style={'display: inline-block;'}
+                  labelText="Private"
+                  ref={checkbox}
+                  checked={initialValues.private}
+                  {...field}
+                  title="Uncheck if you want others to join"
+                  on:change={field.handleInput}
+                  on:blur={field.handleBlur} />
+              </Field>
+            </Column>
+          </Row>
+        </FormGroup> -->
         <FormGroup legendText="Choose from a custom template">
           <Row>
             <Column>

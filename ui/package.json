@@ -22,6 +22,7 @@
     "@types/cookie": "^0.4.0",
     "@typescript-eslint/eslint-plugin": "^4.19.0",
     "@typescript-eslint/parser": "^4.19.0",
+    "@urbit/api": "2.0.0",
     "@yosoyubik/draw-me": "https://api.observablehq.com/@yosoyubik/draw-me.tgz?v=3",
     "any-ascii": "0.2.0",
     "carbon-components-svelte": "0.39.0",

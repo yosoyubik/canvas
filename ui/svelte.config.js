@@ -14,15 +14,15 @@ const config = {
     vite: {
       server: {
         proxy: {
-          '^/~landscape/.*': {
-            target: 'http://localhost:8080/',
-            changeOrigin: true
-          },
-          '^/~/channel/.*': {
+          '^/session.js': {
             target: 'http://localhost:8080/',
             changeOrigin: true
           },
           '^/spider/.*': {
+            target: 'http://localhost:8080/',
+            changeOrigin: true
+          },
+          '^/~/.*': {
             target: 'http://localhost:8080/',
             changeOrigin: true
           }
@@ -32,7 +32,7 @@ const config = {
       build: {},
       resolve: {
         alias: {
-          "./runtimeConfig": "./runtimeConfig.browser"
+          './runtimeConfig': './runtimeConfig.browser'
         }
       }
     },
