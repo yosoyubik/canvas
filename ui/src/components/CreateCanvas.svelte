@@ -234,7 +234,7 @@
                   light
                   labelText="Height"
                   {...field}
-                  warn={field.value > 1000}
+                  warn={field.value > 1024}
                   warnText={meta.warning}
                   invalid={meta.error}
                   invalidText={meta.error}
