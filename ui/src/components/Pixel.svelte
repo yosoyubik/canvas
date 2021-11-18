@@ -17,6 +17,7 @@
   export let attr;
   export let selectedColor;
   export let mousing;
+  export let lockup;
   // export let path;
 
   // $: console.log(topology, d);
@@ -30,31 +31,43 @@
     if (!attr.when || !attr.who) {
       return true;
     } else if (attr.who === $store.ship) {
+      //  The owner is updating
+      //
       return true;
     } else {
-      return Math.abs(Date.now() - attr.when) >= oneDay;
+      console.log(
+        Date.now(),
+        attr,
+        lockup,
+        Math.abs(Date.now() - attr.when) >= lockup
+      );
+      return Math.abs(Date.now() - attr.when) >= lockup;
     }
   }
 
   function mousedown(event) {
-    // console.log('mousedown');
     if (event.which === 3) return; //  right click
     mousing = attr.color === color ? -1 : +1;
     mousemove();
   }
 
   function mousemove() {
-    // console.log('mousemove');
-    // if (mousing && canPaint()) {  // Keeps pixels for at least oneDay
-    if (mousing) {
-      const paint = { color, when: Date.now(), who: $store.ship };
+    if (mousing && canPaint()) {
       const fill = mousing > 0;
+      const when = Date.now();
+      const del = fill ? false : true;
       let stroke = {
-        id
+        id,
+        del,
+        color,
+        when,
+        who: $store.ship
       };
-      // this updates the color right away, making it very fast
-      attr = { ...attr, color: fill ? color : null };
-      if (fill) Object.assign(stroke, paint);
+      // this updates the color right away
+      attr = {
+        ...attr,
+        color: fill ? color : null
+      };
 
       // Save stroke locally
       dispatch('update', {
@@ -66,6 +79,9 @@
 
       // Save stroke remotely
       dispatch('save', stroke);
+    }
+    if (mousing && !canPaint()) {
+      dispatch('locked', { id });
     }
   }
 

@@ -1,14 +1,14 @@
 /-  *canvas
+::
 |%
 ++  blank
-  |=  [=canvas *]
-  canvas
+  |=([=canvas *] canvas)
 ::
 ++  martian
   |=  [* name=@t owner=@p private=?]
   ^-  canvas
   :-  %mesh
-  :_  [name %mesh owner ~ private 1.500 1.000 88 [~ %hexa]]
+  :_  [~ name %mesh owner ~ private 1.500 1.000 88 [~ %hexa]]
   ^-  mesh
   %-  molt
   ^-  (list [@t arc])
@@ -237,7 +237,7 @@
   |=  [* name=@t owner=@p private=?]
   ^-  canvas
   :-  %mesh
-  :_  [name %mesh-welcome owner ~ private 1.500 1.000 88 [~ %hexa]]
+  :_  [~ name %mesh-welcome owner ~ private 1.500 1.000 88 [~ %hexa]]
   ^-  mesh
   %-  molt
   ^-  (list [@t arc])
@@ -476,7 +476,7 @@
   |=  [* name=@t owner=@p private=?]
   ^-  canvas
   :-  %mesh
-  :_  [name %mesh-welcome owner ~ private 1.500 1.000 88 [~ %hexa]]
+  :_  [~ name %mesh-welcome owner ~ private 1.500 1.000 88 [~ %hexa]]
   ^-  mesh
   %-  molt
   ^-  (list [@t arc])
@@ -683,7 +683,7 @@
   |=  [* name=@t owner=@p private=?]
   ^-  canvas
   :-  %mesh
-  :_  [name %mesh-homer owner ~ private 1.500 1.000 88 [~ %hexa]]
+  :_  [~ name %mesh-homer owner ~ private 1.500 1.000 88 [~ %hexa]]
   ^-  mesh
   %-  molt
   ^-  (list [@t arc])
@@ -1857,7 +1857,7 @@
   |=  [* name=@t owner=@p private=?]
   ^-  canvas
   :-  %mesh
-  :_  [name %mesh owner ~ private 1.500 1.000 88 [~ %squa]]
+  :_  [~ name %mesh owner ~ private 1.500 1.000 88 [~ %squa]]
   ^-  mesh
   %-  molt
   ^-  (list [@t arc])
@@ -3170,7 +3170,7 @@
   |=  [* name=@t owner=@p private=?]
   ^-  canvas
   :-  %mesh
-  :_  [name %mesh owner ~ private 1.500 1.000 88 [~ %hexa]]
+  :_  [~ name %mesh owner ~ private 1.500 1.000 88 [~ %hexa]]
   ^-  mesh
   %-  molt
   ^-  (list [@t arc])
@@ -3434,7 +3434,7 @@
   |=  [* name=@t owner=@p private=?]
   ^-  canvas
   :-  %mesh
-  :_  [name %mesh owner ~ private 1.500 1.000 88 [~ %hexa]]
+  :_  [~ name %mesh owner ~ private 1.500 1.000 88 [~ %hexa]]
   ^-  mesh
   %-  molt
   ^-  (list [@t arc])
@@ -3676,7 +3676,7 @@
   |=  [* name=@t owner=@p private=?]
   ^-  canvas
   :-  %mesh
-  :_  [name %mesh owner ~ private 1.500 1.000 88 [~ %hexa]]
+  :_  [~ name %mesh owner ~ private 1.500 1.000 88 [~ %hexa]]
   ^-  mesh
   %-  molt
   ^-  (list [@t arc])
@@ -4332,7 +4332,7 @@
   |=  [* name=@t owner=@p private=?]
   ^-  canvas
   :-  %mesh
-  :_  [name %mesh owner ~ private 1.500 1.000 88 [~ %hexa]]
+  :_  [~ name %mesh owner ~ private 1.500 1.000 88 [~ %hexa]]
   ^-  mesh
   %-  molt
   ^-  (list [@t arc])
@@ -4623,7 +4623,7 @@
   |=  [* name=@t owner=@p private=?]
   ^-  canvas
   :-  %mesh
-  :_  [name %mesh owner ~ private 1.500 1.000 88 [~ %hexa]]
+  :_  [~ name %mesh owner ~ private 1.500 1.000 88 [~ %hexa]]
   ^-  mesh
   %-  molt
   ^-  (list [@t arc])
@@ -5369,7 +5369,7 @@
   |=  [* name=@t owner=@p private=?]
   ^-  canvas
   :-  %mesh
-  :_  [name %mesh owner ~ private 1.500 1.000 88 [~ %hexa]]
+  :_  [~ name %mesh owner ~ private 1.500 1.000 88 [~ %hexa]]
   ^-  mesh
   %-  molt
   ^-  (list [@t arc])
@@ -5908,7 +5908,7 @@
   |=  [* name=@t owner=@p private=?]
   ^-  canvas
   :-  %mesh
-  :_  [name %mesh owner ~ private 1.500 1.000 88 [~ %hexa]]
+  :_  [~ name %mesh owner ~ private 1.500 1.000 88 [~ %hexa]]
   ^-  mesh
   %-  molt
   ^-  (list [@t arc])
@@ -6346,7 +6346,7 @@
   |=  [* name=@t owner=@p private=?]
   ^-  canvas
   :-  %mesh
-  :_  [name %mesh owner ~ private 1.500 1.000 88 [~ %hexa]]
+  :_  [~ name %mesh owner ~ private 1.500 1.000 88 [~ %hexa]]
   ^-  mesh
   %-  molt
   ^-  (list [@t arc])
@@ -7022,7 +7022,7 @@
   |=  [* name=@t owner=@p private=?]
   ^-  canvas
   :-  %mesh
-  :_  [name %mesh-monkey owner ~ private 1.500 1.000 101 [~ %squa]]
+  :_  [~ name %mesh-monkey owner ~ private 1.500 1.000 101 [~ %squa]]
   ^-  mesh
   %-  molt
   =;  monkey=(list [@t arc])
@@ -11311,7 +11311,7 @@
   |=  [* name=@t owner=@p private=?]
   ^-  canvas
   :-  %mesh
-  :_  [name %mesh owner ~ private 1.500 1.000 88 [~ %hexa]]
+  :_  [~ name %mesh owner ~ private 1.500 1.000 88 [~ %hexa]]
   ^-  mesh
   %-  molt
   ^-  (list [@t arc])
@@ -12578,7 +12578,7 @@
   |=  [* name=@t owner=@p private=?]
   ^-  canvas
   :-  %mesh
-  :_  [name %mesh-monkey owner ~ private 1.500 1.000 101 [~ %squa]]
+  :_  [~ name %mesh-monkey owner ~ private 1.500 1.000 101 [~ %squa]]
   ^-  mesh
   %-  molt
   ^-  (list [@t arc])
@@ -14710,7 +14710,7 @@
   |=  [* name=@t owner=@p private=?]
   ^-  canvas
   :-  %mesh
-  :_  [name %mesh-hackathon owner ~ private 1.500 1.000 88 [~ %hexa]]
+  :_  [~ name %mesh-hackathon owner ~ private 1.500 1.000 88 [~ %hexa]]
   ^-  mesh
   %-  molt
   ^-  (list [@t arc])
@@ -16853,7 +16853,7 @@
   |=  [* name=@t owner=@p private=?]
   ^-  canvas
   :-  %mesh
-  :_  [name %mesh-dumas owner ~ private 1.895 1.400 128 [~ %squa]]
+  :_  [~ name %mesh-dumas owner ~ private 1.895 1.400 128 [~ %squa]]
   ^-  mesh
   %-  molt
   ^-  (list [@t arc])

@@ -16,8 +16,9 @@ export interface Paint {
     id: number;
     // fill: boolean;
     color: string;
-    who?:  Patp;
+    who?: Patp;
     when?: number;
+    del: boolean;
   }[];
 }
 

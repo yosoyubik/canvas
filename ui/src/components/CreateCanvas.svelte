@@ -204,6 +204,20 @@
                 </RadioButtonGroup>
               </Field>
             </Column>
+            <Column>
+              <Field let:field let:meta name="private">
+                <Checkbox
+                  disabled={values.group}
+                  style={'display: inline-block; padding: 6px;'}
+                  labelText="Private"
+                  ref={checkbox}
+                  checked={initialValues.private}
+                  {...field}
+                  title="Uncheck if you want others to join"
+                  on:change={field.handleInput}
+                  on:blur={field.handleBlur} />
+              </Field>
+            </Column>
           </Row>
           <Row>
             <Column>

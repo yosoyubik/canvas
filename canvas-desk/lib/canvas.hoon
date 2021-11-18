@@ -31,7 +31,8 @@
         ::
           :-  'metadata'
           %-  ou
-          :~  ['name' (un so)]
+          :~  ['lockup' (uf ~ (mu (cu @dr ni)))]
+              ['name' (un so)]
               ['template' (un (cu template so))]
               ['location' (un (su ;~(pfix sig fed:ag)))]
               ['file' (uf ~ (mu so))]
@@ -60,16 +61,20 @@
     ++  arc-data
       |=  =json
       ?>  ?=(%o -.json)
-      ^-  [@t (unit arc)]
-      ?:  =(~(wyt by p.json) 1)
-        %.  json
-        (ou ~[['id' (un so)] [*@t (uf ~ ul)]])
-      :-  ((ou ['id' (un so)]~) json)
-      %-  some
+      ^-  [@t ? arc]
+      :: TODO: revive this to not send all data when deleting
+      ::
+      :: ?:  =(~(wyt by p.json) 1)
+      ::   %.  json
+      ::   (ou ~[['id' (un so)] [*@t (uf ~ ul)]])
+      :: :-  ((ou ['id' (un so)]~) json)
+      :: %-  some
       %.  json
       %-  ou
-      :~  ['color' (un so)]
-          ['when' (uf ~ (mu (cu from-unix-ms:chrono:userlib ni)))]
+      :~  ['id' (un so)]
+          ['del' (un bo)]
+          ['color' (un so)]
+          ['when' (uf ~ (mu di))]
           ['who' (uf ~ (mu (su fed:ag)))]
       ==
     ::
@@ -104,7 +109,11 @@
     ==
   ::
   ++  share
-    (ot ~[['canvas-name' so] ['chat-path' pa] ['type' (cu image-type so)]])
+    %-  ot
+    :~  ['canvas-name' so]
+        ['chat-path' pa]
+        ['type' (cu image-type so)]
+    ==
   --
 ::
 ++  canvas-view-response-to-json
@@ -117,6 +126,8 @@
       %init-frontend
     %-  pairs
     %+  weld
+      :: TODO
+      :: ['artists' (artists-to-json artists.act)]~
       ['chats' a+(turn chats.act path)]~
     :_  ~
     :-  'canvas'
@@ -195,6 +206,7 @@
         ['height' (numb height)]
         ['columns' (numb columns)]
         ['mesh' ?~(mesh ~ s+u.mesh)]
+        ['lockup' ?~(lockup ~ (numb (div u.lockup ~s1)))]
     ==
   ::
   ++  arc-to-json
@@ -214,10 +226,11 @@
     ^-  (list [@t json])
     ?-    -.stroke
         %mesh
-      ?~  arc.stroke
-        ['id' s+id.stroke]~
-      =*  arc  u.arc.stroke
+      :: ?~  arc.stroke
+      ::   ['id' s+id.stroke]~
+      =*  arc  arc.stroke
       :~  ['id' s+id.stroke]
+          ['del' b+del.stroke]
           ['color' s+color.arc]
           ['when' ?~(when.arc ~ (time u.when.arc))]
           ['who' ?~(who.arc ~ (ship u.who.arc))]

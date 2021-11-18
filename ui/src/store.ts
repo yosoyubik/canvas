@@ -250,9 +250,13 @@ export function paintCanvas(paint: Paint): void {
         //     ...stroke
         //   }
         // };
-        $store.canvas[name].data[stroke.id] = {
-          ...stroke
-        };
+        if (stroke.del) {
+          delete $store.canvas[name].data[stroke.id];
+        } else {
+          $store.canvas[name].data[stroke.id] = {
+            ...stroke
+          };
+        }
       });
       return $store;
     }

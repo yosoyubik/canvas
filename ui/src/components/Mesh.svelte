@@ -64,7 +64,11 @@
     //   canvas.metadata.columns !== columns
     //     ? transformIndex(event.detail.id, canvas.metadata.columns, columns)
     //     : event.detail.id;
-    canvas.data[event.detail.id] = event.detail.data;
+    if (event.detail.del) {
+      delete canvas.data[event.detail.id];
+    } else {
+      canvas.data[event.detail.id] = event.detail.data;
+    }
   }
 
   function handleSave(event) {
@@ -74,6 +78,11 @@
     //     ? transformIndex(id, canvas.metadata.columns, columns)
     //     : id;
     apiPaints[id] = { mesh: { ...event.detail } };
+  }
+
+  function handleLocked(event) {
+    const { id } = event.detail;
+    console.log(id, apiPaints[id]);
   }
 
   function handleFlush() {
@@ -123,8 +132,10 @@
         d={path(topojson.feature(topology, d))}
         attr={d.attr}
         selectedColor={color}
+        lockup={metadata.lockup}
         bind:mousing
         on:update={handleUpdate}
+        on:locked={handleLocked}
         on:save={handleSave}
         on:flush={handleFlush} />
     {/each}

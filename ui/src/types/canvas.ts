@@ -10,6 +10,7 @@ export interface Metadata {
   height: number;
   columns: number;
   mesh?: string;
+  lockup?: number;
 }
 
 export interface Topology {
@@ -32,6 +33,7 @@ export interface Strokes {
     color: string;
     who?: Patp;
     when?: number;
+    del: boolean;
   };
 }
 
