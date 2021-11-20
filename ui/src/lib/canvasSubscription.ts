@@ -63,25 +63,22 @@ export default class CanvasSubscription extends Subscription {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   handleEvent(data: { data: any }): void {
     const json = data.data;
-    console.log(json);
     if (json === null) {
       return;
     }
 
-    if ('groupUpdate' in json) {
-      console.log('groupUpdate', json.groupUpdate);
-
-      // if ('initial' in json.groupUpdate && json.groupUpdate['initial']) {
-      //   createGroups(json.groupUpdate['initial']);
-      //   // updateGroups()
-      // } else if ('add-group' in json.groupUpdate) {
-      //   const { resource, group } = json.groupUpdate['add-group'];
-      //   addGroup(resource, decodeGroup(group));
-      // } else if ('remove-group' in json.groupUpdate) {
-      //   const { resource, group } = json.groupUpdate['remove-group'];
-      //   removeGroup(resource, decodeGroup(group));
-      // }
-    }
+    // if ('groupUpdate' in json) {
+    //   if ('initial' in json.groupUpdate && json.groupUpdate['initial']) {
+    //     createGroups(json.groupUpdate['initial']);
+    //     // updateGroups()
+    //   } else if ('add-group' in json.groupUpdate) {
+    //     const { resource, group } = json.groupUpdate['add-group'];
+    //     addGroup(resource, decodeGroup(group));
+    //   } else if ('remove-group' in json.groupUpdate) {
+    //     const { resource, group } = json.groupUpdate['remove-group'];
+    //     removeGroup(resource, decodeGroup(group));
+    //   }
+    // }
 
     if ('clear' in json) {
       wipeStore();

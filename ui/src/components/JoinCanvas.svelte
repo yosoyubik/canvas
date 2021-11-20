@@ -31,7 +31,6 @@
     if (values.name === '') {
       errors.name = 'Path Required';
     }
-    console.log(errors);
     return errors;
   };
 

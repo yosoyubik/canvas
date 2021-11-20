@@ -1,4 +1,17 @@
 export default class Channel {
+  onChannelError: (err: any) => void;
+  onChannelOpen: (e: any) => void;
+  ackTimer: any;
+  debounceInterval: number;
+  uid: string;
+  requestId: number;
+  eventSource: any;
+  lastEventId: number;
+  lastAcknowledgedEventId: number;
+  outstandingPokes: Map<any, any>;
+  outstandingSubscriptions: Map<any, any>;
+  outstandingJSON: any[];
+  debounceTimer: any;
   constructor() {
     this.init();
     this.deleteOnUnload();
@@ -181,7 +194,15 @@ export default class Channel {
 
   //  sends a JSON command command to the server.
   //
-  sendJSONToChannel(j) {
+  sendJSONToChannel(j?: {
+    id: number;
+    action: string;
+    ship?: any;
+    app?: any;
+    mark?: any;
+    json?: any;
+    subscription?: any;
+  }) {
     let req = new XMLHttpRequest();
     req.open('PUT', this.channelURL());
     req.setRequestHeader('Content-Type', 'application/json');

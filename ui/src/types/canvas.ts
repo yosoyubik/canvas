@@ -1,4 +1,5 @@
 import type { Patp } from './noun';
+import { topology } from 'topojson';
 
 export interface Metadata {
   name: string;
@@ -13,18 +14,25 @@ export interface Metadata {
   lockup?: number;
 }
 
-export interface Topology {
-  transform: {
-    translate: number[];
-    scale: number[];
-  };
+export interface StrokeProps {
+  id: number;
+  color: string;
+  who?: Patp;
+  when?: number;
+}
+
+export interface CanvasStroke extends TopoJSON.Polygon {
+  properties?: StrokeProps;
+}
+
+export interface CanvasTopology extends TopoJSON.Topology {
   objects: {
     pixels: {
-      type: string;
-      geometries: any[];
+      type: 'GeometryCollection';
+      geometries: Array<CanvasStroke>;
     };
   };
-  arcs: any[];
+  transform: TopoJSON.Transform;
 }
 
 export interface Strokes {
@@ -33,24 +41,32 @@ export interface Strokes {
     color: string;
     who?: Patp;
     when?: number;
-    del: boolean;
+    // del: boolean;
   };
 }
 
 export interface Canvas {
   [location: string]: {
     metadata: Metadata;
-    data: Strokes;
+    //data: Strokes;
+    data: CanvasTopology;
+  };
+}
+
+export interface CanvasLoad {
+  [location: string]: {
+    metadata: Metadata;
+    data: Array<StrokeProps>;
   };
 }
 
 export interface CanvasData {
   metadata: Metadata;
-  data: Strokes;
+  data: CanvasTopology;
 }
 
 export type LoadCanvas = Metadata & {
-  data: Strokes;
+  data: CanvasTopology;
 };
 
 export interface CanvasForm {

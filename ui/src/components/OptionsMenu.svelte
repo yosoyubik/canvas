@@ -1,5 +1,10 @@
 <script lang="ts">
-  import store, { leaveCanvas, makePublic, updateImageURL } from '../store';
+  import store, {
+    leaveCanvas,
+    makePublic,
+    setNotification,
+    updateImageURL
+  } from '../store';
   import { PutObjectCommand } from '@aws-sdk/client-s3';
   import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
   import copy from 'clipboard-copy';
@@ -78,13 +83,19 @@
     labelText="Copy Canvas path..."
     icon={Share}
     indented
-    on:click={() => copy(`~${$store.ship}/${name}`)} />
+    on:click={() => {
+      setNotification('Canvas path copied to clipboard');
+      copy(`~${$store.ship}/${name}`);
+    }} />
   {#if location !== `~${$store.ship}`}
     <ContextMenuOption
       labelText="Leave Canvas..."
       icon={Leave}
       indented
-      on:click={() => leave(location, name)} />
+      on:click={() => {
+        setNotification('Unsubscribing from host...');
+        leave(location, name);
+      }} />
   {/if}
   <!-- {#if privateCanvas}
     <ContextMenuOption
@@ -98,7 +109,10 @@
       icon={Copy}
       indented
       labelText="Copy Image URL..."
-      on:click={() => copy(fileURL)} />
+      on:click={() => {
+        setNotification('image URL copied to clipboard');
+        copy(fileURL);
+      }} />
   {/if}
   {#if $store.gcp || hasS3($store.s3)}
     <ContextMenuOption
@@ -128,7 +142,12 @@
           fileURL = signedUrl.split('?')[0];
           $store.api.save(location, name, fileURL).then(() => {
             console.log('[image file saved]', signedUrl);
+            copy(fileURL);
+            console.log('[copied]', fileURL);
             updateImageURL(location, name, fileURL);
+            setNotification(
+              'Canvas SVG exported successfully (URL copied to clipboard)'
+            );
           });
         } else {
           console.log('error');

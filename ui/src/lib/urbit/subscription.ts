@@ -4,7 +4,6 @@ import type { Path } from '../../types/noun';
 export default class Subscription {
   private errorCount = 0;
   constructor(public api: Api, public channel: any) {
-    console.log(this.channel);
     this.channel.setOnChannelError(this.onChannelError.bind(this));
     this.channel.setOnChannelOpen(this.onChannelOpen.bind(this));
   }
@@ -45,7 +44,7 @@ export default class Subscription {
       this.api.ship,
       app,
       this.handleEvent.bind(this),
-      (err) => {
+      err => {
         console.log(err);
         this.subscribe(path, app);
       },

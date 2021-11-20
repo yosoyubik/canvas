@@ -1,4 +1,3 @@
-<!-- From: https://github.com/efeskucuk/svelte-color-picker -->
 <style>
   .main-container {
     width: 240px;
@@ -227,6 +226,7 @@
   }
 </style>
 
+<!-- Credit to: https://github.com/efeskucuk/svelte-color-picker -->
 <script>
   // @ts-nocheck
 
@@ -663,8 +663,7 @@
         <div
           id="colorsquare-event"
           on:mousedown={csDown}
-          on:touchstart={csDownTouch}
-        />
+          on:touchstart={csDownTouch} />
       </div>
     </div>
   </div>
@@ -680,8 +679,7 @@
     <div
       id="alpha-event"
       on:mousedown={alphaDown}
-      on:touchstart={alphaDownTouch}
-    />
+      on:touchstart={alphaDownTouch} />
   </div>
 
   <div class="color-info-box">

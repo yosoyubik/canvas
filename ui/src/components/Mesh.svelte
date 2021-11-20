@@ -19,28 +19,19 @@
     stroke-width: 0.3px;
     pointer-events: none;
   }
-
-  /* .notification {
-    position: absolute;
-    right: 10%;
-    margin: auto;
-  } */
 </style>
 
 <script lang="ts">
-  import * as d3 from 'd3';
   import * as topojson from 'topojson-client';
 
   import store from '../store';
-  import type { CanvasData, Metadata, Topology } from '../types/canvas';
+  import type { CanvasTopology, Metadata } from '../types/canvas';
 
   import { columns as calculateColumns } from '$lib/topology';
-  import { InlineNotification } from 'carbon-components-svelte';
   import Pixel from '././Pixel.svelte';
   import OptionsMenu from './OptionsMenu.svelte';
 
-  export let canvas: CanvasData;
-  export let topology: Topology;
+  export let topology: CanvasTopology;
   export let metadata: Metadata;
   export let color: string;
   export let path: any;
@@ -57,18 +48,6 @@
     const width = type === 'hexa' ? radius * 2 * Math.sin(Math.PI / 3) : radius;
     const height = type === 'hexa' ? 2.5 * radius : 2 * radius + 1;
     return { width, height };
-  }
-
-  function handleUpdate(event) {
-    // const index =
-    //   canvas.metadata.columns !== columns
-    //     ? transformIndex(event.detail.id, canvas.metadata.columns, columns)
-    //     : event.detail.id;
-    if (event.detail.del) {
-      delete canvas.data[event.detail.id];
-    } else {
-      canvas.data[event.detail.id] = event.detail.data;
-    }
   }
 
   function handleSave(event) {
@@ -98,9 +77,6 @@
   columns = calculateColumns(metadata.width, metadata.columns, metadata.mesh);
 </script>
 
-<!-- <div class="notification">
-  <InlineNotification lowContrast kind="success" title="Success:" />
-</div> -->
 <svg
   bind:this={canvasNode}
   width={metadata.width}
@@ -128,13 +104,11 @@
     {/if}
     {#each topology.objects.pixels.geometries as d}
       <Pixel
-        id={d.id}
-        d={path(topojson.feature(topology, d))}
-        attr={d.attr}
+        data={d}
+        path={path(topojson.feature(topology, d))}
         selectedColor={color}
         lockup={metadata.lockup}
         bind:mousing
-        on:update={handleUpdate}
         on:locked={handleLocked}
         on:save={handleSave}
         on:flush={handleFlush} />

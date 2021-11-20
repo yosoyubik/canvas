@@ -112,8 +112,7 @@
     min="0.5"
     max="20"
     value="5"
-    step="0.5"
-  />
+    step="0.5" />
   <input bind:this={colorRef} class="input" id="color" type="color" />
   <div bind:this={canvasRef} {width} {height} />
 </div>
@@ -152,14 +151,12 @@
           } else {
             console.log('error');
           }
-        }}
-      />
+        }} />
       <ContextMenuDivider />
     {/if}
     <ContextMenuOption
       labelText="Show color palette"
       selected={showPalette}
-      on:click={() => (showPalette = !showPalette)}
-    />
+      on:click={() => (showPalette = !showPalette)} />
   </ContextMenu>
 {/if}

@@ -30,16 +30,19 @@
 
 <script lang="ts">
   import * as d3 from 'd3';
-  import store from '../store';
+  import store, { resetNotification } from '../store';
 
-  import {
-    topology as calculateTopology,
-    projection as calculateProjection
-  } from '$lib/topology';
+  import { projection as calculateProjection } from '$lib/topology';
 
-  import type { Metadata } from '../types/canvas';
+  import type { CanvasTopology, Metadata } from '../types/canvas';
   // import FreeHand from '../components/FreeHand.svelte';
-  import { Loading, Row, Column, Tooltip } from 'carbon-components-svelte';
+  import {
+    Loading,
+    Row,
+    Column,
+    Tooltip,
+    InlineNotification
+  } from 'carbon-components-svelte';
   import ColorPalette from 'carbon-icons-svelte/lib/ColorPalette16';
 
   import Mesh from '../components/Mesh.svelte';
@@ -49,10 +52,10 @@
   import JoinCanvas from '../components/JoinCanvas.svelte';
   import Palette from '../components/Palette.svelte';
 
-  let colors = d3.range(18),
-    color = '#d53e4f',
+  let color = '#d53e4f',
     startColor = color,
-    currentCanvas = $store.name;
+    topology: CanvasTopology,
+    path;
 
   function isMesh(metadata: Metadata) {
     return metadata.template !== 'draw';
@@ -70,25 +73,10 @@
     startColor = d3.rgb(r, g, b, a).formatHex();
   }
 
-  let topology,
-    projection,
-    canvas,
-    path,
-    radius = $store.radius;
-
-  $: if ($store.name && $store.canvas) {
-    const { width, height, mesh } = $store.canvas[$store.name].metadata;
-    canvas = $store.canvas[$store.name];
-    topology = calculateTopology(canvas.metadata.mesh)(
-      canvas.metadata.name,
-      radius,
-      width,
-      height,
-      canvas.data,
-      canvas.metadata.columns
-    );
-    projection = calculateProjection(radius, mesh);
-    path = d3.geoPath().projection(projection);
+  $: if ($store.name && $store.canvas && $store.canvas[$store.name]) {
+    const { mesh } = $store.canvas[$store.name].metadata;
+    topology = $store.canvas[$store.name].data;
+    path = d3.geoPath().projection(calculateProjection($store.radius, mesh));
   }
 </script>
 
@@ -111,7 +99,6 @@
         <svg height={15}>
           <g id="legend" class="palette" transform={`translate(13, 1)`}>
             <Palette
-              bind:colors
               on:color={event => {
                 color = event.detail.color;
                 startColor = color;
@@ -126,16 +113,13 @@
 <Row padding>
   <Column>
     <div>
-      {#if canvas && !$store.leaving && topology}
+      {#if topology && !$store.leaving}
         {#if isMesh($store.canvas[$store.name].metadata)}
-          {#key canvas}
-            <Mesh
-              {canvas}
-              {topology}
-              {color}
-              {path}
-              metadata={$store.canvas[$store.name].metadata} />
-          {/key}
+          <Mesh
+            {topology}
+            {color}
+            {path}
+            metadata={$store.canvas[$store.name].metadata} />
           <!-- {:else if $store.canvas[$store.name] && isFreeHand($store.canvas[$store.name].metadata)}
           <FreeHand
             canvas={$store.canvas[$store.name]}
@@ -149,3 +133,18 @@
     </div>
   </Column>
 </Row>
+
+{#if $store.notification}
+  <Row>
+    <Column padding>
+      <div class="notification">
+        <InlineNotification
+          timeout={3000}
+          lowContrast
+          kind="success"
+          title={$store.notification}
+          on:close={() => resetNotification()} />
+      </div>
+    </Column>
+  </Row>
+{/if}

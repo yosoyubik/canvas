@@ -124,8 +124,6 @@
   //   const { ship, name } = resourceFromPath(resource);
   //   return `${name} on ${ship}`;
   // }
-
-  // $: console.log(Object.entries($store.groups));
 </script>
 
 <Button icon={Paint32} kind="ghost" size="small" on:click={() => (open = true)}>

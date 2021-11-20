@@ -7,7 +7,7 @@ import type { Patp, Group } from '@urbit/api';
 
 export interface StoreState {
   // local state
-
+  notification?: string;
   // Canvas state
   canvas?: Canvas;
   radius: number;

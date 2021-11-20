@@ -15,7 +15,7 @@
 +$  mesh         (map @t arc)
 +$  draw         (list form)
 +$  mesh-pixel   ?(%hexa %squa)
-+$  location     [host=ship canvas=@t]
++$  location     [host=ship name=@t]
 +$  metadata-0
   $:  name=@t
       =template
@@ -38,12 +38,12 @@
   ==
 ::
 +$  stroke
-  $%  [%mesh id=@t del=? =arc]
+  $%  [%mesh id=@t arc=(unit arc)]
       [%draw =form]
   ==
 ::
 +$  canvas-action
-  $%  [%paint location=@p name=@t strokes=(list stroke)]
+  $%  [%paint =location strokes=(list stroke)]
       [%init gallery=(list canvas)]
       [%load name=@t =canvas artists=(map ship @ud)]
       [%join =ship name=@t]
@@ -54,8 +54,8 @@
       [%unlock name=@t]
   ==
 ::
-+$  canvas-update
-  $%  [%paint location=@p name=@t strokes=(list stroke) who=@p]
++$  canvas-diff
+  $%  [%paint =location strokes=(list stroke) who=@p]
       [%load name=@t =canvas artists=(map ship @ud)]
   ==
 ::

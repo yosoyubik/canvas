@@ -37,10 +37,9 @@ export default class CanvasApi extends Api {
   /**
    * Send a stroke to a canvas in a location
    */
-  async send(location: Patp, name: string, strokes: unknown): Promise<unknown> {
+  async send(host: Patp, name: string, strokes: unknown): Promise<unknown> {
     const paint = {
-      'canvas-name': name,
-      location,
+      location: { host, name },
       strokes
     };
     return this.sendPoke({ paint });

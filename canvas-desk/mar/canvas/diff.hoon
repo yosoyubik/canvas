@@ -1,10 +1,10 @@
 /+  *canvas
 =,  dejs:format
-|_  act=canvas-update
+|_  act=canvas-diff
 ++  grad  %noun
 ++  grab
   |%
-  ++  noun  canvas-update
+  ++  noun  canvas-diff
   --
 ::
 ++  grow

@@ -1,9 +1,11 @@
 :~  title+'Canvas'
     info+'P2P paint app for Urbit.'
-    color+0x32.88bd
-    image+'https://raw.githubusercontent.com/yosoyubik/canvas/master/urbit/app/canvas/img/tile.svg'
+    color+0x22.88bd
+    image+'https://yosoyubik.fra1.digitaloceanspaces.com/canvas/tile.svg'
     base+'canvas'
-    glob-http+['http://localhost:9999/glob-0v3.psb33.rcld9.snout.p170u.j64dq.glob' 0v3.psb33.rcld9.snout.p170u.j64dq]
+    :+  %glob-http
+      'https://yosoyubik.fra1.digitaloceanspaces.com/canvas/glob-0v4.h6e30.7904e.8olob.f5mbn.9p14h.glob'
+    0v4.h6e30.7904e.8olob.f5mbn.9p14h
     version+[0 0 1]
     website+'https://github.com/yosoyubik/canvas'
     license+'MIT'
