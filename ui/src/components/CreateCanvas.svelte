@@ -191,7 +191,7 @@
                     width="48"
                     height="44"
                     stroke="black"
-                    strokeWidth="0.9"
+                    strokeWidth="0.3"
                     fill="none"
                     type="hexa" />
                   <RadioButton
