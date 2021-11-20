@@ -18,7 +18,7 @@
     +$  card  card:agent:gall
     ::
     +$  app-state
-      $:  %2
+      $:  %3
           gallery=(map location canvas)
           artists=(map location (map ship @ud))
           ::  TODO
@@ -122,10 +122,10 @@
       ^-  (quip card _this)
       ~&  >  "[ init canvas - / home / ]"
       =|  cards=(list card)
-      =+  pub=~master-norsyr-torryn
+      =+  pub=~picsel-norsyr-torryn
       =/  name=@t  'welcome'
       =/  =canvas  (welcome ~ name our.bowl &)
-      =.  gallery.state  (~(put by gallery) [[our.bowl name] canvas])
+      =.  gallery.state  (~(put by gallery) [our.bowl name]^canvas)
       :_  this
       ?:  =(our.bowl pub)  ~
       [(subscribe pub 'public')]~
@@ -136,11 +136,16 @@
       |=  old=vase
       ^-  (quip card _this)
       =|  cards=(list card)
-      =+  pub=~master-norsyr-torryn
+      =+  old-pub=~master-norsyr-torryn
+      =+  new-pub=~picsel-norsyr-torryn
       |^
       =+  !<(old-state=app-states old)
-      =?  cards  &(?=(%0 -.old-state) !=(our.bowl pub))
-        [(subscribe pub 'canvas')]~
+      =?  cards  &(?=(%0 -.old-state) !=(our.bowl old-pub))
+        [(subscribe old-pub 'canvas')]~
+      =?  cards  ?=(%2 -.old-state)
+        :~  (leave old-pub 'canvas')
+            (subscribe new-pub 'canvas')
+        ==
       =?  old-state  ?=(%0 -.old-state)
         ^-  state-1
         :+  %1
@@ -150,10 +155,12 @@
         :+  %2
           (add-lockup gallery.old-state)
         artists.old-state
-      ?>  ?=(%2 -.old-state)
+      =?  old-state  ?=(%2 -.old-state)
+        [%3 +.old-state]
+      ?>  ?=(%3 -.old-state)
       [cards this(state old-state)]
       ::
-      ++  app-states  $%(state-0 state-1 app-state)
+      ++  app-states  $%(state-0 state-1 state-2 app-state)
       ++  state-0
         $:  %0
             gallery=(map location canvas-0)
@@ -162,6 +169,12 @@
       ++  state-1
         $:  %1
             gallery=(map location canvas-0)
+            artists=(map location (map ship @ud))
+        ==
+      ::
+      ++  state-2
+        $:  %2
+            gallery=(map location canvas)
             artists=(map location (map ship @ud))
         ==
       ::
