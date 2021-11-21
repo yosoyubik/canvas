@@ -98,7 +98,7 @@
       ^-  (list card)
       [%give %fact [/frontend]~ %json !>(json)]~
     ::
-    ++  send-remote-canvas
+    ++  send-to-host
       |=  [=location strokes=(list stroke)]
       ^-  card
       ?>  ?=(^ strokes)
@@ -122,7 +122,9 @@
       ^-  (quip card _this)
       ~&  >  "[ init canvas - / home / ]"
       =|  cards=(list card)
-      =+  pub=~picsel-norsyr-torryn
+      =/  pub=@p
+        =+  ~picsel
+        (can 3 2^0x100 2^0x5ef 2^- ~)
       =/  name=@t  'welcome'
       =/  =canvas  (welcome ~ name our.bowl &)
       =.  gallery.state  (~(put by gallery) [our.bowl name]^canvas)
@@ -136,15 +138,19 @@
       |=  old=vase
       ^-  (quip card _this)
       =|  cards=(list card)
-      =+  old-pub=~master-norsyr-torryn
-      =+  new-pub=~picsel-norsyr-torryn
+      =/  old-pub=@p
+        =+  ~master
+        (can 3 2^0x100 2^0x5ef 2^- ~)
+      =/  new-pub=@p
+        =+  ~picsel
+        (can 3 2^0x100 2^0x5ef 2^- ~)
       |^
       =+  !<(old-state=app-states old)
       =?  cards  &(?=(%0 -.old-state) !=(our.bowl old-pub))
         [(subscribe old-pub 'canvas')]~
       =?  cards  ?=(%2 -.old-state)
         :~  (leave old-pub 'canvas')
-            (subscribe new-pub 'canvas')
+            (subscribe new-pub 'public')
         ==
       =?  old-state  ?=(%0 -.old-state)
         ^-  state-1
@@ -200,11 +206,11 @@
         |=  gallery=(map location canvas-0)
         %+  roll  ~(tap by gallery)
         |=  [[loc=location =canvas-0] out=(map location (map ship @ud))]
-        ^-  (map location (map ship @ud))
+        ^+  out
         ?:  ?=([%draw *] canvas-0)  out
         %+  roll  ~(tap by mesh.canvas-0)
         |=  [[* =arc] out=_out]
-        ^-  (map location (map ship @ud))
+        ^+  out
         ?~  who.arc  out
         %+  ~(put by out)  loc
         ?~  ships=(~(get by out) loc)
@@ -513,7 +519,7 @@
     ::  if we are not the host, poke with our paint
     ::
     ?.  =(host.location our.bowl)
-      [(send-remote-canvas location strokes)]~
+      [(send-to-host location strokes)]~
     ::  if we are, send diff to subscribers
     ::
     [(send-paint-diff location strokes our.bowl)]~

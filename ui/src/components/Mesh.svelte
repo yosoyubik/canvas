@@ -44,8 +44,10 @@
     radius = $store.radius,
     columns;
 
+  // FIXME: calculate this properly, so the mesh doesn't cut off on the top/right sides
   function calculateViewBox(radius, type) {
-    const width = type === 'hexa' ? radius * 2 * Math.sin(Math.PI / 3) : radius;
+    const width =
+      type === 'hexa' ? radius * 2 * Math.sin(Math.PI / 3) : 2.5 * radius + 1;
     const height = type === 'hexa' ? 2.5 * radius : 2 * radius + 1;
     return { width, height };
   }
@@ -89,6 +91,7 @@
   on:mouseleave={() => {
     mousing = 0;
   }}>
+  <!-- FIXME: look into fixing translate transformation -->
   <g
     id="hexagons"
     class="hexagon"

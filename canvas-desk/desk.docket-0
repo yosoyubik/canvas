@@ -3,9 +3,11 @@
     color+0x22.88bd
     image+'https://yosoyubik.fra1.digitaloceanspaces.com/canvas/tile.svg'
     base+'canvas'
+  ::
     :+  %glob-http
-      'https://yosoyubik.fra1.digitaloceanspaces.com/canvas/glob-0vhusoi.qaoqs.4d22e.lvuh8.hkk6v.glob'
-    0vhusoi.qaoqs.4d22e.lvuh8.hkk6v
+      'https://yosoyubik.fra1.digitaloceanspaces.com/canvas/0v5.3vcs8.k69jt.c3if4.f1hms.acus0'
+    0v5.3vcs8.k69jt.c3if4.f1hms.acus0
+  ::
     version+[0 0 1]
     website+'https://github.com/yosoyubik/canvas'
     license+'MIT'
