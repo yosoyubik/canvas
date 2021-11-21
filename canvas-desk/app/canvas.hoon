@@ -556,15 +556,18 @@
       draw     (snoc draw form.i.strokes)
     ==
   ::
+  ::  TODO: handle removal properly
+  ::
   ++  update-artists
     |=  [artists=_artists remove=?]
     ^+  artists
     %+  ~(put by artists)  location
     ?~  ships=(~(get by artists) location)
       (~(put by *(map ship @ud)) src.bowl 1)
-    %+  ~(put by u.ships)  src.bowl
-    ?~  artist=(~(get by u.ships) src.bowl)
-      1
-    ?:(remove (dec u.artist) +(u.artist))
+    (~(jab by u.ships) src.bowl |=(c=@ud +(c)))
+    :: %+  ~(put by u.ships)  src.bowl
+    :: ?~  artist=(~(get by u.ships) src.bowl)
+    ::   1
+    :: ?:(remove (dec u.artist) +(u.artist))
   --
 --
