@@ -5,10 +5,7 @@
     base+'canvas'
   ::
     :+  %glob-http
-      %-  crip
-      %+  weld
-        "https://yosoyubik.fra1.digitaloceanspaces.com/canvas/"
-      "glob-0v5.3vcs8.k69jt.c3if4.f1hms.acus0.glob"
+      'https://yosoyubik.fra1.digitaloceanspaces.com/canvas/glob-0v5.3vcs8.k69jt.c3if4.f1hms.acus0.glob'
     0v5.3vcs8.k69jt.c3if4.f1hms.acus0
   ::
     version+[0 0 1]
