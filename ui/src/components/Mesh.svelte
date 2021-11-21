@@ -75,7 +75,7 @@
     apiPaints = {};
   }
 
-  viewBox = calculateViewBox(radius, metadata.mesh);
+  $: viewBox = calculateViewBox(radius, metadata.mesh);
   columns = calculateColumns(metadata.width, metadata.columns, metadata.mesh);
 </script>
 
