@@ -18,7 +18,7 @@
     +$  card  card:agent:gall
     ::
     +$  app-state
-      $:  %4
+      $:  %5
           gallery=(map location canvas)
           artists=(map location (map ship @ud))
           ::  TODO
@@ -152,9 +152,8 @@
         :~  (leave old-pub 'canvas')
             (subscribe new-pub 'public')
         ==
-      =?  cards  ?=(%3 -.old-state)
-        ?:  =(our.bowl new-pub)  ~
-        [(leave old-pub 'public')]~
+     =?  cards  &(?=(%4 -.old-state) =(our.bowl new-pub))
+        [(leave new-pub 'public')]~
       =?  old-state  ?=(%0 -.old-state)
         ^-  state-1
         :+  %1
@@ -168,10 +167,12 @@
         [%3 +.old-state]
       =?  old-state  ?=(%3 -.old-state)
         [%4 +.old-state]
-      ?>  ?=(%4 -.old-state)
+      =?  old-state  ?=(%4 -.old-state)
+        [%5 +.old-state]
+      ?>  ?=(%5 -.old-state)
       [cards this(state old-state)]
       ::
-      ++  app-states  $%(state-0 state-1 state-2 state-3 app-state)
+      ++  app-states  $%(state-0 state-1 state-2-3-4 app-state)
       ++  state-0
         $:  %0
             gallery=(map location canvas-0)
@@ -183,14 +184,8 @@
             artists=(map location (map ship @ud))
         ==
       ::
-      ++  state-2
-        $:  %2
-            gallery=(map location canvas)
-            artists=(map location (map ship @ud))
-        ==
-      ::
-      ++  state-3
-        $:  %3
+      ++  state-2-3-4
+        $:  ?(%2 %3 %4)
             gallery=(map location canvas)
             artists=(map location (map ship @ud))
         ==
