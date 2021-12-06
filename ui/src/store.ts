@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import { writable } from 'svelte/store';
-import type { StoreState } from './types/store';
+import type { StoreState, Notification } from './types/store';
 
 import type Api from './lib/canvasApi';
 import type {
@@ -365,7 +365,7 @@ export function updateImageURL(
   );
 }
 
-export function setNotification(notification: string): void {
+export function setNotification(notification: Notification): void {
   update(
     ($store): StoreState => {
       return {

@@ -23,8 +23,16 @@
 
 <script lang="ts">
   import * as topojson from 'topojson-client';
+  import {
+    Loading,
+    Row,
+    Column,
+    Tooltip,
+    InlineNotification,
+    Grid
+  } from 'carbon-components-svelte';
 
-  import store from '../store';
+  import store, { setNotification } from '../store';
   import type { CanvasTopology, Metadata } from '../types/canvas';
 
   import { columns as calculateColumns } from '$lib/topology';
@@ -35,6 +43,8 @@
   export let metadata: Metadata;
   export let color: string;
   export let path: any;
+
+  export let snoopy: string = '';
 
   let canvasNode,
     apiPaints = {},
@@ -75,6 +85,19 @@
     apiPaints = {};
   }
 
+  function handleInspect(event) {
+    // setNotification({
+    //   text: event.detail.properties.who,
+    //   type: 'info'
+    // });
+    if (!event.detail.properties) return;
+    const properties = event.detail.properties;
+    snoopy =
+      properties && properties.who && properties.when
+        ? `${properties.who}-${new Date(properties.when).toUTCString()}`
+        : '';
+  }
+
   $: viewBox = calculateViewBox(radius, metadata.mesh);
   columns = calculateColumns(metadata.width, metadata.columns, metadata.mesh);
 </script>
@@ -112,6 +135,7 @@
         selectedColor={color}
         lockup={metadata.lockup}
         bind:mousing
+        on:inspect={handleInspect}
         on:locked={handleLocked}
         on:save={handleSave}
         on:flush={handleFlush} />

@@ -45,6 +45,7 @@
   }
 
   function mousemove() {
+    if (data.properties) dispatch('inspect', data);
     if (mousing) {
       const fill = mousing > 0;
       let stroke = { id: data.id };

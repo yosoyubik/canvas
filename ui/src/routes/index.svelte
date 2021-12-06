@@ -51,10 +51,12 @@
   import CreateCanvas from '../components/CreateCanvas.svelte';
   import JoinCanvas from '../components/JoinCanvas.svelte';
   import Palette from '../components/Palette.svelte';
+  import Notification from '../components/Notification.svelte';
 
   let color = '#d53e4f',
     startColor = color,
     topology: CanvasTopology,
+    snoopy = '',
     path;
 
   function isMesh(metadata: Metadata) {
@@ -116,6 +118,7 @@
       {#if topology && !$store.leaving}
         {#if isMesh($store.canvas[$store.name].metadata)}
           <Mesh
+            bind:snoopy
             {topology}
             {color}
             {path}
@@ -134,17 +137,28 @@
   </Column>
 </Row>
 
-{#if $store.notification}
+<!-- {#if $store.notification}
   <Row>
     <Column padding>
       <div class="notification">
         <InlineNotification
           timeout={3000}
           lowContrast
-          kind="success"
-          title={$store.notification}
+          kind={$store.notification.type}
+          title={$store.notification.text}
           on:close={() => resetNotification()} />
       </div>
     </Column>
   </Row>
+{/if} -->
+
+{#if $store.notification}
+  <Notification
+    timeout={true}
+    title={$store.notification.text}
+    kind={$store.notification.type} />
+{/if}
+
+{#if snoopy !== '' && true}
+  <Notification timeout={false} title={snoopy} kind={'info'} />
 {/if}

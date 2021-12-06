@@ -5,6 +5,9 @@
     setNotification,
     updateImageURL
   } from '../store';
+
+  import type { Notification } from '../types/store';
+
   import { PutObjectCommand } from '@aws-sdk/client-s3';
   import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
   import copy from 'clipboard-copy';
@@ -84,7 +87,10 @@
     icon={Share}
     indented
     on:click={() => {
-      setNotification('Canvas path copied to clipboard');
+      setNotification({
+        text: 'Canvas path copied to clipboard',
+        type: 'info'
+      });
       copy(`~${$store.ship}/${name}`);
     }} />
   {#if location !== `~${$store.ship}`}
@@ -93,7 +99,10 @@
       icon={Leave}
       indented
       on:click={() => {
-        setNotification('Unsubscribing from host...');
+        setNotification({
+          text: 'Unsubscribing from host...',
+          type: 'info'
+        });
         leave(location, name);
       }} />
   {/if}
@@ -110,7 +119,10 @@
       indented
       labelText="Copy Image URL..."
       on:click={() => {
-        setNotification('image URL copied to clipboard');
+        setNotification({
+          text: 'image URL copied to clipboard',
+          type: 'info'
+        });
         copy(fileURL);
       }} />
   {/if}
@@ -145,9 +157,11 @@
             copy(fileURL);
             console.log('[copied]', fileURL);
             updateImageURL(location, name, fileURL);
-            setNotification(
-              'Canvas SVG exported successfully (URL copied to clipboard)'
-            );
+            setNotification({
+              text:
+                'Canvas SVG exported successfully (URL copied to clipboard)',
+              type: 'success'
+            });
           });
         } else {
           console.log('error');
