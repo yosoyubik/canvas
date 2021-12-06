@@ -16,37 +16,54 @@
 
 ## Access
 
+Search for `~dister-norsyr-torryn` in Grid to find the Canvas app, and install it from there
+
 A public canvas is hosted at
 
 ```hoon
-~master-norsyr-torryn/canvas
+~picsel-norsyr-torryn/public
 ```
 
-Come and join the first public Urbit Canvas!
-
-## Installation
-
-Copy and commit the contents of the urbit folder to your pier.
-
-- First you need to mount the desk from where you will run canvas (e.g. by running `> |mount /=home=` from your urbit
-- You copy all the frontend and backend files using the `install.sh` script: `install.sh <PATH_TO_THE_MOUNTED_DESK>`
-
-You can also sync from the moon's home desk, without interacting with the file system (this is still experimental, so trying this on a planet is not recommended—use a comet or a moon instead)
-
+Come and join the group to share your creations and see what others are doing:
 ```hoon
-|sync %home ~master-norsyr-torryn %home
+~norsyr-torryn/canvas
 ```
 
-## Running
+## Development Setup
 
-Once you have all the source code downloaded:
+1. Clone the repo, of course
+2. Create a new desk in Urbit to install canvas in
+    - `$ ./urbit -F zod` - Spin up a fake zod, if you haven't already (should be running on port 8080. If not, you'll need to edit [`ui/svelte.config.js`](ui/svelte.config.js))
+    - `dojo> +code` - Get an access code and use it to sign in to your ship at http://localhost:8080
+    - `dojo> |mount %base` - Mount `%base`, if you haven't already
+    - `dojo> |merge %canvas our %base` - Create a `%canvas` desk
+    - `dojo> |mount %canvas` - Mount the desk so it appears in your pier
+    - `$ rm -r zod/canvas/*` - Clear out your new desk to make room for the actual desk
+    - Follow the instructions [here](https://urbit.org/docs/userspace/dist/guide#create-desk) to merge the `base-dev` and `garden-dev` desks into your desk
+3. Copy canvas desk to Urbit
+    From the repo folder, run `./install.sh <PATH_TO_THE_MOUNTED_DESK>` where `<PATH_TO_THE_MOUNTED_DESK>` might be something like `~/urbit/zod/canvas`
+    You can alse run `./install.sh -w <PATH_TO_THE_MOUNTED_DESK>` if you want to watch for changes.
 
-```dojo
-> |start %canvas
-```
+    The following option may be outdated, the guy who was writing this section didn't know:
 
-Then navigate to `YOUR_URBIT_URL/~canvas` (if you are running locally, this is usually: `http://localhost:8080/~canvas`)
+    You can also sync from the moon's home desk, without interacting with the file system (this is still experimental, so trying this on a planet is not recommended—use a comet or a moon instead)
 
+    ```hoon
+    |sync %home ~dister-norsyr-torryn %home
+    ```
+4. Install `%canvas` in Dojo with
+    - `dojo> |commit %canvas` (do this after every change to see it reflected in Urbit)
+    - `dojo> |install our %canvas`(only necessary the first time, I think)
+5. Serve the UI for development
+    In the repo folder:
+    - `cd ui`
+    - `npm i` (short for `npm install`)
+    - `npm run dev` (runs on port 3000. To run on a different port: `npm run dev -- --port 3001`)
+    - Visit http://localhost:3000/apps/canvas
+6. Eventually, build the UI to test in Urbit for real test
+    - `npm run build` (in `/ui`)
+    - `./install.sh <PATH_TO_THE_MOUNTED_DESK>` (in project root)
+    - `|commit %canvas` (in dojo)
 ## Templates
 
 TODO

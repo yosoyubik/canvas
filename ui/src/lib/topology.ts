@@ -27,6 +27,45 @@ export function columns(width, radius, type) {
   return Math.ceil(width / dx) + 1;
 }
 
+export function getAdjacent(width, radius, type, id) {
+  let totalColumns = columns(width, radius, type);
+  let row = Math.floor(id / totalColumns);
+  let column = id % totalColumns;
+  let ids = [];
+  let hexa = type === 'hexa';
+  let rowEven = row % 2 == 0;
+  let hexOffset = rowEven ? 1 : -1;
+
+  // Don't wrap
+  if (column >= 1) {
+    ids.push(id - 1);
+  }
+  if (column + 1 < totalColumns) {
+    ids.push(id + 1);
+  }
+  if (hexa) {
+    let aboveAndBelowPixels = [
+      id - totalColumns,
+      id - totalColumns + hexOffset,
+      id + totalColumns,
+      id + totalColumns + hexOffset,
+    ];
+
+    // Going out of bounds is fine, just don't wrap
+    for (let pixel of aboveAndBelowPixels) {
+      let pixelRow = Math.floor(pixel / totalColumns);
+      if (Math.abs(pixelRow - row) == 1) {
+        ids.push(pixel);
+      }
+    }
+  } else {
+    ids.push(id - totalColumns);
+    ids.push(id + totalColumns);
+  }
+  
+  return ids;
+}
+
 export function projection(radius, type) {
   const dx =
       type === 'hexa' ? radius * 2 * Math.sin(Math.PI / 3) : radius * 1.5,

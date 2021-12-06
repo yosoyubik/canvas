@@ -25,24 +25,27 @@
   import * as topojson from 'topojson-client';
 
   import store from '../store';
-  import type { CanvasTopology, Metadata } from '../types/canvas';
+  import type { CanvasTopology, Metadata, Tool } from '../types/canvas';
 
-  import { columns as calculateColumns } from '$lib/topology';
-  import Pixel from '././Pixel.svelte';
+  import { columns as calculateColumns, getAdjacent } from '$lib/topology';
+  import Mousing from '../lib/mousing';
+  import Pixel from './Pixel.svelte';
   import OptionsMenu from './OptionsMenu.svelte';
 
   export let topology: CanvasTopology;
   export let metadata: Metadata;
   export let color: string;
+  export let selectedTool: Tool;
+  export let mousing: Mousing = new Mousing();
   export let path: any;
 
   let canvasNode,
     apiPaints = {},
-    mousing = 0,
     showMesh = false,
     viewBox = { width: 0, height: 0 },
     radius = $store.radius,
-    columns;
+    columns,
+    pixels = [];
 
   // FIXME: calculate this properly, so the mesh doesn't cut off on the top/right sides
   function calculateViewBox(radius, type) {
@@ -75,6 +78,15 @@
     apiPaints = {};
   }
 
+  function handleFill(event) {
+    let { pixelId, colorToReplace } = event.detail;
+    let adjacentPixelIds = getAdjacent(metadata.width, radius, metadata.mesh, pixelId);
+    for (let id of adjacentPixelIds) {
+      let pixel = pixels[id];
+      pixel?.fill(colorToReplace);
+    }
+  }
+
   $: viewBox = calculateViewBox(radius, metadata.mesh);
   columns = calculateColumns(metadata.width, metadata.columns, metadata.mesh);
 </script>
@@ -89,7 +101,10 @@
   }`}
   preserveAspectRatio="xMaxYMin meet"
   on:mouseleave={() => {
-    mousing = 0;
+    mousing.onCanvas = false;
+  }}
+  on:mouseenter={() => {
+    mousing.onCanvas = true;
   }}>
   <!-- FIXME: look into fixing translate transformation -->
   <g
@@ -107,14 +122,18 @@
     {/if}
     {#each topology.objects.pixels.geometries as d}
       <Pixel
+        bind:this={pixels[d.id]}
         data={d}
         path={path(topojson.feature(topology, d))}
-        selectedColor={color}
+        bind:selectedColor={color}
+        {selectedTool}
         lockup={metadata.lockup}
         bind:mousing
         on:locked={handleLocked}
         on:save={handleSave}
-        on:flush={handleFlush} />
+        on:flush={handleFlush}
+        on:fill={handleFill}
+      />
     {/each}
   </g>
 </svg>

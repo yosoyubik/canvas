@@ -8,17 +8,21 @@
   import { createEventDispatcher } from 'svelte';
 
   import store from '../store';
+  import type Mousing from '../lib/mousing';
+  import { Tool } from '../types/canvas';
 
   export let path;
   export let data;
   export let selectedColor;
-  export let mousing;
+  export let selectedTool: Tool;
+  export let mousing: Mousing;
   export let lockup;
 
   $: color = selectedColor;
 
   const dispatch = createEventDispatcher();
   const oneDay = 1000 * 3600 * 24;
+  const defaultColor = '#fff0';
 
   function canPaint() {
     if (!data.properties.when || !data.properties.who) {
@@ -40,30 +44,60 @@
 
   function mousedown(event) {
     if (event.which === 3) return; //  right click
-    mousing = data.properties && data.properties.color === color ? -1 : +1;
+    mousing.active = true;
+    mousing.drawMode = !(data.properties && data.properties.color === color);
     mousemove();
   }
 
+  export function paint(draw: boolean = true) {
+    let stroke = { id: data.id };
+
+    if (draw) Object.assign(stroke, { color });
+
+    // Save stroke remotely, only if modifying a pixel
+    if ((data.properties && data.properties.color) || draw)
+      dispatch('save', stroke);
+
+    // this updates the color right away
+    data.properties = { ...data.properties, color: draw ? color : null };
+  }
+
+  export function fill(colorToReplace) {
+    if (colorToReplace == data.properties?.color && colorToReplace != selectedColor) {
+      paint();
+      dispatch('fill', {
+        pixelId: data.id,
+        colorToReplace,
+      });
+    }
+  }
+
   function mousemove() {
-    if (mousing) {
-      const fill = mousing > 0;
-      let stroke = { id: data.id };
+    if (mousing.active) {
+      let draw = mousing.drawMode;
+      switch (selectedTool) {
+        case Tool.Eraser:
+          draw = false;
+        case Tool.Brush:
+          paint(draw);
+          break;
+        case Tool.Eyedropper:
+          selectedColor = data.properties?.color || defaultColor;
+          break;
+        case Tool.Fill:
+          let colorToReplace = data.properties?.color;
 
-      if (fill) Object.assign(stroke, { color });
-
-      // Save stroke remotely, only if modifying a pixel
-      if ((data.properties && data.properties.color) || fill)
-        dispatch('save', stroke);
-
-      // this updates the color right away
-      data.properties = { ...data.properties, color: fill ? color : null };
+          fill(colorToReplace);
+          break;
+        default:
+      }
     }
   }
 
   // TODO
   function mousemoveWithCheck() {
     if (mousing && canPaint()) {
-      const fill = mousing > 0;
+      const draw = mousing.drawMode;
       const when = Date.now();
       let stroke = {
         id: data.id,
@@ -74,14 +108,14 @@
       // this updates the color right away
       data = {
         ...data,
-        color: fill ? color : null
+        color: draw ? color : null
       };
 
       // Save stroke locally
       dispatch('update', {
         id: data.id,
         data: {
-          color: fill ? color : null
+          color: draw ? color : null
         }
       });
 
@@ -95,7 +129,6 @@
 
   function mouseup() {
     mousemove();
-    mousing = 0;
     dispatch('flush');
   }
 </script>
@@ -105,7 +138,7 @@
   fill={data.properties && data.properties.color
     ? data.properties.color
     : // 'white' instead?
-      '#fff0'}
+      defaultColor}
   stroke-width={1}
   on:mousedown={mousedown}
   on:mouseup={mouseup}

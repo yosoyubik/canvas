@@ -1,5 +1,5 @@
 <style>
-  div {
+  .container {
     text-align: center;
     display: flex;
     justify-content: center;
@@ -7,14 +7,6 @@
   }
   .palette {
     cursor: pointer;
-  }
-
-  .colorPicker {
-    display: inline-block;
-    vertical-align: top;
-    color: black;
-    margin: 0 auto;
-    text-align: justify;
   }
 
   @media (min-width: 648px) {
@@ -40,20 +32,22 @@
     Loading,
     Row,
     Column,
-    Tooltip,
-    InlineNotification
+    InlineNotification,
   } from 'carbon-components-svelte';
-  import ColorPalette from 'carbon-icons-svelte/lib/ColorPalette16';
+
+  import Mousing from '../lib/mousing';
 
   import Mesh from '../components/Mesh.svelte';
   import CanvasMenu from '../components/CanvasMenu.svelte';
-  import ColorPicker from '../components/ColorPicker.svelte';
   import CreateCanvas from '../components/CreateCanvas.svelte';
   import JoinCanvas from '../components/JoinCanvas.svelte';
   import Palette from '../components/Palette.svelte';
+  import Toolbar from '../components/Toolbar.svelte';
+  import KeyboardShortcuts from '../components/KeyboardShortcuts.svelte';
 
   let color = '#d53e4f',
-    startColor = color,
+    selectedTool,
+    mousing: Mousing = new Mousing(),
     topology: CanvasTopology,
     path;
 
@@ -65,14 +59,6 @@
     return metadata.template === 'draw';
   }
 
-  function colorCallback(event) {
-    const { r, g, b, a } = event.detail;
-    if (!(isNaN(r) || isNaN(r) || isNaN(b))) {
-      color = d3.rgb(r, g, b, a).formatRgb();
-    }
-    startColor = d3.rgb(r, g, b, a).formatHex();
-  }
-
   $: if ($store.name && $store.canvas && $store.canvas[$store.name]) {
     const { mesh } = $store.canvas[$store.name].metadata;
     topology = $store.canvas[$store.name].data;
@@ -80,7 +66,24 @@
   }
 </script>
 
-<div>
+<svelte:window
+  on:mouseleave={() => {
+    mousing.active = false;
+  }}
+  on:mousedown={() => {
+    mousing.pressed = true;
+    if (!mousing.onCanvas) {
+      mousing.drawMode = true;
+    }
+  }}
+  on:mouseup={() => {
+    mousing.pressed = false;
+  }}
+/>
+
+<KeyboardShortcuts bind:selectedTool />
+
+<div class="container">
   {#if $store.canvas}
     <Row>
       <Column padding
@@ -88,20 +91,13 @@
       <Column padding><Row><CreateCanvas /></Row></Column>
       <Column padding><Row><JoinCanvas /></Row></Column>
       <Column>
-        <!-- <Row> -->
-        <Tooltip align="center" icon={ColorPalette}>
-          <div class={'colorPicker'}>
-            <ColorPicker on:colorChange={colorCallback} {startColor} />
-          </div>
-        </Tooltip>
-        <!-- </Row> -->
+        <Toolbar bind:color bind:selectedTool />
 
         <svg height={15}>
-          <g id="legend" class="palette" transform={`translate(13, 1)`}>
+          <g id="legend" class="palette" transform={`translate(9, 1)`}>
             <Palette
               on:color={event => {
                 color = event.detail.color;
-                startColor = color;
               }}
               size={12} />
           </g>
@@ -112,12 +108,14 @@
 </div>
 <Row padding>
   <Column>
-    <div>
+    <div class="container">
       {#if topology && !$store.leaving}
         {#if isMesh($store.canvas[$store.name].metadata)}
           <Mesh
             {topology}
-            {color}
+            bind:color
+            {selectedTool}
+            bind:mousing
             {path}
             metadata={$store.canvas[$store.name].metadata} />
           <!-- {:else if $store.canvas[$store.name] && isFreeHand($store.canvas[$store.name].metadata)}
@@ -137,7 +135,7 @@
 {#if $store.notification}
   <Row>
     <Column padding>
-      <div class="notification">
+      <div class="container notification">
         <InlineNotification
           timeout={3000}
           lowContrast

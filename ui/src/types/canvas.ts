@@ -22,6 +22,7 @@ export interface StrokeProps {
 }
 
 export interface CanvasStroke extends TopoJSON.Polygon {
+  id: number;
   properties?: StrokeProps;
 }
 
@@ -77,4 +78,11 @@ export interface CanvasForm {
   height: number;
   radius: number;
   mesh?: string;
-}
+};
+
+export enum Tool {
+  Brush = 'BRUSH',
+  Eraser = 'ERASER',
+  Eyedropper = 'EYEDROPPER',
+  Fill = 'FILL',
+};
