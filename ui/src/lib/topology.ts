@@ -27,12 +27,11 @@ export function columns(width, radius, type) {
   return Math.ceil(width / dx) + 1;
 }
 
-export function getAdjacent(width, radius, type, id) {
-  let totalColumns = columns(width, radius, type);
+export function getAdjacent(totalColumns, type, id) {
   let row = Math.floor(id / totalColumns);
   let column = id % totalColumns;
   let ids = [];
-  let hexa = type === 'hexa';
+  let hexa = type == 'hexa';
   let rowEven = row % 2 == 0;
   let hexOffset = rowEven ? 1 : -1;
 

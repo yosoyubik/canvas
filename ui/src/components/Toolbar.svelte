@@ -18,8 +18,6 @@
 </style>
 
 <script lang="ts">
-  import * as d3 from 'd3';
-
   import PaintBrushAlt16 from "carbon-icons-svelte/lib/PaintBrushAlt16";
   import Erase16 from "carbon-icons-svelte/lib/Erase16";
   import Eyedropper16 from "carbon-icons-svelte/lib/Eyedropper16";
@@ -30,6 +28,7 @@
 
   export let color;
   export let selectedTool = Tool.Brush;
+
   let tools = [
     {
       name: Tool.Brush,

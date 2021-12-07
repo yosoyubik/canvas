@@ -44,7 +44,6 @@
     showMesh = false,
     viewBox = { width: 0, height: 0 },
     radius = $store.radius,
-    columns,
     pixels = [];
 
   // FIXME: calculate this properly, so the mesh doesn't cut off on the top/right sides
@@ -55,13 +54,17 @@
     return { width, height };
   }
 
-  function handleSave(event) {
-    const { id } = event.detail;
+  function saveStroke(stroke) {
+    const { id } = stroke;
     // const index =
     //   canvas.metadata.columns !== columns
     //     ? transformIndex(id, canvas.metadata.columns, columns)
     //     : id;
-    apiPaints[id] = { mesh: { ...event.detail } };
+    apiPaints[id] = { mesh: { ...stroke } };
+  }
+
+  function handleSave(event) {
+    saveStroke(event.detail);
   }
 
   function handleLocked(event) {
@@ -78,17 +81,50 @@
     apiPaints = {};
   }
 
-  function handleFill(event) {
-    let { pixelId, colorToReplace } = event.detail;
-    let adjacentPixelIds = getAdjacent(metadata.width, radius, metadata.mesh, pixelId);
-    for (let id of adjacentPixelIds) {
-      let pixel = pixels[id];
-      pixel?.fill(colorToReplace);
+  function setDifference(setA, setB) {
+    let _difference = new Set(setA)
+    for (let elem of setB) {
+        _difference.delete(elem)
     }
+    return _difference
+  }
+
+  function handleFill(event) {
+    let start = Date.now();
+    let { pixelId, colorToReplace } = event.detail;
+    let recentlyFilledPixelIds = [pixelId];
+    let allTouchedPixelIds = new Set([pixelId]);
+    let loopCount = 0;
+    while (recentlyFilledPixelIds.length > 0 && loopCount < 5000) {
+      let adjacentPixelIds = recentlyFilledPixelIds.map(id => {
+        return getAdjacent(columns, metadata.mesh, id);
+      });
+      let adjacentPixelIdsSet = new Set(adjacentPixelIds.flat());
+      adjacentPixelIdsSet = setDifference(adjacentPixelIdsSet, allTouchedPixelIds);
+      adjacentPixelIds = [...adjacentPixelIdsSet];
+
+      recentlyFilledPixelIds = adjacentPixelIds.map((id) => {
+        let pixel = pixels[+id];
+        let shouldFill = pixel?.shouldFill(colorToReplace);
+        if (shouldFill) {
+          pixel.immediatePaint();
+          saveStroke({
+            id,
+            color,
+          });
+        }
+        return shouldFill ? id : false;
+      });
+      allTouchedPixelIds = new Set([...allTouchedPixelIds, ...adjacentPixelIds])
+      recentlyFilledPixelIds = recentlyFilledPixelIds.filter((id) => !!id);
+      loopCount += 1;
+    }
+    handleFlush();
+    console.log(`Finished filling in ${Date.now() - start} ms!`);
   }
 
   $: viewBox = calculateViewBox(radius, metadata.mesh);
-  columns = calculateColumns(metadata.width, metadata.columns, metadata.mesh);
+  $: columns = calculateColumns(metadata.width, radius, metadata.mesh);
 </script>
 
 <svg

@@ -27,6 +27,7 @@
   import { projection as calculateProjection } from '$lib/topology';
 
   import type { CanvasTopology, Metadata } from '../types/canvas';
+  import { Tool } from '../types/canvas';
   // import FreeHand from '../components/FreeHand.svelte';
   import {
     Loading,
@@ -46,7 +47,7 @@
   import KeyboardShortcuts from '../components/KeyboardShortcuts.svelte';
 
   let color = '#d53e4f',
-    selectedTool,
+    selectedTool = Tool.Brush,
     mousing: Mousing = new Mousing(),
     topology: CanvasTopology,
     path;

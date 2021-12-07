@@ -24,6 +24,8 @@
   const oneDay = 1000 * 3600 * 24;
   const defaultColor = '#fff0';
 
+  $: pixelColor = data?.properties?.color || defaultColor;
+
   function canPaint() {
     if (!data.properties.when || !data.properties.who) {
       return true;
@@ -45,31 +47,29 @@
   function mousedown(event) {
     if (event.which === 3) return; //  right click
     mousing.active = true;
-    mousing.drawMode = !(data.properties && data.properties.color === color);
+    mousing.drawMode = !(pixelColor === color);
     mousemove();
   }
 
-  export function paint(draw: boolean = true) {
+  export function immediatePaint(draw: boolean = true) {
+    data.properties = { ...data.properties, color: draw ? color : null };
+  }
+
+  function paint(draw: boolean = true) {
     let stroke = { id: data.id };
 
     if (draw) Object.assign(stroke, { color });
 
     // Save stroke remotely, only if modifying a pixel
-    if ((data.properties && data.properties.color) || draw)
+    if (pixelColor !== defaultColor || draw)
       dispatch('save', stroke);
 
     // this updates the color right away
-    data.properties = { ...data.properties, color: draw ? color : null };
+    immediatePaint(draw)
   }
 
-  export function fill(colorToReplace) {
-    if (colorToReplace == data.properties?.color && colorToReplace != selectedColor) {
-      paint();
-      dispatch('fill', {
-        pixelId: data.id,
-        colorToReplace,
-      });
-    }
+  export function shouldFill(colorToReplace) {
+    return colorToReplace == pixelColor && colorToReplace != selectedColor;
   }
 
   function mousemove() {
@@ -82,12 +82,18 @@
           paint(draw);
           break;
         case Tool.Eyedropper:
-          selectedColor = data.properties?.color || defaultColor;
+          selectedColor = pixelColor;
           break;
         case Tool.Fill:
-          let colorToReplace = data.properties?.color;
+          let colorToReplace = pixelColor;
 
-          fill(colorToReplace);
+          if (shouldFill(colorToReplace)) {
+            paint();
+            dispatch('fill', {
+              pixelId: data.id,
+              colorToReplace,
+            });
+          }
           break;
         default:
       }
@@ -96,7 +102,7 @@
 
   // TODO
   function mousemoveWithCheck() {
-    if (mousing && canPaint()) {
+    if (mousing.active && canPaint()) {
       const draw = mousing.drawMode;
       const when = Date.now();
       let stroke = {
@@ -135,10 +141,7 @@
 
 <path
   d={path}
-  fill={data.properties && data.properties.color
-    ? data.properties.color
-    : // 'white' instead?
-      defaultColor}
+  fill={pixelColor}
   stroke-width={1}
   on:mousedown={mousedown}
   on:mouseup={mouseup}
