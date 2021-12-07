@@ -5,18 +5,11 @@
     justify-content: center;
     height: 100%;
   }
-  .palette {
-    cursor: pointer;
-  }
 
   @media (min-width: 648px) {
     div {
       max-width: none;
     }
-  }
-
-  svg {
-    margin-top: 7px;
   }
 </style>
 
@@ -33,7 +26,7 @@
     Loading,
     Row,
     Column,
-    InlineNotification,
+    InlineNotification
   } from 'carbon-components-svelte';
 
   import Mousing from '../lib/mousing';
@@ -46,7 +39,8 @@
   import Toolbar from '../components/Toolbar.svelte';
   import KeyboardShortcuts from '../components/KeyboardShortcuts.svelte';
 
-  let color = '#d53e4f',
+  let color = 'rgb(213, 62, 79)',
+    lastUsedColor,
     selectedTool = Tool.Brush,
     mousing: Mousing = new Mousing(),
     topology: CanvasTopology,
@@ -58,6 +52,13 @@
 
   function isFreeHand(metadata: Metadata) {
     return metadata.template === 'draw';
+  }
+
+  function handleStroke(event) {
+    let { color } = event.detail;
+    if (color) {
+      lastUsedColor = color;
+    }
   }
 
   $: if ($store.name && $store.canvas && $store.canvas[$store.name]) {
@@ -79,8 +80,7 @@
   }}
   on:mouseup={() => {
     mousing.pressed = false;
-  }}
-/>
+  }} />
 
 <KeyboardShortcuts bind:selectedTool />
 
@@ -91,18 +91,11 @@
         ><Row><CanvasMenu selectedCanvas={$store.name} /></Row></Column>
       <Column padding><Row><CreateCanvas /></Row></Column>
       <Column padding><Row><JoinCanvas /></Row></Column>
-      <Column>
-        <Toolbar bind:color bind:selectedTool />
-
-        <svg height={15}>
-          <g id="legend" class="palette" transform={`translate(9, 1)`}>
-            <Palette
-              on:color={event => {
-                color = event.detail.color;
-              }}
-              size={12} />
-          </g>
-        </svg>
+      <Column padding>
+        <Palette bind:color {lastUsedColor} />
+      </Column>
+      <Column padding>
+        <Toolbar bind:selectedTool />
       </Column>
     </Row>
   {/if}
@@ -118,7 +111,8 @@
             {selectedTool}
             bind:mousing
             {path}
-            metadata={$store.canvas[$store.name].metadata} />
+            metadata={$store.canvas[$store.name].metadata}
+            on:stroke={handleStroke} />
           <!-- {:else if $store.canvas[$store.name] && isFreeHand($store.canvas[$store.name].metadata)}
           <FreeHand
             canvas={$store.canvas[$store.name]}

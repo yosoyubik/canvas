@@ -1,15 +1,9 @@
 <style>
   .toolbar {
-    text-align: center;
     display: flex;
+    align-items: center;
     justify-content: center;
-    height: auto;
-  }
-
-  .toolbar-item {
-    padding-left: .5rem;
-    padding-right: .5rem;
-    border-radius: .25rem;
+    height: 100%;
   }
 
   .toolbar-item.selected {
@@ -18,49 +12,51 @@
 </style>
 
 <script lang="ts">
-  import PaintBrushAlt16 from "carbon-icons-svelte/lib/PaintBrushAlt16";
-  import Erase16 from "carbon-icons-svelte/lib/Erase16";
-  import Eyedropper16 from "carbon-icons-svelte/lib/Eyedropper16";
-  import TextFill16 from "carbon-icons-svelte/lib/TextFill16";
+  import { Button } from 'carbon-components-svelte';
+  import PaintBrushAlt16 from 'carbon-icons-svelte/lib/PaintBrushAlt16';
+  import Erase16 from 'carbon-icons-svelte/lib/Erase16';
+  import Eyedropper16 from 'carbon-icons-svelte/lib/Eyedropper16';
+  import TextFill16 from 'carbon-icons-svelte/lib/TextFill16';
 
   import { Tool } from '../types/canvas';
-  import ColorPickerTooltip from './ColorPickerTooltip.svelte';
 
-  export let color;
   export let selectedTool = Tool.Brush;
 
   let tools = [
     {
       name: Tool.Brush,
-      icon: PaintBrushAlt16,
+      icon: PaintBrushAlt16
     },
     {
       name: Tool.Eraser,
-      icon: Erase16,
+      icon: Erase16
     },
     {
       name: Tool.Eyedropper,
-      icon: Eyedropper16,
+      icon: Eyedropper16
     },
     {
       name: Tool.Fill,
-      icon: TextFill16,
+      icon: TextFill16
     }
-  ]
+  ];
 
-  function selectTool(name) {
+  function selectTool(event, name) {
     selectedTool = name;
+    event.target.blur();
   }
 </script>
 
 <div class="toolbar">
   {#each tools as tool}
-    <div class="toolbar-item" class:selected={tool.name == selectedTool}
-      on:click={() => selectTool(tool.name)} >
-      <svelte:component this="{tool.icon}" name="{tool.name}" />
+    <div class="toolbar-item" class:selected={tool.name == selectedTool}>
+      <Button
+        kind="ghost"
+        size="small"
+        on:click={event => selectTool(event, tool.name)}
+        on:mouseleave={event => event.target.blur()}>
+        <svelte:component this={tool.icon} name={tool.name} />
+      </Button>
     </div>
   {/each}
-  <div class="toolbar-item">
-    <ColorPickerTooltip on:colorChange bind:color />
-  </div>
 </div>

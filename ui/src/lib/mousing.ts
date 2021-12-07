@@ -21,4 +21,4 @@ export default class Mousing {
     this.onCanvas = active;
     this.pressed = active;
   }
-};
+}

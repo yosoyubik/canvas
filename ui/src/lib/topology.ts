@@ -47,7 +47,7 @@ export function getAdjacent(totalColumns, type, id) {
       id - totalColumns,
       id - totalColumns + hexOffset,
       id + totalColumns,
-      id + totalColumns + hexOffset,
+      id + totalColumns + hexOffset
     ];
 
     // Going out of bounds is fine, just don't wrap
@@ -61,7 +61,7 @@ export function getAdjacent(totalColumns, type, id) {
     ids.push(id - totalColumns);
     ids.push(id + totalColumns);
   }
-  
+
   return ids;
 }
 

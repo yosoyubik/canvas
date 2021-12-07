@@ -19,13 +19,19 @@
     stroke-width: 0.3px;
     pointer-events: none;
   }
+
+  .eyedropping {
+    cursor: crosshair;
+  }
 </style>
 
 <script lang="ts">
+  import { createEventDispatcher } from 'svelte';
   import * as topojson from 'topojson-client';
 
   import store from '../store';
-  import type { CanvasTopology, Metadata, Tool } from '../types/canvas';
+  import type { CanvasTopology, Metadata } from '../types/canvas';
+  import { Tool } from '../types/canvas';
 
   import { columns as calculateColumns, getAdjacent } from '$lib/topology';
   import Mousing from '../lib/mousing';
@@ -38,6 +44,8 @@
   export let selectedTool: Tool;
   export let mousing: Mousing = new Mousing();
   export let path: any;
+
+  const dispatch = createEventDispatcher();
 
   let canvasNode,
     apiPaints = {},
@@ -61,6 +69,7 @@
     //     ? transformIndex(id, canvas.metadata.columns, columns)
     //     : id;
     apiPaints[id] = { mesh: { ...stroke } };
+    dispatch('stroke', stroke);
   }
 
   function handleSave(event) {
@@ -82,11 +91,11 @@
   }
 
   function setDifference(setA, setB) {
-    let _difference = new Set(setA)
+    let _difference = new Set(setA);
     for (let elem of setB) {
-        _difference.delete(elem)
+      _difference.delete(elem);
     }
-    return _difference
+    return _difference;
   }
 
   function handleFill(event) {
@@ -100,23 +109,29 @@
         return getAdjacent(columns, metadata.mesh, id);
       });
       let adjacentPixelIdsSet = new Set(adjacentPixelIds.flat());
-      adjacentPixelIdsSet = setDifference(adjacentPixelIdsSet, allTouchedPixelIds);
+      adjacentPixelIdsSet = setDifference(
+        adjacentPixelIdsSet,
+        allTouchedPixelIds
+      );
       adjacentPixelIds = [...adjacentPixelIdsSet];
 
-      recentlyFilledPixelIds = adjacentPixelIds.map((id) => {
+      recentlyFilledPixelIds = adjacentPixelIds.map(id => {
         let pixel = pixels[+id];
         let shouldFill = pixel?.shouldFill(colorToReplace);
         if (shouldFill) {
           pixel.immediatePaint();
           saveStroke({
             id,
-            color,
+            color
           });
         }
         return shouldFill ? id : false;
       });
-      allTouchedPixelIds = new Set([...allTouchedPixelIds, ...adjacentPixelIds])
-      recentlyFilledPixelIds = recentlyFilledPixelIds.filter((id) => !!id);
+      allTouchedPixelIds = new Set([
+        ...allTouchedPixelIds,
+        ...adjacentPixelIds
+      ]);
+      recentlyFilledPixelIds = recentlyFilledPixelIds.filter(id => !!id);
       loopCount += 1;
     }
     handleFlush();
@@ -135,6 +150,7 @@
     metadata.height + viewBox.height
   }`}
   preserveAspectRatio="xMaxYMin meet"
+  class:eyedropping={selectedTool == Tool.Eyedropper}
   on:mouseleave={() => {
     mousing.onCanvas = false;
   }}
@@ -167,8 +183,7 @@
         on:locked={handleLocked}
         on:save={handleSave}
         on:flush={handleFlush}
-        on:fill={handleFill}
-      />
+        on:fill={handleFill} />
     {/each}
   </g>
 </svg>

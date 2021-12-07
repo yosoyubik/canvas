@@ -1,11 +1,16 @@
 <style>
   path:hover {
+    stroke: gray;
+  }
+  path:hover:not(.eyedropping path) {
+    stroke: none;
     fill: pink;
   }
 </style>
 
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
+  import * as d3 from 'd3';
 
   import store from '../store';
   import type Mousing from '../lib/mousing';
@@ -22,9 +27,11 @@
 
   const dispatch = createEventDispatcher();
   const oneDay = 1000 * 3600 * 24;
-  const defaultColor = '#fff0';
+  const defaultColor = 'rgba(255, 255, 255, 0)';
 
-  $: pixelColor = data?.properties?.color || defaultColor;
+  $: pixelColor = data?.properties?.color
+    ? d3.color(data.properties.color).formatRgb()
+    : defaultColor;
 
   function canPaint() {
     if (!data.properties.when || !data.properties.who) {
@@ -53,6 +60,7 @@
 
   export function immediatePaint(draw: boolean = true) {
     data.properties = { ...data.properties, color: draw ? color : null };
+    // console.log(`[pixel immediatePaint] painting over ${pixelColor} with ${color}`);
   }
 
   function paint(draw: boolean = true) {
@@ -61,11 +69,10 @@
     if (draw) Object.assign(stroke, { color });
 
     // Save stroke remotely, only if modifying a pixel
-    if (pixelColor !== defaultColor || draw)
-      dispatch('save', stroke);
+    if (pixelColor !== defaultColor || draw) dispatch('save', stroke);
 
     // this updates the color right away
-    immediatePaint(draw)
+    immediatePaint(draw);
   }
 
   export function shouldFill(colorToReplace) {
@@ -91,7 +98,7 @@
             paint();
             dispatch('fill', {
               pixelId: data.id,
-              colorToReplace,
+              colorToReplace
             });
           }
           break;

@@ -10,23 +10,24 @@
   }
 
   .button-only-tooltip {
-    margin-left: -.5rem;
+    margin-left: -0.5rem;
   }
 </style>
 
 <script lang="ts">
   import * as d3 from 'd3';
 
-  import {
-      Tooltip,
-  } from 'carbon-components-svelte';
+  import { Tooltip } from 'carbon-components-svelte';
 
-  import ColorPalette from 'carbon-icons-svelte/lib/ColorPalette16';
-
+  import { textFieldFocused } from '../lib/utils';
+  import LargeColorSquare from './LargeColorSquare.svelte';
   import ColorPicker from './ColorPicker.svelte';
 
+  export let open = false;
   export let color;
-  $: startColor = d3.color(color).formatHex();
+  export let size;
+
+  $: startColor = d3.color(color)?.formatRgb() || 'rgb(213, 62, 79)';
 
   function colorCallback(event) {
     const { r, g, b, a } = event.detail;
@@ -37,9 +38,25 @@
 </script>
 
 <div class="button-only-tooltip">
-  <Tooltip align="center" icon={ColorPalette} triggerText={undefined}>
+  <Tooltip bind:open align="center" triggerText={undefined}>
     <div class={'colorPicker'}>
       <ColorPicker on:colorChange={colorCallback} {startColor} />
     </div>
+    <LargeColorSquare {color} {size} slot="icon" />
   </Tooltip>
 </div>
+
+<svelte:window
+  on:keydown={event => {
+    switch (event.key) {
+      case 'Escape':
+        open = false;
+        break;
+      case 'c':
+        if (!textFieldFocused()) {
+          open = true;
+        }
+        break;
+      default:
+    }
+  }} />
