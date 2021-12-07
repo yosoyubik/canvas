@@ -222,7 +222,10 @@
   import * as d3 from 'd3';
 
   export let startColor = '#FF0000';
+  let mounted = false;
 
+  $: mounted && startColor && setStartColor()
+  
   onMount(() => {
     document.addEventListener('mouseup', mouseUp);
     document.addEventListener('touchend', mouseUp);
@@ -230,7 +233,7 @@
     document.addEventListener('touchmove', touchMove);
     document.addEventListener('touchstart', killMouseEvents);
     document.addEventListener('mousedown', killTouchEvents);
-    setStartColor();
+    mounted = true;
   });
 
   Number.prototype.mod = function (n) {
@@ -550,7 +553,6 @@
       return;
     }
     startColor = color.formatRgb();
-    setStartColor();
   }
 
   function alphaDown(event) {

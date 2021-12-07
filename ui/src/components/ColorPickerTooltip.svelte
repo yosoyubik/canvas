@@ -48,8 +48,8 @@
 
 <svelte:window
   on:keydown={event => {
-    switch (event.key) {
-      case 'Escape':
+    switch (event.key.toLowerCase()) {
+      case 'escape':
         open = false;
         break;
       case 'c':

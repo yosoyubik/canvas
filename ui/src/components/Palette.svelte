@@ -1,6 +1,7 @@
 <style>
   .palette-container {
     display: flex;
+    justify-content: center;
     height: 32px;
   }
 

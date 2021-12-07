@@ -18,10 +18,11 @@
     b: selectTool(Tool.Brush),
     p: selectTool(Tool.Brush),
     e: selectTool(Tool.Eraser),
-    Backspace: selectTool(Tool.Eraser),
+    backspace: selectTool(Tool.Eraser),
     i: selectTool(Tool.Eyedropper),
     d: selectTool(Tool.Eyedropper),
-    f: selectTool(Tool.Fill)
+    f: selectTool(Tool.Fill),
+    g: selectTool(Tool.Fill)
     // 'c': { action: 'openColorPicker' }, // For now, implemented in ColorPickerTooltip.svelte
     // 'Escape': { action: 'closeColorPicker' }, // For now, implemented in ColorPickerTooltip.svelte
   };
@@ -30,12 +31,13 @@
 
 <svelte:window
   on:keydown={event => {
-    let shortcut = shortcuts[event.key];
+    let key = event.key.toLowerCase();
+    let shortcut = shortcuts[key];
     if (shortcut) {
-      if (heldKeys[event.key] || textFieldFocused()) {
+      if (heldKeys[key] || textFieldFocused()) {
         return;
       }
-      heldKeys[event.key] = true;
+      heldKeys[key] = true;
 
       switch (shortcut.action) {
         case 'selectTool':
@@ -53,9 +55,10 @@
     }
   }}
   on:keyup={event => {
-    let shortcut = shortcuts[event.key];
+    let key = event.key.toLowerCase();
+    let shortcut = shortcuts[key];
     if (shortcut) {
-      delete heldKeys[event.key];
+      delete heldKeys[key];
       if (textFieldFocused()) {
         return;
       }
