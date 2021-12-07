@@ -120,7 +120,6 @@
       loopCount += 1;
     }
     handleFlush();
-    console.log(`Finished filling in ${Date.now() - start} ms!`);
   }
 
   $: viewBox = calculateViewBox(radius, metadata.mesh);
