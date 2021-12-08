@@ -4,6 +4,16 @@ const fil = function (n: number) {
   return n >= 10 ? n : '0' + n;
 };
 
+export function textFieldFocused() {
+  let element = document.activeElement;
+  return (
+    element.tagName == 'INPUT' ||
+    element.tagName == 'SELECT' ||
+    element.tagName == 'TEXTAREA' ||
+    element.isContentEditable
+  );
+}
+
 /*
   Goes from:
     (javascript Date object)

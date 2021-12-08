@@ -1,30 +1,15 @@
 <style>
-  div {
+  .container {
     text-align: center;
     display: flex;
     justify-content: center;
     height: 100%;
-  }
-  .palette {
-    cursor: pointer;
-  }
-
-  .colorPicker {
-    display: inline-block;
-    vertical-align: top;
-    color: black;
-    margin: 0 auto;
-    text-align: justify;
   }
 
   @media (min-width: 648px) {
     div {
       max-width: none;
     }
-  }
-
-  svg {
-    margin-top: 7px;
   }
 </style>
 
@@ -35,25 +20,29 @@
   import { projection as calculateProjection } from '$lib/topology';
 
   import type { CanvasTopology, Metadata } from '../types/canvas';
+  import { Tool } from '../types/canvas';
   // import FreeHand from '../components/FreeHand.svelte';
   import {
     Loading,
     Row,
     Column,
-    Tooltip,
     InlineNotification
   } from 'carbon-components-svelte';
-  import ColorPalette from 'carbon-icons-svelte/lib/ColorPalette16';
+
+  import Mousing from '../lib/mousing';
 
   import Mesh from '../components/Mesh.svelte';
   import CanvasMenu from '../components/CanvasMenu.svelte';
-  import ColorPicker from '../components/ColorPicker.svelte';
   import CreateCanvas from '../components/CreateCanvas.svelte';
   import JoinCanvas from '../components/JoinCanvas.svelte';
   import Palette from '../components/Palette.svelte';
+  import Toolbar from '../components/Toolbar.svelte';
+  import KeyboardShortcuts from '../components/KeyboardShortcuts.svelte';
 
-  let color = '#d53e4f',
-    startColor = color,
+  let color = 'rgb(213, 62, 79)',
+    lastUsedColor,
+    selectedTool = Tool.Brush,
+    mousing: Mousing = new Mousing(),
     topology: CanvasTopology,
     path;
 
@@ -65,12 +54,11 @@
     return metadata.template === 'draw';
   }
 
-  function colorCallback(event) {
-    const { r, g, b, a } = event.detail;
-    if (!(isNaN(r) || isNaN(r) || isNaN(b))) {
-      color = d3.rgb(r, g, b, a).formatRgb();
+  function handleStroke(event) {
+    let { color } = event.detail;
+    if (color) {
+      lastUsedColor = color;
     }
-    startColor = d3.rgb(r, g, b, a).formatHex();
   }
 
   $: if ($store.name && $store.canvas && $store.canvas[$store.name]) {
@@ -80,46 +68,51 @@
   }
 </script>
 
-<div>
+<svelte:window
+  on:mouseleave={() => {
+    mousing.active = false;
+  }}
+  on:mousedown={() => {
+    mousing.pressed = true;
+    if (!mousing.onCanvas) {
+      mousing.drawMode = true;
+    }
+  }}
+  on:mouseup={() => {
+    mousing.pressed = false;
+  }} />
+
+<KeyboardShortcuts bind:selectedTool />
+
+<div class="container">
   {#if $store.canvas}
     <Row>
       <Column padding
         ><Row><CanvasMenu selectedCanvas={$store.name} /></Row></Column>
       <Column padding><Row><CreateCanvas /></Row></Column>
       <Column padding><Row><JoinCanvas /></Row></Column>
-      <Column>
-        <!-- <Row> -->
-        <Tooltip align="center" icon={ColorPalette}>
-          <div class={'colorPicker'}>
-            <ColorPicker on:colorChange={colorCallback} {startColor} />
-          </div>
-        </Tooltip>
-        <!-- </Row> -->
-
-        <svg height={15}>
-          <g id="legend" class="palette" transform={`translate(13, 1)`}>
-            <Palette
-              on:color={event => {
-                color = event.detail.color;
-                startColor = color;
-              }}
-              size={12} />
-          </g>
-        </svg>
+      <Column padding>
+        <Palette bind:color {lastUsedColor} />
+      </Column>
+      <Column padding>
+        <Toolbar bind:selectedTool />
       </Column>
     </Row>
   {/if}
 </div>
 <Row padding>
   <Column>
-    <div>
+    <div class="container">
       {#if topology && !$store.leaving}
         {#if isMesh($store.canvas[$store.name].metadata)}
           <Mesh
             {topology}
-            {color}
+            bind:color
+            {selectedTool}
+            bind:mousing
             {path}
-            metadata={$store.canvas[$store.name].metadata} />
+            metadata={$store.canvas[$store.name].metadata}
+            on:stroke={handleStroke} />
           <!-- {:else if $store.canvas[$store.name] && isFreeHand($store.canvas[$store.name].metadata)}
           <FreeHand
             canvas={$store.canvas[$store.name]}
@@ -137,7 +130,7 @@
 {#if $store.notification}
   <Row>
     <Column padding>
-      <div class="notification">
+      <div class="container notification">
         <InlineNotification
           timeout={3000}
           lowContrast

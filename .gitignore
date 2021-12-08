@@ -4,6 +4,9 @@ bin
 urbit-src
 zod
 
+# OS X
+.DS_Store
+
 # Ignore everything in canvas-desk...
 #
 canvas-desk/app/*
