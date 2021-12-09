@@ -224,8 +224,8 @@
   export let startColor = '#FF0000';
   let mounted = false;
 
-  $: mounted && startColor && setStartColor()
-  
+  $: mounted && startColor && setStartColor();
+
   onMount(() => {
     document.addEventListener('mouseup', mouseUp);
     document.addEventListener('touchend', mouseUp);
@@ -253,9 +253,9 @@
   function setStartColor() {
     let color = d3.color(startColor);
     hexValue = color.formatHex();
-    r = color.r;
-    g = color.g;
-    b = color.b;
+    r = color.r || 255;
+    g = color.g || 255;
+    b = color.b || 255;
     a = color.opacity;
     updatePickers();
   }

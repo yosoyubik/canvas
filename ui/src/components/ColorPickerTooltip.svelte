@@ -27,7 +27,11 @@
   export let color;
   export let size;
 
+  let pickerDiv;
+
   $: startColor = d3.color(color)?.formatRgb() || 'rgb(213, 62, 79)';
+  $: pickerDivOnLeftSide =
+    pickerDiv && pickerDiv.getBoundingClientRect().left <= 128;
 
   function colorCallback(event) {
     const { r, g, b, a } = event.detail;
@@ -37,8 +41,11 @@
   }
 </script>
 
-<div class="button-only-tooltip">
-  <Tooltip bind:open align="center" triggerText={undefined}>
+<div class="button-only-tooltip" bind:this={pickerDiv}>
+  <Tooltip
+    bind:open
+    align={pickerDivOnLeftSide ? 'start' : 'center'}
+    triggerText={undefined}>
     <div class={'colorPicker'}>
       <ColorPicker on:colorChange={colorCallback} {startColor} />
     </div>
