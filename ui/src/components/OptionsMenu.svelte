@@ -76,6 +76,56 @@
       makePublic(name);
     });
   }
+
+  function canUploadFilesToStorage() {
+    return $store.gcp || hasS3($store.s3);
+  }
+
+  async function uploadFileToStorage(data, fileName: string) {
+    if (!$store.s3.client) {
+      throw new Error('Storage not ready');
+    }
+
+    const bucket = $store.s3.configuration.currentBucket;
+    const params = new PutObjectCommand({
+      Bucket: bucket,
+      Key: fileName,
+      Body: data,
+      ACL: 'public-read',
+      ContentType: 'image/svg+xml'
+    });
+
+    const { $metadata } = await $store.s3.client.send(params);
+    if ($metadata.httpStatusCode === 200) {
+      const signedUrl = await getSignedUrl($store.s3.client, params);
+      fileURL = signedUrl.split('?')[0];
+      $store.api.save(location, name, fileURL).then(() => {
+        console.log('[image file saved]', signedUrl);
+        copy(fileURL);
+        console.log('[copied]', fileURL);
+        updateImageURL(location, name, fileURL);
+        setNotification(
+          'Canvas SVG exported successfully (URL copied to clipboard)'
+        );
+      });
+    } else {
+      throw new Error(`Failed to upload to s3. Request failed with this status code: ${$metadata.httpStatusCode}`);
+    }
+  }
+
+  function downloadFile(data, fileName: string, mimetype: string = 'text/plain;charset=utf-8') {
+    let element = document.createElement('a');
+    let fileString = `data:${mimetype},` + encodeURIComponent(data);
+    element.setAttribute('href', fileString);
+    element.setAttribute('download', fileName);
+
+    element.style.display = 'none';
+    document.body.appendChild(element);
+
+    element.click();
+
+    document.body.removeChild(element);
+  }
 </script>
 
 <ContextMenu open={menu}>
@@ -114,46 +164,25 @@
         copy(fileURL);
       }} />
   {/if}
-  {#if $store.gcp || hasS3($store.s3)}
-    <ContextMenuOption
-      indented
-      labelText="Export canvas..."
-      on:click={async () => {
-        const svgData = exportSvg(canvasNode);
-        if (!$store.s3.client) {
-          throw new Error('Storage not ready');
-        }
+  <ContextMenuOption
+    indented
+    labelText="Export canvas..."
+    on:click={async () => {
+      const svgData = exportSvg(canvasNode);
 
-        const fileExtension = 'svg';
-        const timestamp = dateToDa(new Date());
-        const bucket = $store.s3.configuration.currentBucket;
-        const fileName = `${window.ship}/${timestamp}-${name}.${fileExtension}`;
-        const params = new PutObjectCommand({
-          Bucket: bucket,
-          Key: fileName,
-          Body: svgData,
-          ACL: 'public-read',
-          ContentType: 'image/svg+xml'
-        });
-
-        const { $metadata } = await $store.s3.client.send(params);
-        if ($metadata.httpStatusCode === 200) {
-          const signedUrl = await getSignedUrl($store.s3.client, params);
-          fileURL = signedUrl.split('?')[0];
-          $store.api.save(location, name, fileURL).then(() => {
-            console.log('[image file saved]', signedUrl);
-            copy(fileURL);
-            console.log('[copied]', fileURL);
-            updateImageURL(location, name, fileURL);
-            setNotification(
-              'Canvas SVG exported successfully (URL copied to clipboard)'
-            );
-          });
-        } else {
-          console.log('error');
+      const fileExtension = 'svg';
+      const timestamp = dateToDa(new Date());
+      const fileName = `${window.ship}/${timestamp}-${name}.${fileExtension}`;
+      if (canUploadFilesToStorage()) {
+        try {
+          await uploadFileToStorage(svgData, fileName);
+          return;
+        } catch (e) {
+          console.error(`Encountered error uploading to s3: ${e.message}\nDownloading svg file`, e);
         }
-      }} />
-  {/if}
+      }
+      downloadFile(svgData, fileName, 'image/svg+xml');
+    }} />
   <ContextMenuDivider />
   <ContextMenuGroup>
     <ContextMenuOption
