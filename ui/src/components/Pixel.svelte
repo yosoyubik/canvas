@@ -1,4 +1,7 @@
 <style>
+  path {
+    shape-rendering: crispEdges;
+  }
   path:hover {
     stroke: gray;
   }
