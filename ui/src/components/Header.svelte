@@ -96,7 +96,9 @@
               <TooltipFooter selectorPrimaryFocus="#d">
                 <span>
                   Feedback, questions? Join
-                  <a href="/apps/landscape/perma/group/~norsyr-torryn/canvas" target="_blank">~norsyr-torryn/canvas</a>
+                  <a
+                    href="/apps/landscape/perma/group/~norsyr-torryn/canvas"
+                    target="_blank">~norsyr-torryn/canvas</a>
                   or contact ~norsyr-torryn :)
                 </span>
               </TooltipFooter>
