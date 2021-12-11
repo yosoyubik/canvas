@@ -7,6 +7,7 @@
   } from '../store';
   import { PutObjectCommand } from '@aws-sdk/client-s3';
   import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+  import { Buffer } from 'buffer';
   import copy from 'clipboard-copy';
   import {
     ContextMenu,
@@ -64,11 +65,12 @@
       throw new Error('Storage not ready');
     }
 
+    const body = mimetype !== 'image/png' ? data : Buffer.from(data, 'base64');
     const bucket = $store.s3.configuration.currentBucket;
     const params = new PutObjectCommand({
       Bucket: bucket,
       Key: fileName,
-      Body: data,
+      Body: body,
       ACL: 'public-read',
       ContentType: mimetype
     });
@@ -113,7 +115,7 @@
     const fileName = `${window.ship}/${timestamp}-${name}.${fileExtension}`;
     if (canUploadFilesToStorage()) {
       try {
-        await uploadFileToStorage(svgData, fileName, mimetype);
+        await uploadFileToStorage(data, fileName, mimetype);
         return;
       } catch (e) {
         console.error(`Encountered error uploading to s3: ${e.message}\nDownloading svg file`, e);
