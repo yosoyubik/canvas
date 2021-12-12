@@ -5,8 +5,7 @@
     SelectItem,
     SelectItemGroup
   } from 'carbon-components-svelte';
-  import { cite } from '@urbit/api';
-  import { daToDate, dateToShortDa } from '$lib/utils';
+  import { cite, daToDate, dateToShortDa } from '$lib/utils';
 
   export let selectedCanvas: string;
 
