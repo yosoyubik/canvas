@@ -253,9 +253,9 @@
   function setStartColor() {
     let color = d3.color(startColor);
     hexValue = color.formatHex();
-    r = color.r || 255;
-    g = color.g || 255;
-    b = color.b || 255;
+    r = color.r || 0;
+    g = color.g || 0;
+    b = color.b || 0;
     a = color.opacity;
     updatePickers();
   }
