@@ -41,7 +41,7 @@
 
   let color = 'rgb(213, 62, 79)',
     lastUsedColor,
-    selectedTool = Tool.Brush,
+    selectedTool: Tool = Tool.Brush,
     mousing: Mousing = new Mousing(),
     topology: CanvasTopology,
     path;

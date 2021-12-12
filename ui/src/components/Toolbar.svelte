@@ -20,7 +20,7 @@
 
   import { Tool } from '../types/canvas';
 
-  export let selectedTool = Tool.Brush;
+  export let selectedTool: Tool = Tool.Brush;
 
   let tools = [
     {
@@ -45,6 +45,10 @@
     selectedTool = name;
     event.target.blur();
   }
+
+  function blurTarget(event) {
+    event.target.blur();
+  }
 </script>
 
 <div class="toolbar">
@@ -54,7 +58,7 @@
         kind="ghost"
         size="small"
         on:click={event => selectTool(event, tool.name)}
-        on:mouseleave={event => event.target.blur()}>
+        on:mouseleave={event => blurTarget(event)}>
         <svelte:component this={tool.icon} name={tool.name} />
       </Button>
     </div>
