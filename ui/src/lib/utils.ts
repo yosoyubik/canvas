@@ -76,3 +76,50 @@ export function stringToSymbol(str) {
   }
   return result.replace(/^\-+|\-+$/g, '');
 }
+
+export function generateDataUrl(data, mimetype: string) {
+  return `data:${mimetype},` + encodeURIComponent(data);
+}
+
+export function downloadFile(dataUrl, fileName: string) {
+  let element = document.createElement('a');
+  element.setAttribute('href', dataUrl);
+  element.setAttribute('download', fileName);
+
+  element.style.display = 'none';
+  document.body.appendChild(element);
+
+  element.click();
+
+  document.body.removeChild(element);
+}
+
+export async function renderSvgToPng(svgData) {
+  let svgDataUrl = generateDataUrl(svgData, 'image/svg+xml');
+  return getBase64FromImageUrl(svgDataUrl, 'image/png');
+}
+
+function getBase64FromImageUrl(url, mimetype: string): Promise<any> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+
+    img.onload = function () {
+      try {
+        var canvas = document.createElement("canvas");
+        canvas.width =img.width;
+        canvas.height =img.height;
+  
+        var ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0);
+  
+        var dataUrl = canvas.toDataURL(mimetype);
+        var data = dataUrl.replace(/^data:image\/(png|jpg);base64,/, "");
+        resolve({ data, dataUrl });
+      } catch (e) {
+        reject(e);
+      }
+    };
+  
+    img.src = url;
+  });
+}
