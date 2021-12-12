@@ -30,7 +30,7 @@
 
   const dispatch = createEventDispatcher();
   const oneDay = 1000 * 3600 * 24;
-  const defaultColor = 'rgba(255, 255, 255, 0)';
+  const defaultColor = 'rgba(0, 0, 0, 0)';
 
   $: pixelColor = data?.properties?.color
     ? d3.color(data.properties.color).formatRgb()
