@@ -43,14 +43,6 @@ Come and join the group to share your creations and see what others are doing:
 3. Copy canvas desk to Urbit
     From the repo folder, run `./install.sh <PATH_TO_THE_MOUNTED_DESK>` where `<PATH_TO_THE_MOUNTED_DESK>` might be something like `~/urbit/zod/canvas`
     You can alse run `./install.sh -w <PATH_TO_THE_MOUNTED_DESK>` if you want to watch for changes.
-
-    The following option may be outdated, the guy who was writing this section didn't know:
-
-    You can also sync from the moon's home desk, without interacting with the file system (this is still experimental, so trying this on a planet is not recommended—use a comet or a moon instead)
-
-    ```hoon
-    |sync %home ~dister-norsyr-torryn %home
-    ```
 4. Install `%canvas` in Dojo with
     - `dojo> |commit %canvas` (do this after every change to see it reflected in Urbit)
     - `dojo> |install our %canvas`(only necessary the first time, I think)
