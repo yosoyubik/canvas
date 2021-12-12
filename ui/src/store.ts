@@ -13,8 +13,8 @@ import type { Paint } from './types/canvasAction';
 
 import { topology as calculateTopology } from '$lib/topology';
 
-import type { Path, Patp, Enc } from '@urbit/api';
-import type { Group, Resource, Tags, GroupPolicy } from '@urbit/api/groups';
+// import type { Path, Patp, Enc } from '@urbit/api';
+// import type { Group, Resource, Tags, GroupPolicy } from '@urbit/api/groups';
 
 import type { ConnectionStatus } from './types/connection';
 import type { GcpToken } from './types/gcp-state';

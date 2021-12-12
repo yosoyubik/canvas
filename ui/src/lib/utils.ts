@@ -5,7 +5,7 @@ const fil = function (n: number) {
 };
 
 export function textFieldFocused() {
-  let element = document.activeElement;
+  let element = document.activeElement as HTMLElement;
   return (
     element.tagName == 'INPUT' ||
     element.tagName == 'SELECT' ||
@@ -105,21 +105,21 @@ function getBase64FromImageUrl(url, mimetype: string): Promise<any> {
 
     img.onload = function () {
       try {
-        var canvas = document.createElement("canvas");
-        canvas.width =img.width;
-        canvas.height =img.height;
-  
-        var ctx = canvas.getContext("2d");
+        var canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+
+        var ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0);
-  
+
         var dataUrl = canvas.toDataURL(mimetype);
-        var data = dataUrl.replace(/^data:image\/(png|jpg);base64,/, "");
+        var data = dataUrl.replace(/^data:image\/(png|jpg);base64,/, '');
         resolve({ data, dataUrl });
       } catch (e) {
         reject(e);
       }
     };
-  
+
     img.src = url;
   });
 }

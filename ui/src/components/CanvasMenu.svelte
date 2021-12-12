@@ -5,17 +5,20 @@
     SelectItem,
     SelectItemGroup
   } from 'carbon-components-svelte';
+  import { cite } from '@urbit/api';
   import { daToDate, dateToShortDa } from '$lib/utils';
 
   export let selectedCanvas: string;
 
   function parseCanvasName(name: string) {
-    const parse = name.split('-');
-    if (parse.length === 1) return name;
+    const [host, canvas] = name.split('/');
+    const citeHost = cite(host);
+    const parse = canvas.split('-');
+    if (parse.length === 1) return [citeHost, canvas].join('/');
     const date = daToDate(parse[parse.length - 1]);
-    if (date === null) return name;
+    if (date === null) return [citeHost, canvas].join('/');
     parse.pop();
-    return `${parse.join('-')} [${dateToShortDa(date)}] `;
+    return `${[citeHost, parse.join('-')].join('/')} [${dateToShortDa(date)}] `;
   }
 </script>
 
