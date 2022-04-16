@@ -2,7 +2,9 @@ node_modules
 dist
 bin
 urbit-src
-zod
+zod*
+moon*
+nus
 
 # OS X
 .DS_Store
