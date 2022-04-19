@@ -1,8 +1,21 @@
+import _ from 'lodash';
 import { writable } from 'svelte/store';
 import type { StoreState } from './types/store';
-import type Api from './lib/canvasApi';
-import type { Canvas, LoadCanvas, CanvasData } from './types/canvas';
-import type { Paint } from './types/canvasAction';
+
+import type Api from '$lib/canvasApi';
+import type {
+  Canvas,
+  LoadCanvas,
+  CanvasData,
+  CanvasLoad
+} from './types/canvas';
+import type { Paint, Expand } from './types/canvasAction';
+
+import { topology as calculateTopology } from '$lib/topology';
+
+// import type { Path, Patp, Enc } from '@urbit/api';
+// import type { Group, Resource, Tags, GroupPolicy } from '@urbit/api/groups';
+
 import type { ConnectionStatus } from './types/connection';
 import type { GcpToken } from './types/gcp-state';
 import type { S3Configuration, S3Credentials } from './types/s3';
@@ -10,10 +23,11 @@ import type { S3Configuration, S3Credentials } from './types/s3';
 import { S3Client } from '@aws-sdk/client-s3';
 
 import { browser } from '$app/env';
-import type { StringChain } from 'lodash';
+// import type { StringChain } from 'lodash';
 
 const initStore: StoreState = {
   chats: [],
+  groups: {},
   connection: 'disconnected',
   // publicCanvas: [],
   // privateCanvas: [],
@@ -40,6 +54,51 @@ function isToken(token: any): token is GcpToken {
   );
 }
 
+// function resourceFromPath(path: Path): Resource {
+//   const [, , ship, name] = path.split('/');
+//   return { ship, name };
+// }
+
+// export function decodeGroup(group: Enc<Group>): Group {
+//   const members = new Set(group.members);
+//   const res = {
+//     ...group,
+//     members,
+//     tags: decodeTags(group.tags),
+//     policy: decodePolicy(group.policy)
+//   };
+//   return res;
+// }
+
+// function decodePolicy(policy: Enc<GroupPolicy>): GroupPolicy {
+//   if ('invite' in policy) {
+//     const { invite } = policy;
+//     return { invite: { pending: new Set(invite.pending) } };
+//   } else {
+//     const { open } = policy;
+//     return {
+//       open: { banned: new Set(open.banned), banRanks: new Set(open.banRanks) }
+//     };
+//   }
+// }
+
+// function decodeTags(tags: Enc<Tags>): Tags {
+//   return _.reduce(
+//     tags,
+//     (acc, ships: any, key): Tags => {
+//       if (key.search(/\\/) === -1) {
+//         acc.role[key] = new Set(ships);
+//         return acc;
+//       } else {
+//         const [app, tag, resource] = key.split('\\');
+//         _.set(acc, [app, resource, tag], new Set(ships));
+//         return acc;
+//       }
+//     },
+//     { role: {} }
+//   );
+// }
+
 export function wipeStore(): void {
   return;
 }
@@ -57,11 +116,27 @@ function groupCanvasListKeys(canvas: Canvas) {
   return [priv, pub];
 }
 
-export function createCanvasStore(canvas: Canvas): void {
-  console.log('[createCanvasStore]', canvas);
-  const [privateCanvas, publicCanvas] = groupCanvasListKeys(canvas);
+export function createCanvasStore(canvasStore: Canvas): void {
+  console.log('[createCanvasStore]', canvasStore);
+  const [privateCanvas, publicCanvas] = groupCanvasListKeys(canvasStore);
+
   update(
     ($store): StoreState => {
+      let canvas: Canvas = {};
+      for (let [location, { metadata, connected, data }] of Object.entries(
+        canvasStore
+      )) {
+        const { width, height } = metadata;
+        const topology = calculateTopology(metadata.mesh)(
+          metadata.name,
+          $store.radius,
+          width,
+          height,
+          data,
+          metadata.columns
+        );
+        canvas[location] = { connected, metadata, data: topology };
+      }
       return {
         ...$store,
         canvas,
@@ -92,22 +167,27 @@ export function saveS3credentials(credentials: S3Credentials): void {
     credentials.endpoint.search('http://') !== -1
       ? credentials.endpoint
       : `https://${credentials.endpoint}`;
-  console.log(endpoint);
+
   update(
     ($store): StoreState => {
-      return {
-        ...$store,
-        s3: {
-          ...$store.s3,
-          credentials,
-          client: new S3Client({
-            credentials,
-            endpoint,
-            //https://github.com/aws/aws-sdk-js-v3/issues/1845#issuecomment-754832210
-            region: 'us-east-1'
-          })
-        }
-      };
+      return credentials.endpoint === ''
+        ? $store
+        : {
+            ...$store,
+            s3: {
+              ...$store.s3,
+              credentials,
+              client: new S3Client({
+                credentials,
+                endpoint:
+                  credentials.endpoint.search('http://') !== -1
+                    ? credentials.endpoint
+                    : `https://${credentials.endpoint}`,
+                //https://github.com/aws/aws-sdk-js-v3/issues/1845#issuecomment-754832210
+                region: 'us-east-1'
+              })
+            }
+          };
     }
   );
 }
@@ -137,17 +217,16 @@ export function loadCanvas(canvas: LoadCanvas): void {
         ...$store,
         canvas: {
           [name]: {
-            metadata: {
-              // name: canvas.name,
-              // template: canvas.template,
-              // location: canvas.location,
-              // saved: canvas.saved,
-              // width: canvas.width,
-              // height: canvas.height,
-              // private: canvas.private
-              ...canvas
-            },
-            data: canvas.data
+            metadata: { ...canvas },
+            connected: canvas.connected,
+            data: calculateTopology(canvas.mesh)(
+              canvas.name,
+              $store.radius,
+              canvas.width,
+              canvas.height,
+              canvas.data,
+              canvas.columns
+            )
           },
           ...$store.canvas
         },
@@ -187,38 +266,21 @@ export function updatePrivate(name: string): void {
 }
 
 export function paintCanvas(paint: Paint): void {
-  console.log('[painting]', paint);
   update(
     ($store): StoreState => {
       const name = `${paint.location}/${paint.name}`;
       paint.strokes.forEach(stroke => {
-        // $store.canvas[paint.name].data = {
-        //   ...$store.canvas[paint.name].data,
-        //   [stroke.id]: {
-        //     ...stroke
-        //   }
-        // };
-        $store.canvas[name].data[stroke.id] = {
-          ...stroke
+        const polygon =
+          $store.canvas[name].data.objects.pixels.geometries[stroke.id];
+        $store.canvas[name].data.objects.pixels.geometries[stroke.id] = {
+          ...polygon,
+          properties: stroke
         };
       });
       return $store;
     }
   );
 }
-
-// export function updateCanvasStore(canvas: Canvas): void {
-//   update(
-//     ($store): StoreState => {
-//       return {
-//         ...$store,
-//         canvas: {
-//           ...$store.canvas
-//         }
-//       };
-//     }
-//   );
-// }
 
 export function updateConnection(connection: ConnectionStatus): void {
   update(
@@ -275,6 +337,50 @@ export function leaveCanvas(oldLocation: string, name: string): void {
   );
 }
 
+export function deleteCanvas(location: string, name: string): void {
+  update(
+    ($store): StoreState => {
+      const canvasLocation = `${location}/${name}`;
+      delete $store.canvas[canvasLocation];
+      console.log(
+        `deleted: ${canvasLocation}, loading ~${$store.ship}/welcome`
+      );
+      return {
+        ...$store,
+        name: `~${$store.ship}/welcome`,
+        privateCanvas: $store.privateCanvas.filter(
+          name => name !== canvasLocation
+        )
+      };
+    }
+  );
+}
+
+export function expandCanvas(expand: Expand): void {
+  update(
+    ($store): StoreState => {
+      const canvasLocation = `${expand.location}/${expand.name}`;
+      console.log(
+        `expanding: ${canvasLocation} W/H: ${expand.width}/${expand.height}`
+      );
+      const canvas = $store.canvas[canvasLocation];
+      const { width } = canvas.metadata;
+      const topology = calculateTopology(canvas.metadata.mesh)(
+        canvas.metadata.name,
+        $store.radius,
+        width,
+        expand.height,
+        canvas.data,
+        canvas.metadata.columns
+      );
+      canvas.metadata.height = expand.height;
+      canvas.data = topology;
+
+      return $store;
+    }
+  );
+}
+
 export function makePublic(name: string): void {
   update(
     ($store): StoreState => {
@@ -305,5 +411,42 @@ export function updateImageURL(
     }
   );
 }
+
+export function setNotification(notification: string): void {
+  update(
+    ($store): StoreState => {
+      return {
+        ...$store,
+        notification
+      };
+    }
+  );
+}
+
+export function resetNotification(): void {
+  update(
+    ($store): StoreState => {
+      return {
+        ...$store,
+        notification: undefined
+      };
+    }
+  );
+}
+
+// export function createGroups(data: any): void {
+//   const groups = _.mapValues(data, decodeGroup);
+//   console.log(data, groups);
+//   update(
+//     ($store): StoreState => {
+//       return {
+//         ...$store,
+//         groups
+//       };
+//     }
+//   );
+// }
+// export function addGroup(resource: Resource, group: Group): void {}
+// export function removeGroup(resource: Resource, group: Group): void {}
 
 export default { subscribe };

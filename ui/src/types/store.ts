@@ -1,13 +1,13 @@
 import type { GcpToken } from './gcp-state';
 import type { Canvas } from './canvas';
 import type { ConnectionStatus } from './connection';
-import type { Patp } from './noun';
 import type Api from '../lib/canvasApi';
 import type { S3Credentials, S3Configuration } from './s3';
+import type { Patp, Group } from '@urbit/api';
 
 export interface StoreState {
   // local state
-
+  notification?: string;
   // Canvas state
   canvas?: Canvas;
   radius: number;
@@ -16,6 +16,9 @@ export interface StoreState {
   privateCanvas?: string[];
   leaving: boolean;
   // Urbit
+  groups: {
+    [group: string]: Group;
+  };
   chats: [];
   connection: ConnectionStatus;
   api?: Api;

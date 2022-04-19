@@ -37,10 +37,9 @@ export default class CanvasApi extends Api {
   /**
    * Send a stroke to a canvas in a location
    */
-  async send(location: Patp, name: string, strokes: unknown): Promise<unknown> {
+  async send(host: Patp, name: string, strokes: unknown): Promise<unknown> {
     const paint = {
-      'canvas-name': name,
-      location,
+      location: { host, name },
       strokes
     };
     return this.sendPoke({ paint });
@@ -81,6 +80,29 @@ export default class CanvasApi extends Api {
   }
 
   /**
+   * Revmoves a private canvas from the gallery
+   */
+  async deletePrivate(location: Patp, name: string): Promise<unknown> {
+    const remove = {
+      'canvas-name': name,
+      ship: location
+    };
+    return this.sendPoke({ remove });
+  }
+
+  /**
+   * Expands the dimensions of the canvas
+   */
+  async expand(location: Patp, name: string, rows: number): Promise<unknown> {
+    const expand = {
+      'canvas-name': name,
+      ship: location,
+      dimensions: { rows, cols: 0 }
+    };
+    return this.sendPoke({ expand });
+  }
+
+  /**
    * Makes a private canvas public:
    *
    *    [Currently not exposed to the UI. see OptionsMenu.svelte]
@@ -90,6 +112,10 @@ export default class CanvasApi extends Api {
       'canvas-name': name
     };
     return this.sendPoke({ unlock });
+  }
+
+  async isSubscribed(location: string): Promise<unknown> {
+    return this.scry('canvas', `/subscribed/${location}`);
   }
 
   private async sendPoke(action: unknown): Promise<unknown> {

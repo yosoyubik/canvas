@@ -9,17 +9,25 @@ export default class Api {
     this.channel.unsubscribe(id);
   }
 
-  subscribe(path: Path, method, ship = this.ship, app: string, success, fail, quit) {
+  subscribe(
+    path: Path,
+    method,
+    ship = this.ship,
+    app: string,
+    success,
+    fail,
+    quit
+  ) {
     this.bindPaths = _.uniq([...this.bindPaths, path]);
 
     return this.channel.subscribe(
       this.ship,
       app,
       path,
-      (err) => {
+      err => {
         fail(err);
       },
-      (event) => {
+      event => {
         success({
           data: event,
           from: {
@@ -28,23 +36,28 @@ export default class Api {
           }
         });
       },
-      (qui) => {
+      qui => {
         quit(qui);
       }
     );
   }
 
-  action(appl: string, mark: string, data: any, ship = (window as any).ship): Promise<any> {
+  action(
+    appl: string,
+    mark: string,
+    data: any,
+    ship = (window as any).ship
+  ): Promise<any> {
     return new Promise((resolve, reject) => {
       this.channel.poke(
         ship,
         appl,
         mark,
         data,
-        (json) => {
+        json => {
           resolve(json);
         },
-        (err) => {
+        err => {
           reject(err);
         }
       );
@@ -52,20 +65,25 @@ export default class Api {
   }
 
   scry<T>(app: string, path: Path): Promise<T> {
-    return fetch(`/~/scry/${app}${path}.json`).then((r) => r.json() as Promise<T>);
+    return fetch(`/~/scry/${app}${path}.json`).then(
+      r => r.json() as Promise<T>
+    );
   }
 
   async spider<T>(
+    desk: string,
     inputMark: string,
     outputMark: string,
     threadName: string,
     body: any
   ): Promise<T> {
-    console.log(`/spider/${inputMark}/${threadName}/${outputMark}.json`);
-    const res = await fetch(`/spider/${inputMark}/${threadName}/${outputMark}.json`, {
-      method: 'POST',
-      body: JSON.stringify(body)
-    });
+    const res = await fetch(
+      `/spider/${desk}/${inputMark}/${threadName}/${outputMark}.json`,
+      {
+        method: 'POST',
+        body: JSON.stringify(body)
+      }
+    );
 
     return res.json();
   }

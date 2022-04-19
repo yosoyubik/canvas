@@ -1,4 +1,3 @@
-<!-- From: https://github.com/efeskucuk/svelte-color-picker -->
 <style>
   .main-container {
     width: 240px;
@@ -146,8 +145,8 @@
   }
 
   .color-picked {
-    width: 18px;
-    height: 18px;
+    width: 20px;
+    height: 20px;
     border-radius: 2px;
     background: rgba(255, 0, 0, 1);
     display: inline-block;
@@ -160,36 +159,42 @@
       linear-gradient(-45deg, transparent 75%, #808080 75%);
     background-size: 10px 10px;
     background-position: 0 0, 0 5px, 5px -5px, -5px 0px;
-    border: 2px solid #fff;
-    border-radius: 4px;
-    width: 18px;
-    height: 18px;
+    border-radius: 2px;
+    width: 20px;
+    height: 20px;
     color: #fff;
     display: inline-block;
   }
 
-  .hex-text-block {
+  .hex-text-input {
     display: inline-block;
     background: white;
     border-radius: 2px;
+    margin: 0 4px;
     padding: 2px;
     border: 1px solid #e3e3e3;
-    height: 16px;
-    width: 54px;
+    height: 20px;
+    width: 80px;
     vertical-align: top;
     text-align: center;
   }
 
-  .rgb-text-block {
+  .rgb-block {
+    display: inline-block;
+    vertical-align: top;
+    text-align: center;
+  }
+
+  .rgb-text-input {
     display: inline-block;
     background: white;
     border-radius: 2px;
     padding: 2px;
-    margin: 0 1px;
+    margin: 0 0 4px 0;
     border: 1px solid #dcdcdc;
-    height: 16px;
-    width: 23px;
-    vertical-align: top;
+    height: 20px;
+    width: 29px;
+    font-size: 12px;
     text-align: center;
   }
 
@@ -207,32 +212,19 @@
     font-size: small;
     color: #888;
   }
-
-  .text {
-    display: inline;
-    font-family: sans-serif;
-    margin: 0;
-    display: inline-block;
-    font-size: 12px;
-    font-size-adjust: 0.5;
-    position: relative;
-    top: -1px;
-    vertical-align: middle;
-    -webkit-touch-callout: all;
-    -webkit-user-select: all;
-    -khtml-user-select: all;
-    -moz-user-select: all;
-    -ms-user-select: all;
-    user-select: all;
-  }
 </style>
 
+<!-- Credit to: https://github.com/efeskucuk/svelte-color-picker -->
 <script>
   // @ts-nocheck
 
   import { onMount, createEventDispatcher } from 'svelte';
+  import * as d3 from 'd3';
 
   export let startColor = '#FF0000';
+  let mounted = false;
+
+  $: mounted && startColor && setStartColor();
 
   onMount(() => {
     document.addEventListener('mouseup', mouseUp);
@@ -241,7 +233,7 @@
     document.addEventListener('touchmove', touchMove);
     document.addEventListener('touchstart', killMouseEvents);
     document.addEventListener('mousedown', killTouchEvents);
-    setStartColor();
+    mounted = true;
   });
 
   Number.prototype.mod = function (n) {
@@ -259,24 +251,13 @@
   let hexValue = '#FF0000';
 
   function setStartColor() {
-    let hex = startColor.replace('#', '');
-    if (hex.length !== 6 && hex.length !== 3 && !hex.match(/([^A-F0-9])/gi)) {
-      alert('Invalid property value (startColor)');
-      return;
-    }
-    let hexFiltered = '';
-    if (hex.length === 3)
-      hex.split('').forEach(c => {
-        hexFiltered += c + c;
-      });
-    else hexFiltered = hex;
-    hexValue = hexFiltered;
-    r = parseInt(hexFiltered.substring(0, 2), 16);
-    g = parseInt(hexFiltered.substring(2, 4), 16);
-    b = parseInt(hexFiltered.substring(4, 6), 16);
-    rgbToHSV(r, g, b, true);
-    updateCsPicker();
-    updateHuePicker();
+    let color = d3.color(startColor);
+    hexValue = color.formatHex();
+    r = color.r || 0;
+    g = color.g || 0;
+    b = color.b || 0;
+    a = color.opacity;
+    updatePickers();
   }
 
   function removeEventListenerFromElement(
@@ -316,6 +297,31 @@
     document.removeEventListener('mousedown', killTouchEvents);
   }
 
+  function convertStringToUInt8(str) {
+    let int = parseInt(str) || 0;
+    return Math.max(Math.min(int, 255), 0);
+  }
+
+  function convertStringToFloat0to1(str) {
+    let int = parseFloat(str) || 1.0;
+    return Math.max(Math.min(int, 1.0), 0.0);
+  }
+
+  function handleRGBValueChange() {
+    r = convertStringToUInt8(r);
+    g = convertStringToUInt8(g);
+    b = convertStringToUInt8(b);
+    a = convertStringToFloat0to1(a);
+    updatePickers();
+  }
+
+  function updatePickers() {
+    rgbToHSV(r, g, b, true);
+    updateCsPicker();
+    updateHuePicker();
+    updateAlphaPicker();
+  }
+
   function updateCsPicker() {
     let csPicker = document.querySelector('#colorsquare-picker');
     let xPercentage = s * 100;
@@ -328,6 +334,12 @@
     let huePicker = document.querySelector('#hue-picker');
     let xPercentage = h * 100;
     huePicker.style.left = xPercentage + '%';
+  }
+
+  function updateAlphaPicker() {
+    let alphaPicker = document.querySelector('#alpha-picker');
+    let xPercentage = a * 100;
+    alphaPicker.style.left = xPercentage + '%';
   }
 
   function colorChangeCallback() {
@@ -532,6 +544,17 @@
     colorChangeCallback();
   }
 
+  function handleHexValueChange(event) {
+    let color = d3.color(event.target.value);
+    if (!color) {
+      alert(
+        'Invalid Hex Value, please enter a value with 3 or 6 hexadecimal characters.'
+      );
+      return;
+    }
+    startColor = color.formatRgb();
+  }
+
   function alphaDown(event) {
     tracked = event.currentTarget;
     let xPercentage = ((event.offsetX - 9) / 220) * 100;
@@ -663,8 +686,7 @@
         <div
           id="colorsquare-event"
           on:mousedown={csDown}
-          on:touchstart={csDownTouch}
-        />
+          on:touchstart={csDownTouch} />
       </div>
     </div>
   </div>
@@ -680,8 +702,7 @@
     <div
       id="alpha-event"
       on:mousedown={alphaDown}
-      on:touchstart={alphaDownTouch}
-    />
+      on:touchstart={alphaDownTouch} />
   </div>
 
   <div class="color-info-box">
@@ -689,23 +710,31 @@
       <div class="color-picked" />
     </div>
 
-    <div class="hex-text-block">
-      <p class="text">{hexValue}</p>
-    </div>
+    <input
+      class="hex-text-input"
+      value={hexValue}
+      on:change={handleHexValueChange} />
 
     <div class="rgb-text-div">
-      <div class="rgb-text-block">
-        <p class="text">{r}</p>
+      <div class="rgb-block">
+        <input
+          class="rgb-text-input"
+          bind:value={r}
+          on:change={handleRGBValueChange} />
         <p class="text-label">R</p>
       </div>
-
-      <div class="rgb-text-block">
-        <p class="text">{g}</p>
+      <div class="rgb-block">
+        <input
+          class="rgb-text-input"
+          bind:value={g}
+          on:change={handleRGBValueChange} />
         <p class="text-label">G</p>
       </div>
-
-      <div class="rgb-text-block">
-        <p class="text">{b}</p>
+      <div class="rgb-block">
+        <input
+          class="rgb-text-input"
+          bind:value={b}
+          on:change={handleRGBValueChange} />
         <p class="text-label">B</p>
       </div>
     </div>

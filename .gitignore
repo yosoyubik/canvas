@@ -1,1 +1,31 @@
 node_modules
+dist
+bin
+urbit-src
+zod*
+moon*
+nus
+
+# OS X
+.DS_Store
+
+# Ignore everything in canvas-desk...
+#
+canvas-desk/app/*
+canvas-desk/gen/*
+canvas-desk/lib/*
+canvas-desk/mar/*
+canvas-desk/sur/*
+
+# ...except this files
+#
+!canvas-desk/app/canvas
+!canvas-desk/mar/canvas
+!canvas-desk/sur/canvas.hoon
+!canvas-desk/app/canvas.hoon
+!canvas-desk/sys.kelvin
+!canvas-desk/desk.docket-0
+!canvas-desk/desk.bill
+!canvas-desk/lib/canvas-templates.hoon
+!canvas-desk/lib/canvas.hoon
+

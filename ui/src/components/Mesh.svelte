@@ -20,125 +20,149 @@
     pointer-events: none;
   }
 
-  /* .notification {
-    position: absolute;
-    right: 10%;
-    margin: auto;
-  } */
+  .eyedropping {
+    cursor: crosshair;
+  }
 </style>
 
 <script lang="ts">
-  import * as d3 from 'd3';
+  import { createEventDispatcher } from 'svelte';
   import * as topojson from 'topojson-client';
 
   import store from '../store';
-  import type { CanvasData } from '../types/canvas';
+  import type { CanvasTopology, Metadata } from '../types/canvas';
+  import { Tool } from '../types/canvas';
 
-  import {
-    topology as calculateTopology,
-    projection as calculateProjection,
-    transformIndex,
-    columns as calculateColumns
-  } from '$lib/topology';
-  import { InlineNotification } from 'carbon-components-svelte';
-  import Pixel from '././Pixel.svelte';
+  import { columns as calculateColumns, getAdjacent } from '$lib/topology';
+  import Mousing from '../lib/mousing';
+  import Pixel from './Pixel.svelte';
   import OptionsMenu from './OptionsMenu.svelte';
 
-  export let canvas: CanvasData;
-  export let width: number;
-  export let height: number;
+  export let topology: CanvasTopology;
+  export let metadata: Metadata;
   export let color: string;
+  export let selectedTool: Tool;
+  export let mousing: Mousing = new Mousing();
+  export let path: any;
 
-  let topology,
-    geometries,
-    canvasNode,
-    projection,
-    path,
+  const dispatch = createEventDispatcher();
+
+  let canvasNode,
     apiPaints = {},
-    mousing = 0,
     showMesh = false,
     viewBox = { width: 0, height: 0 },
     radius = $store.radius,
-    columns;
+    pixels = [];
 
+  // FIXME: calculate this properly, so the mesh doesn't cut off on the top/right sides
   function calculateViewBox(radius, type) {
-    const width = type === 'hexa' ? radius * 2 * Math.sin(Math.PI / 3) : radius;
+    const width =
+      type === 'hexa' ? radius * 2 * Math.sin(Math.PI / 3) : 2.5 * radius + 1;
     const height = type === 'hexa' ? 2.5 * radius : 2 * radius + 1;
     return { width, height };
   }
 
-  function handleUpdate(event) {
-    // const index =
-    //   canvas.metadata.columns !== columns
-    //     ? transformIndex(event.detail.id, canvas.metadata.columns, columns)
-    //     : event.detail.id;
-    canvas.data[event.detail.id] = event.detail.data;
-  }
-
-  function handleSave(event) {
-    const { id } = event.detail;
+  function saveStroke(stroke) {
+    const { id } = stroke;
     // const index =
     //   canvas.metadata.columns !== columns
     //     ? transformIndex(id, canvas.metadata.columns, columns)
     //     : id;
-    apiPaints[id] = { mesh: { ...event.detail } };
+    apiPaints[id] = { mesh: { ...stroke } };
+    dispatch('stroke', stroke);
+  }
+
+  function handleSave(event) {
+    saveStroke(event.detail);
+  }
+
+  function handleLocked(event) {
+    const { id } = event.detail;
+    console.log(id, apiPaints[id]);
   }
 
   function handleFlush() {
     const strokes = Object.values(apiPaints);
-    const { location, name } = canvas.metadata;
+    const { location, name } = metadata;
     if (strokes.length > 0) {
       $store.api.send(location, name, strokes);
     }
     apiPaints = {};
   }
 
-  // FIXME: this is called for every stroke... (performance issues?)
-  // but needs to be added for switching between canvas
-  //
-  // The only noticeable performance issue is drawing with the
-  // mesh on (?)
-  //
-  $: {
-    viewBox = calculateViewBox(radius, canvas.metadata.mesh);
-
-    topology = calculateTopology(canvas.metadata.mesh)(
-      canvas.metadata.name,
-      radius,
-      width,
-      height,
-      canvas.data,
-      canvas.metadata.columns
-    );
-    geometries = topology.objects.pixels.geometries;
-    projection = calculateProjection(radius, canvas.metadata.mesh);
-    path = d3.geoPath().projection(projection);
-    columns = calculateColumns(
-      width,
-      canvas.metadata.columns,
-      canvas.metadata.mesh
-    );
+  function setDifference(setA, setB) {
+    let _difference = new Set(setA);
+    for (let elem of setB) {
+      _difference.delete(elem);
+    }
+    return _difference;
   }
+
+  function handleFill(event) {
+    let start = Date.now();
+    let { pixelId, colorToReplace } = event.detail;
+    let recentlyFilledPixelIds = [pixelId];
+    let allTouchedPixelIds = new Set([pixelId]);
+    let loopCount = 0;
+    while (recentlyFilledPixelIds.length > 0 && loopCount < 5000) {
+      let adjacentPixelIds = recentlyFilledPixelIds.map(id => {
+        return getAdjacent(columns, metadata.mesh, id);
+      });
+      let adjacentPixelIdsSet = new Set(adjacentPixelIds.flat());
+      adjacentPixelIdsSet = setDifference(
+        adjacentPixelIdsSet,
+        allTouchedPixelIds
+      );
+      adjacentPixelIds = [...adjacentPixelIdsSet];
+
+      recentlyFilledPixelIds = adjacentPixelIds.map(id => {
+        let pixel = pixels[+id];
+        let shouldFill = pixel?.shouldFill(colorToReplace);
+        if (shouldFill) {
+          pixel.immediatePaint();
+          saveStroke({
+            id,
+            color
+          });
+        }
+        return shouldFill ? id : false;
+      });
+      allTouchedPixelIds = new Set([
+        ...allTouchedPixelIds,
+        ...adjacentPixelIds
+      ]);
+      recentlyFilledPixelIds = recentlyFilledPixelIds.filter(id => !!id);
+      loopCount += 1;
+    }
+    handleFlush();
+  }
+
+  $: viewBox = calculateViewBox(radius, metadata.mesh);
+  $: columns = calculateColumns(metadata.width, radius, metadata.mesh);
 </script>
 
-<!-- <div class="notification">
-  <InlineNotification lowContrast kind="success" title="Success:" />
-</div> -->
 <svg
   bind:this={canvasNode}
-  {width}
-  {height}
+  width={metadata.width}
+  height={metadata.height}
   id="canvas"
-  viewBox={`0 0 ${width + viewBox.width} ${height + viewBox.height}`}
+  viewBox={`0 0 ${metadata.width + viewBox.width} ${
+    metadata.height + viewBox.height
+  }`}
   preserveAspectRatio="xMaxYMin meet"
+  class:eyedropping={selectedTool == Tool.Eyedropper}
   on:mouseleave={() => {
-    mousing = 0;
+    mousing.onCanvas = false;
+  }}
+  on:mouseenter={() => {
+    mousing.onCanvas = true;
   }}>
+  <!-- FIXME: look into fixing translate transformation -->
   <g
     id="hexagons"
     class="hexagon"
     transform={`translate(${radius}, ${
-      canvas.metadata.mesh === 'hexa' ? radius : radius + 1
+      metadata.mesh === 'hexa' ? radius : radius + 1
     })`}>
     {#if showMesh}
       <path
@@ -147,28 +171,27 @@
         id="mesh"
         d={path(topojson.mesh(topology, topology.objects.pixels))} />
     {/if}
-    <!-- {#if topology && geometries} -->
-    {#each geometries as d}
+    {#each topology.objects.pixels.geometries as d}
       <Pixel
-        {topology}
-        {d}
-        {path}
-        selectedColor={color}
+        bind:this={pixels[d.id]}
+        data={d}
+        path={path(topojson.feature(topology, d))}
+        bind:selectedColor={color}
+        {selectedTool}
+        lockup={metadata.lockup}
         bind:mousing
-        on:update={handleUpdate}
+        on:locked={handleLocked}
         on:save={handleSave}
-        on:flush={handleFlush} />
+        on:flush={handleFlush}
+        on:fill={handleFill} />
     {/each}
-    <!-- {/if} -->
   </g>
 </svg>
 
-{#if canvas.metadata}
-  <OptionsMenu
-    name={canvas.metadata.name}
-    location={canvas.metadata.location}
-    fileURL={canvas.metadata.file}
-    privateCanvas={canvas.metadata.private}
-    bind:showMesh
-    {canvasNode} />
-{/if}
+<OptionsMenu
+  name={metadata.name}
+  location={metadata.location}
+  fileURL={metadata.file}
+  privateCanvas={metadata.private}
+  bind:showMesh
+  {canvasNode} />

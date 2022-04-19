@@ -1,32 +1,35 @@
 // Forked of https://observablehq.com/@d3/draw-me
 // stored in https://observablehq.com/@yosoyubik/draw-me
 //
-import * as d3 from "d3";
+import * as d3 from 'd3';
 
 let context, curve, strokes, width, height;
 
 const redo = [];
 
-const initDrawCanvas = (canvas, params={width, height}) => {
+const initDrawCanvas = (canvas, params = { width, height }) => {
   // const canvas = document.getElementById('canvas');
   context = canvas.getContext('2d');
-  context.lineJoin = "round";
-  context.lineCap = "round";
+  context.lineJoin = 'round';
+  context.lineCap = 'round';
   curve = d3.curveBasis(context);
   width = params.width;
   height = params.height;
-}
+};
 
 const drawHexCanvas = (props, line, color) => {
-  strokes = (props.canvas) ? props.canvas : [];
+  strokes = props.canvas ? props.canvas : [];
   context.canvas.value = strokes;
 
-  d3.select("canvas").call(d3.drag()
+  d3.select('canvas').call(
+    d3
+      .drag()
       .container(context.canvas)
       .subject(dragsubject)
-      .on("start drag", dragged)
-      .on("start.render drag.render", render)
-      .on("end.drag", mouseEnds));
+      .on('start drag', dragged)
+      .on('start.render drag.render', render)
+      .on('end.drag', mouseEnds)
+  );
 
   render();
 
@@ -47,15 +50,17 @@ const drawHexCanvas = (props, line, color) => {
     const lineWidth = stroke.lineWidth;
     const strokeStyle = stroke.strokeStyle;
     props.api.canvas.paint({
-      "canvas-name": props.name,
-      "location": props.metadata.location,
-      "strokes": [{
-        draw: {
-          coords: stroke,
-          lineWidth: lineWidth,
-          strokeStyle: strokeStyle
+      'canvas-name': props.name,
+      location: props.metadata.location,
+      strokes: [
+        {
+          draw: {
+            coords: stroke,
+            lineWidth: lineWidth,
+            strokeStyle: strokeStyle
+          }
         }
-      }]
+      ]
     });
   }
 
@@ -73,7 +78,7 @@ const drawHexCanvas = (props, line, color) => {
   function dragged() {
     d3.event.subject.push([d3.event.x, d3.event.y]);
   }
-}
+};
 
 // Render and report the new value.
 const render = () => {
@@ -91,11 +96,11 @@ const render = () => {
     context.stroke();
   }
   context.canvas.value = strokes;
-  context.canvas.dispatchEvent(new CustomEvent("input"));
-}
+  context.canvas.dispatchEvent(new CustomEvent('input'));
+};
 
 const updateDrawCanvas = () => {
   render();
-}
+};
 
-export { initDrawCanvas, drawHexCanvas, updateDrawCanvas};
+export { initDrawCanvas, drawHexCanvas, updateDrawCanvas };

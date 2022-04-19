@@ -24,6 +24,7 @@
   import type { CanvasForm } from '../types/canvas';
 
   import MeshPreview from './MeshPreview.svelte';
+  // import { resourceAsPath, resourceFromPath } from '@urbit/api';
 
   const hexaTemplates = {
     'mesh-welcome': 'Canvas ~ Urbit',
@@ -36,6 +37,8 @@
     'mesh-dumas': 'Dumas-Dutil Cosmic Call'
   };
 
+  const groups = Object.keys($store.groups);
+
   const performanceWarning =
     'Mesh grids with many pixels could affect performance';
 
@@ -47,7 +50,8 @@
     name: '',
     mesh: 'squa',
     private: true,
-    template: 'mesh'
+    template: 'mesh',
+    group: ''
     // width: 1500,
     // height: 1000
   };
@@ -115,6 +119,11 @@
         isSubmitting = false;
       });
   }
+
+  // function parsePath(resource: string): string {
+  //   const { ship, name } = resourceFromPath(resource);
+  //   return `${name} on ${ship}`;
+  // }
 </script>
 
 <Button icon={Paint32} kind="ghost" size="small" on:click={() => (open = true)}>
@@ -151,19 +160,6 @@
                   on:blur={field.handleBlur} />
               </Field>
             </Column>
-            <Column padding lg={4}>
-              <Field let:field let:meta name="private">
-                <Checkbox
-                  style={'display: inline-block;'}
-                  labelText="Private"
-                  ref={checkbox}
-                  checked={initialValues.private}
-                  {...field}
-                  title="Uncheck if you want others to join"
-                  on:change={field.handleInput}
-                  on:blur={field.handleBlur} />
-              </Field>
-            </Column>
           </Row>
         </FormGroup>
         <!-- <FormGroup legendText="Mesh"> -->
@@ -186,16 +182,38 @@
                     strokeWidth="0.7"
                     fill="none"
                     type="squa" />
-                  <RadioButton type="radio" labelText="Squares" value="squa" />
+                  <RadioButton
+                    style={'margin-left: 20px;'}
+                    type="radio"
+                    labelText="Squares"
+                    value="squa" />
                   <MeshPreview
                     width="48"
                     height="44"
                     stroke="black"
-                    strokeWidth="0.9"
+                    strokeWidth="0.3"
                     fill="none"
                     type="hexa" />
-                  <RadioButton type="radio" labelText="Hexagons" value="hexa" />
+                  <RadioButton
+                    style={'margin-left: 20px;'}
+                    type="radio"
+                    labelText="Hexagons"
+                    value="hexa" />
                 </RadioButtonGroup>
+              </Field>
+            </Column>
+            <Column>
+              <Field let:field let:meta name="private">
+                <Checkbox
+                  disabled={values.group}
+                  style={'display: inline-block; padding: 6px;'}
+                  labelText="Private"
+                  ref={checkbox}
+                  checked={initialValues.private}
+                  {...field}
+                  title="Uncheck if you want others to join"
+                  on:change={field.handleInput}
+                  on:blur={field.handleBlur} />
               </Field>
             </Column>
           </Row>
@@ -228,7 +246,7 @@
                   light
                   labelText="Height"
                   {...field}
-                  warn={field.value > 1000}
+                  warn={field.value > 1024}
                   warnText={meta.warning}
                   invalid={meta.error}
                   invalidText={meta.error}
@@ -238,7 +256,45 @@
             </Column>
           </Row>
         </FormGroup>
-        <FormGroup legendText="Choose from a custom template">
+        <!-- <FormGroup legendText="Access">
+          <Row>
+            <Column padding>
+              <Field let:field let:meta name="group">
+                <Select
+                  light
+                  size="sm"
+                  inline
+                  on:change={vals => {
+                    if (!vals.detail) return;
+                    const target = { name: 'group', value: vals.detail };
+                    return field.handleInput({ target });
+                  }}>
+                  <SelectItemGroup label="Groups">
+                    {#each Object.entries($store.groups) as [resource, group]}
+                      <SelectItem value={resource} text={parsePath(resource)} />
+                    {/each}
+                  </SelectItemGroup>
+                </Select>
+              </Field>
+            </Column>
+            <Column padding lg={4}>
+              <Field let:field let:meta name="private">
+                <Checkbox
+                  disabled={values.group}
+                  style={'display: inline-block;'}
+                  labelText="Private"
+                  ref={checkbox}
+                  checked={initialValues.private}
+                  {...field}
+                  title="Uncheck if you want others to join"
+                  on:change={field.handleInput}
+                  on:blur={field.handleBlur} />
+              </Field>
+            </Column>
+          </Row>
+        </FormGroup> -->
+        <FormGroup
+          legendText="Choose from a custom template (current options will be ignored)">
           <Row>
             <Column>
               <Field let:field name="template">

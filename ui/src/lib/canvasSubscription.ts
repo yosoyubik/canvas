@@ -7,9 +7,14 @@ import {
   updateConnection,
   paintCanvas,
   loadCanvas,
+  expandCanvas,
   saveGCPToken,
   saveS3credentials,
   saveS3config
+  // createGroups,
+  // addGroup,
+  // removeGroup,
+  // decodeGroup
 } from '../store';
 
 /**
@@ -28,6 +33,7 @@ export default class CanvasSubscription extends Subscription {
   start(): void {
     this.subscribe('/frontend', 'canvas');
     this.subscribe('/all', 's3-store');
+    this.subscribe('/groups', 'group-store');
   }
 
   restart(): void {
@@ -62,7 +68,20 @@ export default class CanvasSubscription extends Subscription {
       return;
     }
 
-    if ('clear' in json && json.clear) {
+    // if ('groupUpdate' in json) {
+    //   if ('initial' in json.groupUpdate && json.groupUpdate['initial']) {
+    //     createGroups(json.groupUpdate['initial']);
+    //     // updateGroups()
+    //   } else if ('add-group' in json.groupUpdate) {
+    //     const { resource, group } = json.groupUpdate['add-group'];
+    //     addGroup(resource, decodeGroup(group));
+    //   } else if ('remove-group' in json.groupUpdate) {
+    //     const { resource, group } = json.groupUpdate['remove-group'];
+    //     removeGroup(resource, decodeGroup(group));
+    //   }
+    // }
+
+    if ('clear' in json) {
       wipeStore();
     } else if ('connection' in json) {
       updateConnection(json.connection);
@@ -72,6 +91,8 @@ export default class CanvasSubscription extends Subscription {
       loadCanvas(json['load']);
     } else if ('paint' in json) {
       paintCanvas(json['paint']);
+    } else if ('expand' in json) {
+      expandCanvas(json['expand']);
     } else if ('gcp-token' in json) {
       saveGCPToken(json['gcp-token']);
     } else if ('s3-update' in json) {

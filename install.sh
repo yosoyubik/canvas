@@ -24,12 +24,16 @@ done
 
 if [ -z "$WATCH_MODE" ]; then
     echo "Installed %canvas"
-    rsync -r --exclude-from=$EXCLUDE_FILE ./urbit/* $PIER/
+    # rsync -r --copy-links --exclude-from=$EXCLUDE_FILE ./canvas-desk/* $PIER/
+    rsync -r --copy-links --exclude-from=$EXCLUDE_FILE ./canvas-desk/* $PIER/
+
 else
    echo "Watching for changes to copy to ${PIER}..."
    while [ 0 ]
    do
     sleep 0.8
-    rsync -r --exclude-from=$EXCLUDE_FILE ./urbit/* $PIER/
+    # rsync -r --copy-links --exclude-from=$EXCLUDE_FILE ./canvas-desk/* $PIER/
+    rsync -r --copy-links --exclude-from=$EXCLUDE_FILE ./canvas-desk/* $PIER/
+
    done
 fi

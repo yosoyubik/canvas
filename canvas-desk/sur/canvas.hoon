@@ -15,7 +15,8 @@
 +$  mesh         (map @t arc)
 +$  draw         (list form)
 +$  mesh-pixel   ?(%hexa %squa)
-+$  metadata
++$  location     [host=ship name=@t]
++$  metadata-0
   $:  name=@t
       =template
       location=ship
@@ -26,8 +27,10 @@
       columns=@ud
       mesh=(unit mesh-pixel)
   ==
-::
-+$  location     [host=ship canvas=@t]
++$  metadata
+  $:  lockup=(unit @dr)
+      metadata-0
+  ==
 ::
 +$  canvas
   $%  [%mesh =mesh =metadata]
@@ -38,26 +41,38 @@
   $%  [%mesh id=@t arc=(unit arc)]
       [%draw =form]
   ==
+::  TODO: refactor actions and diffs
 ::
 +$  canvas-action
-  $%  [%paint location=@p name=@t strokes=(list stroke)]
+  $%  [%paint =location strokes=(list stroke)]
       [%init gallery=(list canvas)]
-      [%load name=@t =canvas]
+      [%load connected=? name=@t =canvas artists=(map ship @ud)]
       [%join =ship name=@t]
       [%leave =ship name=@t]
       [%create =canvas]
       [%share name=@t =path type=image-type]
       [%save =ship name=@t file=@t]
       [%unlock name=@t]
+      [%kick =ship name=@t]
+      [%remove =ship name=@t]
+      [%expand =location rows=(unit @ud) cols=(unit @ud)]
   ==
 ::
-+$  canvas-update
-  $%  [%paint location=@p name=@t strokes=(list stroke) who=@p]
-      [%load name=@t =canvas]
++$  canvas-diff
+  $%  [%paint =location strokes=(list stroke) who=@p]
+      [%load name=@t =canvas artists=(map ship @ud)]
+      [%expand =location width=(unit @ud) height=(unit @ud)]
   ==
+::  TODO: refactor actions and diffs
 ::
 +$  canvas-view-response
-  $%  canvas-action
-      [%init-frontend gallery=(list canvas) chats=(list path)]
-  ==
+  $%  [%expand =location width=(unit @ud) height=(unit @ud)]
+      [%paint =location strokes=(list stroke)]
+      [%load connected=? name=@t =canvas artists=(map ship @ud)]
+    ::
+      $:  %init-frontend
+          gallery=(list [connected=? canvas])
+          chats=(list path)
+          artists=(map location (map ship @ud))
+  ==  ==
 --

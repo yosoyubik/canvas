@@ -1,3 +1,5 @@
+import type { CanvasStroke, CanvasTopology } from 'src/types/canvas';
+
 function coordinatesFromIndex(index, n) {
   return { x: Math.floor(index / n), y: index % n };
 }
@@ -20,8 +22,47 @@ export function topology(type) {
 }
 
 export function columns(width, radius, type) {
-  const dx = type === 'hexa' ? radius * 2 * Math.sin(Math.PI / 3) :radius * 1.5;
+  const dx =
+    type === 'hexa' ? radius * 2 * Math.sin(Math.PI / 3) : radius * 1.5;
   return Math.ceil(width / dx) + 1;
+}
+
+export function getAdjacent(totalColumns, type, id) {
+  let row = Math.floor(id / totalColumns);
+  let column = id % totalColumns;
+  let ids = [];
+  let hexa = type == 'hexa';
+  let rowEven = row % 2 == 0;
+  let hexOffset = rowEven ? 1 : -1;
+
+  // Don't wrap
+  if (column >= 1) {
+    ids.push(id - 1);
+  }
+  if (column + 1 < totalColumns) {
+    ids.push(id + 1);
+  }
+  if (hexa) {
+    let aboveAndBelowPixels = [
+      id - totalColumns,
+      id - totalColumns + hexOffset,
+      id + totalColumns,
+      id + totalColumns + hexOffset
+    ];
+
+    // Going out of bounds is fine, just don't wrap
+    for (let pixel of aboveAndBelowPixels) {
+      let pixelRow = Math.floor(pixel / totalColumns);
+      if (Math.abs(pixelRow - row) == 1) {
+        ids.push(pixel);
+      }
+    }
+  } else {
+    ids.push(id - totalColumns);
+    ids.push(id + totalColumns);
+  }
+
+  return ids;
 }
 
 export function projection(radius, type) {
@@ -56,7 +97,7 @@ function squareTopology(
   radius,
   width,
   height,
-  hexagons,
+  squares: CanvasTopology,
   oldN
 ) {
   const dx = radius * 1.5,
@@ -84,49 +125,51 @@ function squareTopology(
     }
   }
 
-  const hexKeys = Object.keys(hexagons);
-  const indexMap = {};
-  hexKeys.map(index => {
+  squares.arcs = arcs;
+
+  const indexMap = new Map();
+
+  squares.objects.pixels.geometries.map((data, i) => {
     //  FIXME: turn off reindex of pixels
     if (n !== oldN && false) {
-      indexMap[transformIndex(index, oldN, n)] = index;
+      indexMap.set(transformIndex(data.id, oldN, n), i);
     } else {
-    indexMap[index] = index;
+      indexMap.set(data.id, i);
     }
   });
-
   let total = 0;
 
   for (let j = 0, q = 2; j < m; ++j, q += 4) {
     for (let i = 0; i < n; ++i, q += 2) {
-      geometries.push({
-        id: indexMap[total]? indexMap[total].toString() : total.toString(),
-        name,
-        type: 'Polygon',
-        arcs: [[q, q + 1, ~(q + (n + 2) * 2), ~(q - 1)]],
-        attr: (hexagons && hexagons[indexMap[total]]) || {}
-      });
+      const arcs = [[q, q + 1, ~(q + (n + 2) * 2), ~(q - 1)]];
+      const polygon: CanvasStroke = indexMap.has(total)
+        ? {
+            ...squares.objects.pixels.geometries[indexMap.get(total)],
+            arcs
+          }
+        : {
+            id: total,
+            type: 'Polygon',
+            arcs
+          };
+
+      geometries.push(polygon);
 
       ++total;
     }
   }
 
-  return {
-    transform: { translate: [0, 0], scale: [1, 1] },
-    objects: {
-      pixels: { type: 'GeometryCollection', geometries }
-    },
-    arcs
-  };
-}
+  squares.objects.pixels.geometries = geometries;
 
+  return squares;
+}
 
 function hexTopology(
   name,
   radius,
   width,
   height,
-  hexagons,
+  hexagons: CanvasTopology,
   oldN
 ) {
   const dx = radius * 2 * Math.sin(Math.PI / 3),
@@ -161,45 +204,47 @@ function hexTopology(
   }
 
   // const move = false;
-  const hexKeys = Object.keys(hexagons);
-  const indexMap = {};
-  hexKeys.map(index => {
+
+  const indexMap = new Map();
+  hexagons.objects.pixels.geometries.map(({ id }, i) => {
     // if ((oldWidth && width !== oldWidth) || move) {
-   if (oldN !== n) {
-      indexMap[transformIndex(index, oldN, n)] = index;
+    if (oldN !== n) {
+      indexMap.set(transformIndex(id, oldN, n), id);
     } else {
-      indexMap[index] = index;
+      indexMap.set(id, i);
     }
   });
 
   for (let j = 0, q = 3; j < m; ++j, q += 6) {
     for (let i = 0; i < n; ++i, q += 3) {
-      geometries.push({
-        id: total.toString(),
-        name,
-        type: 'Polygon',
-        arcs: [
-          [
-            q,
-            q + 1,
-            q + 2,
-            ~(q + (n + 2 - (j & 1)) * 3),
-            ~(q - 2),
-            ~(q - (n + 2 + (j & 1)) * 3 + 2)
-          ]
-        ],
-        attr: (hexagons && hexagons[indexMap[total]]) || {}
-      });
+      const arcs = [
+        [
+          q,
+          q + 1,
+          q + 2,
+          ~(q + (n + 2 - (j & 1)) * 3),
+          ~(q - 2),
+          ~(q - (n + 2 + (j & 1)) * 3 + 2)
+        ]
+      ];
+      const polygon: CanvasStroke = indexMap.has(total)
+        ? {
+            ...hexagons.objects.pixels.geometries[indexMap.get(total)],
+            arcs
+          }
+        : {
+            id: total,
+            type: 'Polygon',
+            arcs
+          };
+
+      geometries.push(polygon);
 
       ++total;
     }
   }
 
-  return {
-    transform: { translate: [0, 0], scale: [1, 1] },
-    objects: {
-      pixels: { type: 'GeometryCollection', geometries }
-    },
-    arcs
-  };
+  hexagons.objects.pixels.geometries = geometries;
+
+  return { ...hexagons, arcs };
 }

@@ -1,81 +1,157 @@
 <style>
+  path {
+    shape-rendering: crispEdges;
+  }
   path:hover {
+    stroke: gray;
+  }
+  path:hover:not(.eyedropping path) {
+    stroke: none;
     fill: pink;
   }
 </style>
 
 <script lang="ts">
-  import * as d3 from 'd3';
-  import * as topojson from 'topojson-client';
   import { createEventDispatcher } from 'svelte';
+  import * as d3 from 'd3';
 
   import store from '../store';
+  import type Mousing from '../lib/mousing';
+  import { Tool } from '../types/canvas';
 
-  export let topology;
-  export let d;
-  export let selectedColor;
-  export let mousing;
   export let path;
+  export let data;
+  export let selectedColor;
+  export let selectedTool: Tool;
+  export let mousing: Mousing;
+  export let lockup;
 
   $: color = selectedColor;
 
   const dispatch = createEventDispatcher();
   const oneDay = 1000 * 3600 * 24;
+  const defaultColor = 'rgba(0, 0, 0, 0)';
+
+  $: pixelColor = data?.properties?.color
+    ? d3.color(data.properties.color).formatRgb()
+    : defaultColor;
 
   function canPaint() {
-    if (!d.attr.when || !d.attr.who) {
+    if (!data.properties.when || !data.properties.who) {
       return true;
-    } else if (d.attr.who === $store.ship) {
+    } else if (data.who === $store.ship) {
+      //  The owner is updating
+      //
       return true;
     } else {
-      return Math.abs(Date.now() - d.attr.when) >= oneDay;
+      console.log(
+        Date.now(),
+        data,
+        lockup,
+        Math.abs(Date.now() - data.properties.when) >= lockup
+      );
+      return Math.abs(Date.now() - data.properties.when) >= lockup;
     }
   }
 
   function mousedown(event) {
-    //  right click
-    if (event.which === 3) return;
-    mousing = d.attr.color === color ? -1 : +1;
+    if (event.which === 3) return; //  right click
+    mousing.active = true;
+    mousing.drawMode = !(pixelColor === color);
     mousemove();
   }
 
+  export function immediatePaint(draw: boolean = true) {
+    data.properties = { ...data.properties, color: draw ? color : null };
+    // console.log(`[pixel immediatePaint] painting over ${pixelColor} with ${color}`);
+  }
+
+  function paint(draw: boolean = true) {
+    let stroke = { id: data.id };
+
+    if (draw) Object.assign(stroke, { color });
+
+    // Save stroke remotely, only if modifying a pixel
+    if (pixelColor !== defaultColor || draw) dispatch('save', stroke);
+
+    // this updates the color right away
+    immediatePaint(draw);
+  }
+
+  export function shouldFill(colorToReplace) {
+    return colorToReplace == pixelColor && colorToReplace != selectedColor;
+  }
+
   function mousemove() {
-    // if (mousing && canPaint()) {  // Keeps pixels for at least oneDay
-    if (mousing) {
-      const paint = { color, when: Date.now(), who: $store.ship };
-      const fill = mousing > 0;
+    if (mousing.active) {
+      let draw = mousing.drawMode;
+      switch (selectedTool) {
+        case Tool.Eraser:
+          draw = false;
+        case Tool.Brush:
+          paint(draw);
+          break;
+        case Tool.Eyedropper:
+          selectedColor = pixelColor;
+          break;
+        case Tool.Fill:
+          let colorToReplace = pixelColor;
+
+          if (shouldFill(colorToReplace)) {
+            paint();
+            dispatch('fill', {
+              pixelId: data.id,
+              colorToReplace
+            });
+          }
+          break;
+        default:
+      }
+    }
+  }
+
+  // TODO
+  function mousemoveWithCheck() {
+    if (mousing.active && canPaint()) {
+      const draw = mousing.drawMode;
+      const when = Date.now();
       let stroke = {
-        id: d.id
+        id: data.id,
+        color,
+        when,
+        who: $store.ship
       };
-      // d.attr = { ...d.attr, color: fill ? color : null };
-      if (fill) Object.assign(stroke, paint);
+      // this updates the color right away
+      data = {
+        ...data,
+        color: draw ? color : null
+      };
 
       // Save stroke locally
       dispatch('update', {
-        id: d.id,
+        id: data.id,
         data: {
-          color: fill ? color : null
+          color: draw ? color : null
         }
       });
 
       // Save stroke remotely
       dispatch('save', stroke);
     }
+    if (mousing && !canPaint()) {
+      dispatch('locked', { id: data.id });
+    }
   }
 
   function mouseup() {
     mousemove();
-    mousing = 0;
     dispatch('flush');
   }
 </script>
 
 <path
-  d={path(topojson.feature(topology, d))}
-  fill={d.attr && d.attr.color
-    ? d.attr.color
-    : // 'white' instead?
-      '#fff0'}
+  d={path}
+  fill={pixelColor}
   stroke-width={1}
   on:mousedown={mousedown}
   on:mouseup={mouseup}

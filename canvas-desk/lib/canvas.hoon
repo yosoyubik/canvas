@@ -16,6 +16,8 @@
         [%share share]
         [%save save]
         [%unlock unlock]
+        [%remove subscription]
+        [%expand expand]
     ==
   ::
   ++  create
@@ -31,7 +33,8 @@
         ::
           :-  'metadata'
           %-  ou
-          :~  ['name' (un so)]
+          :~  ['lockup' (uf ~ (mu (cu @dr ni)))]
+              ['name' (un so)]
               ['template' (un (cu template so))]
               ['location' (un (su ;~(pfix sig fed:ag)))]
               ['file' (uf ~ (mu so))]
@@ -41,14 +44,16 @@
               ['columns' (un ni)]
               ['mesh' (uf ~ (mu (cu mesh-pixel so)))]
       ==  ==
-    ::
     --
   ::
   ++  paint
     |^
     %-  ot
-    :~  ['location' (su ;~(pfix sig fed:ag))]
-        ['canvas-name' so]
+    :~  :-  'location'
+        %-  ot
+        :~  ['host' (su ;~(pfix sig fed:ag))]
+            ['name' so]
+        ==
       ::
         :-  'strokes'
         %-  ar
@@ -60,11 +65,11 @@
     ++  arc-data
       |=  =json
       ?>  ?=(%o -.json)
-      ^-  [@t (unit arc)]
+       ^-  [@t (unit arc)]
       ?:  =(~(wyt by p.json) 1)
         %.  json
-        (ou ~[['id' (un so)] [*@t (uf ~ ul)]])
-      :-  ((ou ['id' (un so)]~) json)
+        (ou ~[['id' (un no)] [*@t (uf ~ ul)]])
+      :-  ((ou ['id' (un no)]~) json)
       %-  some
       %.  json
       %-  ou
@@ -104,7 +109,22 @@
     ==
   ::
   ++  share
-    (ot ~[['canvas-name' so] ['chat-path' pa] ['type' (cu image-type so)]])
+    %-  ot
+    :~  ['canvas-name' so]
+        ['chat-path' pa]
+        ['type' (cu image-type so)]
+    ==
+  ::
+  ++  expand
+    %-  ot
+    :~  :-  'location'
+        %-  ot
+        :~  ['host' (su ;~(pfix sig fed:ag))]
+            ['name' so]
+        ==
+      ::
+        ['dimensions' (ou ~[['rows' (uf ~ (mu ni))] ['cols' (uf ~ (mu ni))]])]
+    ==
   --
 ::
 ++  canvas-view-response-to-json
@@ -113,17 +133,19 @@
   =,  enjs:format
   |^
   %+  frond  -.act
-  ?+     -.act  ~|(%action-not-supported !!)
+  ?-     -.act
       %init-frontend
     %-  pairs
     %+  weld
+      :: TODO
+      :: ['artists' (artists-to-json artists.act)]~
       ['chats' a+(turn chats.act path)]~
     :_  ~
     :-  'canvas'
     %-  pairs
     %+  turn
       gallery.act
-    |=  =canvas
+    |=  [connected=? =canvas]
     ^-  [@t json]
     :-  %-  crip
         ;:  weld
@@ -134,25 +156,38 @@
     %-  pairs
     %+  weld
       (canvas-to-json canvas)
-    ['metadata' (pairs (metadata-to-json metadata.canvas))]~
+    :~  ^-  [@t json]  ['connected' b+connected]
+        ^-  [@t json]  ['metadata' (pairs (metadata-to-json metadata.canvas))]
+    ==
   ::
       %load
     %-  pairs
-    %+  weld
+    ;:  weld
       (canvas-to-json canvas.act)
-    (metadata-to-json metadata.canvas.act)
+      ['connected' b+connected.act]~
+      (metadata-to-json metadata.canvas.act)
+    ==
   ::
       %paint
     %-  pairs
     ^-  (list [@t json])
-    :~  ['name' s+name.act]
-        ['location' s+(scot %p location.act)]
+    :~  ['name' s+name.location.act]
+        ['location' s+(scot %p host.location.act)]
       ::
         =;  pairs-of-strokes
           ['strokes' a+(turn strokes.act pairs-of-strokes)]
         |=  =stroke
         ^-  json
         (pairs (stroke-to-json stroke))
+    ==
+  ::
+      %expand
+    %-  pairs
+    ^-  (list [@t json])
+    :~  ['name' s+name.location.act]
+        ['location' s+(scot %p host.location.act)]
+        ['width' ?~(width.act ~ (numb u.width.act))]
+        ['height' ?~(height.act ~ (numb u.height.act))]
     ==
   ==
   ::
@@ -164,9 +199,7 @@
     :-  'data'
     ?-    -.canvas
         %mesh
-      %-  pairs
-      %-  zing
-      (turn ~(tap by mesh.canvas) arc-to-json)
+      (topojson ~(tap by mesh.canvas))
     ::
         %draw
       :-  %a
@@ -195,16 +228,50 @@
         ['height' (numb height)]
         ['columns' (numb columns)]
         ['mesh' ?~(mesh ~ s+u.mesh)]
+        ['lockup' ?~(lockup ~ (numb (div u.lockup ~s1)))]
     ==
+  ::
+  ++  topojson
+    |=  properties=(list [@t arc])
+    ^-  json
+    |^
+    %-  pairs
+    :~  ['arcs' a+~]
+        ['transform' (pairs transform)]
+        ['objects' (pairs objects)]
+    ==
+    ::
+    ++  transform
+      :~  ['scale' a+~[[n+~.1] [n+~.1]]]
+          ['translate' a+~[[n+~.0] [n+~.0]]]
+      ==
+    ::
+    ++  objects
+      :_  ~
+      :-  'pixels'
+      %-  pairs
+      :~  ['type' s+'GeometryCollection']
+          ['geometries' a+(turn properties geometries)]
+      ==
+    ::
+    ++  geometries
+      |=  [id=@t =arc]
+      ^-  json
+      %-  pairs
+      :~  ['id' n+id]
+          ['type' s+'Polygon']
+          ['arcs' a+~]
+          ['properties' (arc-to-json id arc)]
+      ==
+    --
   ::
   ++  arc-to-json
     |=  [id=@t =arc]
-    ^-  (list [@t json])
-    :_  ~
-    :-  id
+    ^-  json
     %-  pairs
     ^-  (list [@t json])
-    :~  ['color' s+color.arc]
+    :~  ['id' n+id]
+        ['color' s+color.arc]
         ['when' ?~(when.arc ~ (time u.when.arc))]
         ['who' ?~(who.arc ~ (ship u.who.arc))]
     ==
@@ -215,9 +282,9 @@
     ?-    -.stroke
         %mesh
       ?~  arc.stroke
-        ['id' s+id.stroke]~
+        ['id' n+id.stroke]~
       =*  arc  u.arc.stroke
-      :~  ['id' s+id.stroke]
+      :~  ['id' n+id.stroke]
           ['color' s+color.arc]
           ['when' ?~(when.arc ~ (time u.when.arc))]
           ['who' ?~(who.arc ~ (ship u.who.arc))]

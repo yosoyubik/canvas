@@ -1,0 +1,15 @@
+:~  title+'Canvas'
+    info+'Collaborative Pixel Art'
+    color+0x22.88bd
+    image+'https://yosoyubik.fra1.digitaloceanspaces.com/canvas/tile.svg'
+    base+'canvas'
+  ::
+    :+  %glob-http
+      'https://yosoyubik.fra1.digitaloceanspaces.com/canvas/glob-0v6.ij87u.2nsdp.ve1v5.e8jsf.16h9s.glob'
+    0v6.ij87u.2nsdp.ve1v5.e8jsf.16h9s
+  ::
+    version+[0 0 7]
+    website+'https://github.com/yosoyubik/canvas'
+    license+'MIT'
+==
+
