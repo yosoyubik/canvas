@@ -55,6 +55,7 @@
     }
   }}
   on:keyup={event => {
+    if (!(event && event.key)) return;
     let key = event.key.toLowerCase();
     let shortcut = shortcuts[key];
     if (shortcut) {

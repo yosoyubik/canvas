@@ -2,14 +2,14 @@ import _ from 'lodash';
 import { writable } from 'svelte/store';
 import type { StoreState } from './types/store';
 
-import type Api from './lib/canvasApi';
+import type Api from '$lib/canvasApi';
 import type {
   Canvas,
   LoadCanvas,
   CanvasData,
   CanvasLoad
 } from './types/canvas';
-import type { Paint } from './types/canvasAction';
+import type { Paint, Expand } from './types/canvasAction';
 
 import { topology as calculateTopology } from '$lib/topology';
 
@@ -123,7 +123,9 @@ export function createCanvasStore(canvasStore: Canvas): void {
   update(
     ($store): StoreState => {
       let canvas: Canvas = {};
-      for (let [location, { metadata, data }] of Object.entries(canvasStore)) {
+      for (let [location, { metadata, connected, data }] of Object.entries(
+        canvasStore
+      )) {
         const { width, height } = metadata;
         const topology = calculateTopology(metadata.mesh)(
           metadata.name,
@@ -133,7 +135,7 @@ export function createCanvasStore(canvasStore: Canvas): void {
           data,
           metadata.columns
         );
-        canvas[location] = { metadata, data: topology };
+        canvas[location] = { connected, metadata, data: topology };
       }
       return {
         ...$store,
@@ -216,6 +218,7 @@ export function loadCanvas(canvas: LoadCanvas): void {
         canvas: {
           [name]: {
             metadata: { ...canvas },
+            connected: canvas.connected,
             data: calculateTopology(canvas.mesh)(
               canvas.name,
               $store.radius,
@@ -330,6 +333,50 @@ export function leaveCanvas(oldLocation: string, name: string): void {
         leaving: true,
         publicCanvas: $store.publicCanvas.filter(name => name !== oldCanvas)
       };
+    }
+  );
+}
+
+export function deleteCanvas(location: string, name: string): void {
+  update(
+    ($store): StoreState => {
+      const canvasLocation = `${location}/${name}`;
+      delete $store.canvas[canvasLocation];
+      console.log(
+        `deleted: ${canvasLocation}, loading ~${$store.ship}/welcome`
+      );
+      return {
+        ...$store,
+        name: `~${$store.ship}/welcome`,
+        privateCanvas: $store.privateCanvas.filter(
+          name => name !== canvasLocation
+        )
+      };
+    }
+  );
+}
+
+export function expandCanvas(expand: Expand): void {
+  update(
+    ($store): StoreState => {
+      const canvasLocation = `${expand.location}/${expand.name}`;
+      console.log(
+        `expanding: ${canvasLocation} W/H: ${expand.width}/${expand.height}`
+      );
+      const canvas = $store.canvas[canvasLocation];
+      const { width } = canvas.metadata;
+      const topology = calculateTopology(canvas.metadata.mesh)(
+        canvas.metadata.name,
+        $store.radius,
+        width,
+        expand.height,
+        canvas.data,
+        canvas.metadata.columns
+      );
+      canvas.metadata.height = expand.height;
+      canvas.data = topology;
+
+      return $store;
     }
   );
 }

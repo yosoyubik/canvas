@@ -57,6 +57,44 @@
           ?=(^ lockup.meta)
           (gte (sub now.bowl u.when.u.arc) u.lockup.meta)
       ==
+    ::
+    ++  is-connected
+      |=  [host=@p canvas=@t subs=boat:gall]
+      =/  =wire  [%subscribe (scot %p host) canvas ~]
+      (~(has by subs) [wire host %canvas])
+    ::
+    ++  add-connected
+      |=  [subs=boat:gall gallery=(list canvas)]
+      %+  turn  gallery
+      |=  =canvas
+      ^-  [connected=? ^canvas]
+      =,  canvas
+      [(is-connected location.metadata name.metadata subs) +<]
+    ::
+    ::  TODO: to lib?
+    ::
+    ++  expand-dimensions
+      |=  [rows=@ud height=@ud]
+      ^-  (unit @ud)
+      =+  float=~(ma rs %u)
+      =+  radius=10
+      ::  rows = Math.ceil((height + radius) / (radius * 1.5) + 1);
+      ::  extraHeight =
+      ::   (rows + extraRows - 1) * ($store.radius * 1.5) - radius;
+      ::
+      =/  current-rows=(unit @s)
+        %-  toi:float
+        %+  add:float  .1
+        %+  div:float
+          (add:float (sun:float radius) (sun:float height))
+        .15
+      ?~  current-rows
+        ~&  >>>  '[ expansion failed ]'  ~
+      %-  some
+      %+  sub
+        %+  mul  15
+        (dec (add (abs:si u.current-rows) rows))
+      radius
     --
 ::  Cards
 ::
@@ -93,6 +131,16 @@
           !>([%paint location strokes who])
       ==
     ::
+    ++  send-expand-diff
+      |=  [=location width=(unit @ud) height=(unit @ud)]
+      ^-  card
+      :*  %give
+          %fact
+          [/canvas/(scot %p host.location)/(scot %tas name.location)]~
+          %canvas-diff
+          !>([%expand location width height])
+      ==
+    ::
     ++  send-frontend
       |=  =json
       ^-  (list card)
@@ -110,6 +158,11 @@
           %canvas-action
           !>([%paint location strokes])
       ==
+    ::
+    ++  delay-resub
+      |=  [=wire time=@da]
+      ^-  card
+     [%pass wire %arvo %b %wait time]
     --
 ::
 =<  |_  =bowl:gall
@@ -258,27 +311,51 @@
     ++  on-agent
       |=  [=wire =sign:agent:gall]
       ^-  (quip card _this)
-      ?-    -.sign
-          %poke-ack   (on-agent:def wire sign)
-          %watch-ack  (on-agent:def wire sign)
-          %kick       (on-agent:def wire sign)
-      ::
-          %fact
-        =^  cards  state
-          =*  vase  q.cage.sign
-          ^-  (quip card _state)
-          ?+    p.cage.sign  ~|([%canvas-bad-update-mark wire vase] !!)
-              %canvas-diff
-            (handle-canvas-diff:cc !<(canvas-diff vase))
-          ==
-        [cards this]
+      |^
+      ?+  wire  (on-agent:def wire sign)
+        [%subscribe @ @ *]    (handle-sub i.t.wire i.t.t.wire sign)
       ==
+      ::
+      ++  handle-sub
+        |=  [ship=@t name=@t =sign:agent:gall]
+        ^-  (quip card _this)
+        ?-    -.sign
+            %poke-ack   (on-agent:def wire sign)
+            %watch-ack  (on-agent:def wire sign)
+        ::
+            %kick
+          ::  to try to avoid kick-resub loop, wait ~s30 to send the %watch
+          ::
+          ~&  >>  "canvas: kick on {<ship>}/{<name>} resubscribing..."
+          :_  this
+          [(delay-resub /resub/[ship]/[name] (add now.bowl ~s30))]~
+        ::
+            %fact
+          =^  cards  state
+            =*  vase  q.cage.sign
+            ^-  (quip card _state)
+            ?+    p.cage.sign  ~|([%canvas-bad-update-mark wire vase] !!)
+                %canvas-diff
+              (handle-canvas-diff:cc !<(canvas-diff vase))
+            ==
+          [cards this]
+        ==
+      --
     ::
     ++  on-arvo
       |=  [=wire =sign-arvo]
-      ^-  (quip card:agent:gall _this)
+      ^-  (quip card _this)
       ?:  ?=(%bound +<.sign-arvo)  [~ this]
-      (on-arvo:def wire sign-arvo)
+      ?+    wire  (on-arvo:def wire sign-arvo)
+          [%resub @ @ ~]
+        ?+    sign-arvo  (on-arvo:def wire sign-arvo)
+            [%behn %wake *]
+          ?^  error.sign-arvo
+            (on-arvo:def wire sign-arvo)
+          :_  this
+          [(subscribe (slav %p i.t.wire) i.t.t.wire)]~
+        ==
+      ==
     ::
     ++  on-leave  on-leave:def
     ::
@@ -305,6 +382,11 @@
           !>(?~(count 0 u.count))
         %.  ship
         ~(get by (~(got by artists) location))
+      ::
+          [%x %subscribed @t @t ~]
+        =/  =location  (extract-location t.t.path)
+        =/  =wire      [%subscribe t.t.path]
+        ``atom+!>((~(has by wex.bowl) [wire host.location %canvas]))
       ==
     ::
     ++  on-fail   on-fail:def
@@ -338,16 +420,21 @@
     %create  (handle-create +.act)
     %save    (handle-save +.act)
     %unlock  (handle-unlock +.act)
+    %remove  (handle-remove +.act)
+    %expand  (handle-expand +.act)
   ==
   ::
   ++  handle-init
     ^-  (list card)
     %-  send-frontend
-    (canvas-view-response-to-json %init-frontend ~(val by gallery) ~ ~)
+    %+  canvas-view-response-to-json  %init-frontend
+    [(add-connected wex.bowl ~(val by gallery)) ~ ~]
   ::
   ++  handle-paint
     |=  [=location strokes=(list stroke)]
     ^-  (quip card _state)
+    ::  TODO: only accept strokes from subscribers
+    ::
     (process-paint location strokes)
   ::
   ++  handle-join
@@ -363,7 +450,7 @@
     ~&  >>  ["[ leave ]" ship name]
     ?>  =(our.bowl src.bowl)
     =/  new-name=@t
-      (crip "{(trip name)}-{(trip (scot %da now.bowl))}")
+      (crip "{(trip name)}-{<now.bowl>}")
     =/  =canvas  (~(got by gallery) [ship name])
     ::  the canvas becomes local and private
     ::  and it's archived under the old name and the date
@@ -375,7 +462,7 @@
         name      new-name
       ==
     =/  load
-      (send-frontend (canvas-view-response-to-json %load new-name canvas ~))
+      (send-frontend (canvas-view-response-to-json %load | new-name canvas ~))
     ::  TODO: do this if /leave is succesful?
     ::
     :-  [(leave ship name) load]
@@ -404,7 +491,7 @@
     ::
     =.  lockup.metadata.canvas  `~m30
     =/  load=canvas-view-response
-      [%load name.metadata.canvas canvas ~]
+      [%load & name.metadata.canvas canvas ~]
     :-  (send-frontend (canvas-view-response-to-json load))
     %_    state
         gallery
@@ -427,11 +514,44 @@
     ?>  =(our.bowl src.bowl)
     ~&  >>  "[ unlock ] / TBA"
     ?:  &  `state
-    ?>  =(our.bowl src.bowl)
     =/  =canvas  (~(got by gallery) [our.bowl name])
     =.  private.metadata.canvas  |
     :-  ~
     state(gallery (~(put by gallery) [our.bowl name] canvas))
+  ::
+  ++  handle-remove
+    |=  [=ship name=@t]
+    ^-  (quip card _state)
+    ?>  =(our.bowl src.bowl)
+    ~&  >>  ["[ deleting ]" ship name]
+    =/  =canvas  (~(got by gallery) [ship name])
+    ::  TODO: allow for deleting a public canvas (leave/kick + delete)
+    ::
+    ?>  private.metadata.canvas
+    [~ state(gallery (~(del by gallery) [ship name]))]
+  ::
+  ++  handle-expand
+    |=  [=location rows=(unit @ud) cols=(unit @ud)]
+    ^-  (quip card _state)
+    ?>  =(our.bowl src.bowl)
+    ?.  =(host.location our.bowl)
+      ~&  >>>  "[ only owners can expand a canvas ]"
+      `state
+    =/  =canvas  (~(got by gallery) location)
+    ?:  ?=([~ ~] [rows cols])  `state
+    ?>  ?=(^ rows)
+    =+  old-height=height.metadata.canvas
+    ?~  height=(expand-dimensions u.rows old-height)
+      `state
+    ~&  >  "[ height: {<old-height>} -> {<u.height>} ]"
+    =.  height.metadata.canvas  u.height
+    ::  TODO: handle col expansion (pixel id recalculation needed)
+    ::
+    =+  width=width.metadata.canvas
+    :_  state(gallery (~(put by gallery) location canvas))
+    %+  weld  [(send-expand-diff location `width height)]~
+    %-  send-frontend
+    (canvas-view-response-to-json %expand location `width height)
   ::
   --
 ::
@@ -442,6 +562,7 @@
   ?-  -.act
     %load    (handle-load +.act)
     %paint   (handle-paint +.act)
+    %expand  (handle-expand +.act)
   ==
   ::
   ++  handle-load
@@ -453,8 +574,11 @@
         artists.state  ?~  artists  artists.state
                        (~(put by artists.state) [location artists])
       ==
+    =/  =wire        [%subscribe (scot %p src.bowl) name ~]
+    =/  connected=?  (~(has by wex.bowl) [wire src.bowl %canvas])
     :_  state
-    (send-frontend (canvas-view-response-to-json %load name canvas artists))
+    %-  send-frontend
+    (canvas-view-response-to-json %load connected name canvas artists)
   ::
   ++  handle-paint
     |=  [=location strokes=(list stroke) who=@p]
@@ -464,6 +588,26 @@
       ::
       `state
     (process-paint location strokes)
+  ::
+  ++  handle-expand
+    |=  [=location width=(unit @ud) height=(unit @ud)]
+    ^-  (quip card _state)
+    =/  =canvas  (~(got by gallery) location)
+    ?~  height  `state
+    ::  TODO: handle col expansion (pixel id recalculation needed)
+    ::
+    =+  old-height=height.metadata.canvas
+    ~&  >  "[ {<name.location>} height: {<old-height>} -> {<u.height>} ]"
+    =.  height.metadata.canvas  u.height
+    :_  state(gallery (~(put by gallery) location canvas))
+    ::  XX: updating the frontend recalculates the topology so we might want
+    ::      to avoid messing with current painting sessions, and let the users
+    ::      see the new dimensiones when loading the ui again?
+    ::
+    :: ~
+    %-  send-frontend
+    (canvas-view-response-to-json %expand location width height)
+  ::
   --
 ::
 ++  process-paint
@@ -495,7 +639,7 @@
   :: TODO
   ::
   :: ?:  ?=(%draw -.u.canvas)  strokes
-  :: %+  skim  ^-((list stroke) strokes)  :: ?
+  :: %+  skim  ^-((list stroke) strokes)  :: XX ?
   :: |=  =stroke
   :: ?>  ?=(%mesh -.stroke)
   :: =+  past-arc=(~(get by mesh.u.canvas) id.stroke)
@@ -504,31 +648,33 @@
   ++  send-effects
     |=  strokes=(list stroke)
     ^-  (list card)
-    ?.  =(our.bowl src.bowl)
-      ::  stroke from a remote ship
+    ?:  =(our.bowl src.bowl)
+      ::  stroke from local (e.g. frontend)
       ::
-      %+  weld
-        %-  send-frontend
-        ::  TODO: include who and when in every stroke?
-        ::
-        (canvas-view-response-to-json %paint location strokes)
+      ::  if we are not the host and are are
+      ::  still subscribed, poke with our strokes
       ::
-      ::  if we are not the host, ignore
-      ::
-      ?.  =(host.location our.bowl)  ~
+      ?.  =(host.location our.bowl)
+        ?.  (is-connected host.location name.meta wex.bowl)
+          ~
+        [(send-to-host location strokes)]~
       ::  if we are, send diff to subscribers
       ::
-      [(send-paint-diff location strokes src.bowl)]~
-    ::  stroke from local (e.g. frontend)
+      [(send-paint-diff location strokes our.bowl)]~
+    ::  stroke from a remote ship
     ::
-    ?>  =(src.bowl our.bowl)
-    ::  if we are not the host, poke with our paint
+    %+  weld
+      %-  send-frontend
+      ::  TODO: include who and when in every stroke?
+      ::
+      (canvas-view-response-to-json %paint location strokes)
     ::
-    ?.  =(host.location our.bowl)
-      [(send-to-host location strokes)]~
+    ::  if we are not the host, ignore
+    ::
+    ?.  =(host.location our.bowl)  ~
     ::  if we are, send diff to subscribers
     ::
-    [(send-paint-diff location strokes our.bowl)]~
+    [(send-paint-diff location strokes src.bowl)]~
   ::
   ++  parse-strokes
     |=  [strokes=(list stroke) =mesh artists=_artists.state]

@@ -1,6 +1,8 @@
 <script lang="ts">
   import store, {
     leaveCanvas,
+    deleteCanvas,
+    expandCanvas,
     makePublic,
     setNotification,
     updateImageURL
@@ -16,12 +18,18 @@
     ContextMenuGroup
   } from 'carbon-components-svelte';
   import Copy from 'carbon-icons-svelte/lib/CopyFile16';
+  import Trash from 'carbon-icons-svelte/lib/TrashCan16';
   import Leave from 'carbon-icons-svelte/lib/Unlink16';
   import Share from 'carbon-icons-svelte/lib/Share16';
   import Public from 'carbon-icons-svelte/lib/Unlocked16';
 
   import exportSvg from '../lib/exportCanvas';
-  import { dateToDa, downloadFile, generateDataUrl, renderSvgToPng } from '../lib/utils';
+  import {
+    dateToDa,
+    downloadFile,
+    generateDataUrl,
+    renderSvgToPng
+  } from '../lib/utils';
 
   export let name: string;
   export let fileURL: string;
@@ -48,6 +56,25 @@
       leaveCanvas(location, name);
     });
   }
+
+  function deletePrivateCanvas(location: string, name: string) {
+    $store.api.deletePrivate(location, name).then(() => {
+      console.log('[ success deleting canvas... ]', location, name);
+      deleteCanvas(location, name);
+    });
+  }
+
+  //  TODO: expose to the UI
+  // function expandRows(extraRows: number) {
+  //   const height = $store.canvas[`~${location}/${name}]`].metadata.height;
+  //   const rows = Math.ceil((height + 10) / (10 * 1.5) + 1);
+  //   const newHeight =
+  //     (rows + extraRows - 1) * ($store.radius * 1.5) - $store.radius;
+  //   $store.api.expand(location, name, newHeight).then(() => {
+  //     console.log('[ success expanding canvas... ]', location, name);
+  //     expandCanvas(location, name, newHeight);
+  //   });
+  // }
 
   function unlock(name: string) {
     $store.api.makePublic(name).then(() => {
@@ -89,7 +116,9 @@
         );
       });
     } else {
-      throw new Error(`Failed to upload to s3. Request failed with this status code: ${$metadata.httpStatusCode}`);
+      throw new Error(
+        `Failed to upload to s3. Request failed with this status code: ${$metadata.httpStatusCode}`
+      );
     }
   }
 
@@ -118,7 +147,10 @@
         await uploadFileToStorage(data, fileName, mimetype);
         return;
       } catch (e) {
-        console.error(`Encountered error uploading to s3: ${e.message}\nDownloading svg file`, e);
+        console.error(
+          `Encountered error uploading to s3: ${e.message}\nDownloading svg file`,
+          e
+        );
       }
     }
     downloadFile(dataUrl, fileName);
@@ -132,7 +164,7 @@
     indented
     on:click={() => {
       setNotification('Canvas path copied to clipboard');
-      copy(`~${$store.ship}/${name}`);
+      copy(`${location}/${name}`);
     }} />
   {#if location !== `~${$store.ship}`}
     <ContextMenuOption
@@ -176,4 +208,15 @@
       selected={showMesh}
       on:click={() => (showMesh = !showMesh)} />
   </ContextMenuGroup>
+  {#if privateCanvas && name !== 'welcome'}
+    <ContextMenuDivider />
+    <ContextMenuOption
+      icon={Trash}
+      indented
+      labelText="Delete"
+      on:click={() => {
+        setNotification('Deleting private canvas...');
+        deletePrivateCanvas(location, name);
+      }} />
+  {/if}
 </ContextMenu>

@@ -7,6 +7,7 @@ import {
   updateConnection,
   paintCanvas,
   loadCanvas,
+  expandCanvas,
   saveGCPToken,
   saveS3credentials,
   saveS3config
@@ -90,6 +91,8 @@ export default class CanvasSubscription extends Subscription {
       loadCanvas(json['load']);
     } else if ('paint' in json) {
       paintCanvas(json['paint']);
+    } else if ('expand' in json) {
+      expandCanvas(json['expand']);
     } else if ('gcp-token' in json) {
       saveGCPToken(json['gcp-token']);
     } else if ('s3-update' in json) {

@@ -44,7 +44,11 @@
     selectedTool: Tool = Tool.Brush,
     mousing: Mousing = new Mousing(),
     topology: CanvasTopology,
-    path;
+    path,
+    isDisconnected;
+
+  const disconnectedMsg = `This canvas is not subscribed to the host anymore, and your updates won't be sent out.
+    You can leave (right-click on the screen) to save a local copy, and then join again to resubscribe.`;
 
   function isMesh(metadata: Metadata) {
     return metadata.template !== 'draw';
@@ -62,9 +66,14 @@
   }
 
   $: if ($store.name && $store.canvas && $store.canvas[$store.name]) {
-    const { mesh } = $store.canvas[$store.name].metadata;
-    topology = $store.canvas[$store.name].data;
+    const currentCanvas = $store.canvas[$store.name];
+    const { mesh } = currentCanvas.metadata;
+    topology = currentCanvas.data;
     path = d3.geoPath().projection(calculateProjection($store.radius, mesh));
+    isDisconnected =
+      !currentCanvas.connected &&
+      !currentCanvas.metadata.private &&
+      currentCanvas.metadata.location !== `~${$store.ship}`;
   }
 </script>
 
@@ -100,6 +109,19 @@
     </Row>
   {/if}
 </div>
+{#if isDisconnected}
+  <Row>
+    <Column padding>
+      <div class="container notification">
+        <InlineNotification
+          lowContrast
+          kind="warning"
+          title={disconnectedMsg}
+          on:close={() => resetNotification()} />
+      </div>
+    </Column>
+  </Row>
+{/if}
 <Row padding>
   <Column>
     <div class="container">

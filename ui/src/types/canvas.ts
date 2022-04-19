@@ -48,6 +48,7 @@ export interface Strokes {
 
 export interface Canvas {
   [location: string]: {
+    connected?: boolean;
     metadata: Metadata;
     //data: Strokes;
     data: CanvasTopology;
@@ -68,7 +69,7 @@ export interface CanvasData {
 
 export type LoadCanvas = Metadata & {
   data: CanvasTopology;
-};
+} & { connected: boolean };
 
 export interface CanvasForm {
   name: string;
