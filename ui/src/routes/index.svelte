@@ -96,10 +96,18 @@
 <KeyboardShortcuts bind:selectedTool />
 
 <div class="container">
+  <Row padding>
+    {#if snoopy !== '' && selectedTool === 'SNOOP'}
+      <Notification timeout={false} title={snoopy} kind={'info'} />
+    {/if}
+  </Row>
+</div>
+<div class="container">
   {#if $store.canvas}
     <Row>
-      <Column padding
-        ><Row><CanvasMenu selectedCanvas={$store.name} /></Row></Column>
+      <Column padding>
+        <Row><CanvasMenu selectedCanvas={$store.name} /></Row>
+      </Column>
       <Column padding><Row><CreateCanvas /></Row></Column>
       <Column padding><Row><JoinCanvas /></Row></Column>
       <Column padding>
@@ -172,8 +180,4 @@
     timeout={true}
     title={$store.notification.text}
     kind={$store.notification.type} />
-{/if}
-
-{#if snoopy !== '' && true}
-  <Notification timeout={false} title={snoopy} kind={'info'} />
 {/if}

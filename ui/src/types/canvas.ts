@@ -85,5 +85,6 @@ export enum Tool {
   Brush = 'BRUSH',
   Eraser = 'ERASER',
   Eyedropper = 'EYEDROPPER',
-  Fill = 'FILL'
+  Fill = 'FILL',
+  Snoop = 'SNOOP'
 }

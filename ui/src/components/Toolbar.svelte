@@ -17,6 +17,7 @@
   import Erase16 from 'carbon-icons-svelte/lib/Erase16';
   import Eyedropper16 from 'carbon-icons-svelte/lib/Eyedropper16';
   import TextFill16 from 'carbon-icons-svelte/lib/TextFill16';
+  import Search16 from 'carbon-icons-svelte/lib/Search16';
 
   import { Tool } from '../types/canvas';
 
@@ -38,6 +39,10 @@
     {
       name: Tool.Fill,
       icon: TextFill16
+    },
+    {
+      name: Tool.Snoop,
+      icon: Search16
     }
   ];
 
