@@ -16,6 +16,8 @@
         [%share share]
         [%save save]
         [%unlock unlock]
+        [%remove subscription]
+        [%expand expand]
     ==
   ::
   ++  create
@@ -112,6 +114,17 @@
         ['chat-path' pa]
         ['type' (cu image-type so)]
     ==
+  ::
+  ++  expand
+    %-  ot
+    :~  :-  'location'
+        %-  ot
+        :~  ['host' (su ;~(pfix sig fed:ag))]
+            ['name' so]
+        ==
+      ::
+        ['dimensions' (ou ~[['rows' (uf ~ (mu ni))] ['cols' (uf ~ (mu ni))]])]
+    ==
   --
 ::
 ++  canvas-view-response-to-json
@@ -120,7 +133,7 @@
   =,  enjs:format
   |^
   %+  frond  -.act
-  ?+     -.act  ~|(%action-not-supported !!)
+  ?-     -.act
       %init-frontend
     %-  pairs
     %+  weld
@@ -132,7 +145,7 @@
     %-  pairs
     %+  turn
       gallery.act
-    |=  =canvas
+    |=  [connected=? =canvas]
     ^-  [@t json]
     :-  %-  crip
         ;:  weld
@@ -143,13 +156,17 @@
     %-  pairs
     %+  weld
       (canvas-to-json canvas)
-    ['metadata' (pairs (metadata-to-json metadata.canvas))]~
+    :~  ^-  [@t json]  ['connected' b+connected]
+        ^-  [@t json]  ['metadata' (pairs (metadata-to-json metadata.canvas))]
+    ==
   ::
       %load
     %-  pairs
-    %+  weld
+    ;:  weld
       (canvas-to-json canvas.act)
-    (metadata-to-json metadata.canvas.act)
+      ['connected' b+connected.act]~
+      (metadata-to-json metadata.canvas.act)
+    ==
   ::
       %paint
     %-  pairs
@@ -162,6 +179,15 @@
         |=  =stroke
         ^-  json
         (pairs (stroke-to-json stroke))
+    ==
+  ::
+      %expand
+    %-  pairs
+    ^-  (list [@t json])
+    :~  ['name' s+name.location.act]
+        ['location' s+(scot %p host.location.act)]
+        ['width' ?~(width.act ~ (numb u.width.act))]
+        ['height' ?~(height.act ~ (numb u.height.act))]
     ==
   ==
   ::

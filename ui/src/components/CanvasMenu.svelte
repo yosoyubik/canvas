@@ -5,17 +5,29 @@
     SelectItem,
     SelectItemGroup
   } from 'carbon-components-svelte';
-  import { daToDate, dateToShortDa } from '$lib/utils';
+  import { cite, daToDate, dateToShortDa } from '$lib/utils';
 
   export let selectedCanvas: string;
 
   function parseCanvasName(name: string) {
-    const parse = name.split('-');
-    if (parse.length === 1) return name;
+    const [host, canvas] = name.split('/');
+    const citeHost = cite(host);
+    const parse = canvas.split('-');
+    const disconnected =
+      !$store.canvas[name].connected &&
+      !$store.canvas[name].metadata.private &&
+      host !== `~${$store.ship}`
+        ? '!!! '
+        : '';
+
+    if (parse.length === 1)
+      return `${disconnected}${[citeHost, canvas].join('/')}`;
     const date = daToDate(parse[parse.length - 1]);
-    if (date === null) return name;
+    if (date === null) return `${disconnected}${[citeHost, canvas].join('/')}`;
     parse.pop();
-    return `${parse.join('-')} [${dateToShortDa(date)}] `;
+    return `${disconnected}${[citeHost, parse.join('-')].join(
+      '/'
+    )} [${dateToShortDa(date)}] `;
   }
 </script>
 

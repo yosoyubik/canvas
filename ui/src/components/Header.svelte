@@ -6,6 +6,9 @@
     /* width: 48px; */
     /* float: left; */
   }
+  a {
+    color: lightblue;
+  }
 </style>
 
 <script lang="ts">
@@ -71,13 +74,33 @@
                 SVG files.
               </TooltipFooter>
               <TooltipFooter selectorPrimaryFocus="#d">
-                You can see the color picker by clicking on the Palette icon.
+                You can see the color picker by clicking on the large color
+                square.
+              </TooltipFooter>
+              <TooltipFooter selectorPrimaryFocus="#d">
+                You can switch between tools with keyboard shortcuts:
+                <br />
+                B or P — Paint Brush
+                <br />
+                E or ⌫ — Eraser
+                <br />
+                I or D — Eyedropper (select colors on the canvas)
+                <br />
+                F or G — Fill Tool (be very careful with this one!)
+                <br />
+                C and Esc open and close the Color Picker
               </TooltipFooter>
               <TooltipFooter selectorPrimaryFocus="#d">
                 To show more options, right click anywhere in the canvas.
               </TooltipFooter>
               <TooltipFooter selectorPrimaryFocus="#d">
-                Feedback, questions? Contact ~norsyr-torryn :)
+                <span>
+                  Feedback, questions? Join
+                  <a
+                    href="/apps/landscape/perma/group/~norsyr-torryn/canvas"
+                    target="_blank">~norsyr-torryn/canvas</a>
+                  or contact ~norsyr-torryn :)
+                </span>
               </TooltipFooter>
             </p>
           </Tooltip>

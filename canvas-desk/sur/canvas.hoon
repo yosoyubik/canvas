@@ -41,29 +41,37 @@
   $%  [%mesh id=@t arc=(unit arc)]
       [%draw =form]
   ==
+::  TODO: refactor actions and diffs
 ::
 +$  canvas-action
   $%  [%paint =location strokes=(list stroke)]
       [%init gallery=(list canvas)]
-      [%load name=@t =canvas artists=(map ship @ud)]
+      [%load connected=? name=@t =canvas artists=(map ship @ud)]
       [%join =ship name=@t]
       [%leave =ship name=@t]
       [%create =canvas]
       [%share name=@t =path type=image-type]
       [%save =ship name=@t file=@t]
       [%unlock name=@t]
+      [%kick =ship name=@t]
+      [%remove =ship name=@t]
+      [%expand =location rows=(unit @ud) cols=(unit @ud)]
   ==
 ::
 +$  canvas-diff
   $%  [%paint =location strokes=(list stroke) who=@p]
       [%load name=@t =canvas artists=(map ship @ud)]
+      [%expand =location width=(unit @ud) height=(unit @ud)]
   ==
+::  TODO: refactor actions and diffs
 ::
 +$  canvas-view-response
-  $%  canvas-action
+  $%  [%expand =location width=(unit @ud) height=(unit @ud)]
+      [%paint =location strokes=(list stroke)]
+      [%load connected=? name=@t =canvas artists=(map ship @ud)]
     ::
       $:  %init-frontend
-          gallery=(list canvas)
+          gallery=(list [connected=? canvas])
           chats=(list path)
           artists=(map location (map ship @ud))
   ==  ==

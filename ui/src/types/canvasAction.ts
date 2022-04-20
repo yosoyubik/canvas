@@ -9,6 +9,13 @@ export interface Load {
   canvas: Canvas;
 }
 
+export interface Expand {
+  location: Patp;
+  name: string;
+  width?: number;
+  height?: number;
+}
+
 export interface Paint {
   location: Patp;
   name: string;
