@@ -11,6 +11,18 @@
       max-width: none;
     }
   }
+
+  .snoopy {
+    position: fixed;
+    top: 50px;
+    margin: 15px;
+    color: black;
+    background-color: white;
+    font-family: monospace;
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: 180px;
+  }
 </style>
 
 <script lang="ts">
@@ -93,15 +105,12 @@
     mousing.pressed = false;
   }} />
 
+{#if snoopy !== '' && selectedTool === 'SNOOP'}
+  <div class="snoopy">{snoopy}</div>
+{/if}
+
 <KeyboardShortcuts bind:selectedTool />
 
-<div class="container">
-  <Row padding>
-    {#if snoopy !== '' && selectedTool === 'SNOOP'}
-      <Notification timeout={false} title={snoopy} kind={'info'} />
-    {/if}
-  </Row>
-</div>
 <div class="container">
   {#if $store.canvas}
     <Row>
@@ -116,6 +125,9 @@
       <Column padding>
         <Toolbar bind:selectedTool />
       </Column>
+      <!-- {#if snoopy !== '' && selectedTool === 'SNOOP'}
+        <Notification timeout={false} title={snoopy} kind={'info'} />
+      {/if} -->
     </Row>
   {/if}
 </div>

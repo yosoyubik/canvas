@@ -1,16 +1,9 @@
 <style>
-  .notification-left {
+  .container {
     text-align: center;
+    display: flex;
     justify-content: center;
-    position: absolute;
-    left: 65%;
-  }
-
-  .notification-right {
-    text-align: center;
-    justify-content: center;
-    position: absolute;
-    right: 65%;
+    height: 100%;
   }
 </style>
 
@@ -23,11 +16,15 @@
   export let kind;
 </script>
 
-<div class={timeout ? 'notification-left' : 'notification-right'}>
-  <InlineNotification
-    lowContrast
-    timeout={timeout ? 3000 : 0}
-    {kind}
-    {title}
-    on:close={() => timeout && resetNotification()} />
-</div>
+<Row>
+  <Column padding>
+    <div class="container notification">
+      <InlineNotification
+        lowContrast
+        timeout={timeout ? 3000 : 0}
+        {kind}
+        {title}
+        on:close={() => timeout && resetNotification()} />
+    </div>
+  </Column>
+</Row>

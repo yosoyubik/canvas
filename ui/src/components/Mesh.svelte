@@ -28,20 +28,13 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
   import * as topojson from 'topojson-client';
-  import {
-    Loading,
-    Row,
-    Column,
-    Tooltip,
-    InlineNotification,
-    Grid
-  } from 'carbon-components-svelte';
 
-  import store, { setNotification } from '../store';
+  import store from '../store';
   import type { CanvasTopology, Metadata } from '../types/canvas';
   import { Tool } from '../types/canvas';
 
   import { columns as calculateColumns, getAdjacent } from '$lib/topology';
+  import { cite } from '$lib/utils';
   import Mousing from '../lib/mousing';
   import Pixel from './Pixel.svelte';
   import OptionsMenu from './OptionsMenu.svelte';
@@ -107,10 +100,13 @@
     // });
     if (!event.detail.properties) return;
     const properties = event.detail.properties;
-    snoopy =
-      properties && properties.who && properties.when
-        ? `${properties.who}-${new Date(properties.when).toUTCString()}`
+    // TODO: render date
+    const date =
+      properties && properties.when && false
+        ? `$-{new Date(properties.when).toISOString()}`
         : '';
+    snoopy =
+      properties && properties.who ? `${cite(properties.who)}${date}` : '';
   }
 
   function setDifference(setA, setB) {

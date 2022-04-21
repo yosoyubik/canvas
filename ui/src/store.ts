@@ -3,12 +3,7 @@ import { writable } from 'svelte/store';
 import type { StoreState, Notification } from './types/store';
 
 import type Api from '$lib/canvasApi';
-import type {
-  Canvas,
-  LoadCanvas,
-  CanvasData,
-  CanvasLoad
-} from './types/canvas';
+import type { Canvas, LoadCanvas } from './types/canvas';
 import type { Paint, Expand } from './types/canvasAction';
 
 import { topology as calculateTopology } from '$lib/topology';
@@ -270,6 +265,7 @@ export function paintCanvas(paint: Paint): void {
     ($store): StoreState => {
       const name = `${paint.location}/${paint.name}`;
       paint.strokes.forEach(stroke => {
+        stroke.who = stroke.who;
         const polygon =
           $store.canvas[name].data.objects.pixels.geometries[stroke.id];
         $store.canvas[name].data.objects.pixels.geometries[stroke.id] = {

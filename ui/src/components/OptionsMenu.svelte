@@ -8,8 +8,6 @@
     updateImageURL
   } from '../store';
 
-  import type { Notification } from '../types/store';
-
   import { PutObjectCommand } from '@aws-sdk/client-s3';
   import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
   import { Buffer } from 'buffer';
@@ -114,9 +112,10 @@
         copy(fileURL);
         console.log('[copied]', fileURL);
         updateImageURL(location, name, fileURL);
-        setNotification(
-          'Canvas SVG exported successfully (URL copied to clipboard)'
-        );
+        setNotification({
+          text: 'Canvas SVG exported successfully (URL copied to clipboard)',
+          type: 'info'
+        });
       });
     } else {
       throw new Error(
@@ -166,7 +165,10 @@
     icon={Share}
     indented
     on:click={() => {
-      setNotification('Canvas path copied to clipboard');
+      setNotification({
+        text: 'Canvas path copied to clipboard',
+        type: 'info'
+      });
       copy(`${location}/${name}`);
     }} />
   {#if location !== `~${$store.ship}`}
@@ -224,7 +226,7 @@
       indented
       labelText="Delete"
       on:click={() => {
-        setNotification('Deleting private canvas...');
+        setNotification({ text: 'Deleting private canvas...', type: 'info' });
         deletePrivateCanvas(location, name);
       }} />
   {/if}
