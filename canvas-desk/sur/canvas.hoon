@@ -67,7 +67,7 @@
 ::
 +$  canvas-view-response
   $%  [%expand =location width=(unit @ud) height=(unit @ud)]
-      [%paint =location strokes=(list stroke)]
+      [%paint =location strokes=(list stroke) who=@p]
       [%load connected=? name=@t =canvas artists=(map ship @ud)]
     ::
       $:  %init-frontend

@@ -435,7 +435,7 @@
     ^-  (quip card _state)
     ::  TODO: only accept strokes from subscribers
     ::
-    (process-paint location strokes)
+    (process-paint location strokes src.bowl)
   ::
   ++  handle-join
     |=  [=ship name=@t]
@@ -587,7 +587,7 @@
       ::  we receive an update for a stroke we originaly sent; discard
       ::
       `state
-    (process-paint location strokes)
+    (process-paint location strokes who)
   ::
   ++  handle-expand
     |=  [=location width=(unit @ud) height=(unit @ud)]
@@ -611,7 +611,7 @@
   --
 ::
 ++  process-paint
-  |=  [=location strokes=(list stroke)]
+  |=  [=location strokes=(list stroke) who=@p]
   ^-  (quip card _state)
   :: ?>  ?=(^ strokes)
   ?~  strokes  [~ state]
@@ -665,9 +665,9 @@
     ::
     %+  weld
       %-  send-frontend
-      ::  TODO: include who and when in every stroke?
+      ::  TODO: include when in every stroke?
       ::
-      (canvas-view-response-to-json %paint location strokes)
+      (canvas-view-response-to-json %paint location strokes who)
     ::
     ::  if we are not the host, ignore
     ::

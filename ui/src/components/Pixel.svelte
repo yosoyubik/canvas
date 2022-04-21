@@ -83,6 +83,7 @@
   }
 
   function mousemove() {
+    if (data.properties) dispatch('inspect', data);
     if (mousing.active) {
       let draw = mousing.drawMode;
       switch (selectedTool) {

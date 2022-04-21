@@ -11,6 +11,18 @@
       max-width: none;
     }
   }
+
+  .snoopy {
+    position: fixed;
+    top: 50px;
+    margin: 15px;
+    color: black;
+    background-color: white;
+    font-family: monospace;
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: 180px;
+  }
 </style>
 
 <script lang="ts">
@@ -36,6 +48,7 @@
   import CreateCanvas from '../components/CreateCanvas.svelte';
   import JoinCanvas from '../components/JoinCanvas.svelte';
   import Palette from '../components/Palette.svelte';
+  import Notification from '../components/Notification.svelte';
   import Toolbar from '../components/Toolbar.svelte';
   import KeyboardShortcuts from '../components/KeyboardShortcuts.svelte';
 
@@ -45,6 +58,7 @@
     mousing: Mousing = new Mousing(),
     topology: CanvasTopology,
     path,
+    snoopy = '',
     isDisconnected;
 
   const disconnectedMsg = `This canvas is not subscribed to the host anymore, and your updates won't be sent out.
@@ -91,13 +105,18 @@
     mousing.pressed = false;
   }} />
 
+{#if snoopy !== '' && selectedTool === 'SNOOP'}
+  <div class="snoopy">{snoopy}</div>
+{/if}
+
 <KeyboardShortcuts bind:selectedTool />
 
 <div class="container">
   {#if $store.canvas}
     <Row>
-      <Column padding
-        ><Row><CanvasMenu selectedCanvas={$store.name} /></Row></Column>
+      <Column padding>
+        <Row><CanvasMenu selectedCanvas={$store.name} /></Row>
+      </Column>
       <Column padding><Row><CreateCanvas /></Row></Column>
       <Column padding><Row><JoinCanvas /></Row></Column>
       <Column padding>
@@ -106,6 +125,9 @@
       <Column padding>
         <Toolbar bind:selectedTool />
       </Column>
+      <!-- {#if snoopy !== '' && selectedTool === 'SNOOP'}
+        <Notification timeout={false} title={snoopy} kind={'info'} />
+      {/if} -->
     </Row>
   {/if}
 </div>
@@ -128,6 +150,7 @@
       {#if topology && !$store.leaving}
         {#if isMesh($store.canvas[$store.name].metadata)}
           <Mesh
+            bind:snoopy
             {topology}
             bind:color
             {selectedTool}
@@ -149,17 +172,24 @@
   </Column>
 </Row>
 
-{#if $store.notification}
+<!-- {#if $store.notification}
   <Row>
     <Column padding>
       <div class="container notification">
         <InlineNotification
           timeout={3000}
           lowContrast
-          kind="success"
-          title={$store.notification}
+          kind={$store.notification.type}
+          title={$store.notification.text}
           on:close={() => resetNotification()} />
       </div>
     </Column>
   </Row>
+{/if} -->
+
+{#if $store.notification}
+  <Notification
+    timeout={true}
+    title={$store.notification.text}
+    kind={$store.notification.type} />
 {/if}

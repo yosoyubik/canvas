@@ -178,7 +178,7 @@
           ['strokes' a+(turn strokes.act pairs-of-strokes)]
         |=  =stroke
         ^-  json
-        (pairs (stroke-to-json stroke))
+        (pairs (stroke-to-json stroke who.act))
     ==
   ::
       %expand
@@ -277,7 +277,7 @@
     ==
   ::
   ++  stroke-to-json
-    |=  =stroke
+    |=  [=stroke who=@p]
     ^-  (list [@t json])
     ?-    -.stroke
         %mesh
@@ -287,7 +287,7 @@
       :~  ['id' n+id.stroke]
           ['color' s+color.arc]
           ['when' ?~(when.arc ~ (time u.when.arc))]
-          ['who' ?~(who.arc ~ (ship u.who.arc))]
+          ['who' (ship who)]
       ==
     ::
         %draw

@@ -5,9 +5,10 @@ import type Api from '../lib/canvasApi';
 import type { S3Credentials, S3Configuration } from './s3';
 import type { Patp, Group } from '@urbit/api';
 
+export type Notification = { text: string; type: 'success' | 'error' | 'info' };
 export interface StoreState {
   // local state
-  notification?: string;
+  notification?: Notification;
   // Canvas state
   canvas?: Canvas;
   radius: number;

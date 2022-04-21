@@ -34,6 +34,7 @@
   import { Tool } from '../types/canvas';
 
   import { columns as calculateColumns, getAdjacent } from '$lib/topology';
+  import { cite } from '$lib/utils';
   import Mousing from '../lib/mousing';
   import Pixel from './Pixel.svelte';
   import OptionsMenu from './OptionsMenu.svelte';
@@ -44,6 +45,8 @@
   export let selectedTool: Tool;
   export let mousing: Mousing = new Mousing();
   export let path: any;
+
+  export let snoopy: string = '';
 
   const dispatch = createEventDispatcher();
 
@@ -88,6 +91,22 @@
       $store.api.send(location, name, strokes);
     }
     apiPaints = {};
+  }
+
+  function handleInspect(event) {
+    // setNotification({
+    //   text: event.detail.properties.who,
+    //   type: 'info'
+    // });
+    if (!event.detail.properties) return;
+    const properties = event.detail.properties;
+    // TODO: render date
+    const date =
+      properties && properties.when && false
+        ? `$-{new Date(properties.when).toISOString()}`
+        : '';
+    snoopy =
+      properties && properties.who ? `${cite(properties.who)}${date}` : '';
   }
 
   function setDifference(setA, setB) {
@@ -180,6 +199,7 @@
         {selectedTool}
         lockup={metadata.lockup}
         bind:mousing
+        on:inspect={handleInspect}
         on:locked={handleLocked}
         on:save={handleSave}
         on:flush={handleFlush}
