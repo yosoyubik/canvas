@@ -651,8 +651,8 @@
     ?:  =(our.bowl src.bowl)
       ::  stroke from local (e.g. frontend)
       ::
-      ::  if we are not the host and are are
-      ::  still subscribed, poke with our strokes
+      ::  if we are not the host and are still
+      ::  subscribed, poke with our strokes
       ::
       ?.  =(host.location our.bowl)
         ?.  (is-connected host.location name.meta wex.bowl)
@@ -674,7 +674,7 @@
     ?.  =(host.location our.bowl)  ~
     ::  if we are, send diff to subscribers
     ::
-    [(send-paint-diff location strokes src.bowl)]~
+    [(send-paint-diff location strokes who)]~
   ::
   ++  parse-strokes
     |=  [strokes=(list stroke) =mesh artists=_artists.state]
@@ -691,7 +691,7 @@
         (~(del by mesh) id)
       ::  TODO: check if is is out of canvas' boundaries
       ::
-      (~(put by mesh) [id color.u.arc `now.bowl `src.bowl])
+      (~(put by mesh) [id color.u.arc `now.bowl `who])
       ::
         artists
       (update-artists artists ?=(~ arc))
@@ -715,10 +715,10 @@
     ^+  artists
     %+  ~(put by artists)  location
     ?~  ships=(~(get by artists) location)
-      (~(put by *(map ship @ud)) src.bowl 1)
-    ?~  ship=(~(get by u.ships) src.bowl)
-      (~(put by u.ships) src.bowl 1)
-    (~(jab by u.ships) src.bowl |=(c=@ud +(c)))
+      (~(put by *(map ship @ud)) who 1)
+    ?~  ship=(~(get by u.ships) who)
+      (~(put by u.ships) who 1)
+    (~(jab by u.ships) who |=(c=@ud +(c)))
     :: %+  ~(put by u.ships)  src.bowl
     :: ?~  artist=(~(get by u.ships) src.bowl)
     ::   1
