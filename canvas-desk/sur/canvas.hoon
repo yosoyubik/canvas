@@ -56,6 +56,7 @@
       [%kick =ship name=@t]
       [%remove =ship name=@t]
       [%expand =location rows=(unit @ud) cols=(unit @ud)]
+      [?(%unban %ban) =location =ship]
   ==
 ::
 +$  canvas-diff

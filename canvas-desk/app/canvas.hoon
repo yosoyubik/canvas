@@ -18,7 +18,8 @@
     +$  card  card:agent:gall
     ::
     +$  app-state
-      $:  %5
+      $:  %6
+          banned=(set ship)
           gallery=(map location canvas)
           artists=(map location (map ship @ud))
           ::  TODO
@@ -205,8 +206,8 @@
         :~  (leave old-pub 'canvas')
             (subscribe new-pub 'public')
         ==
-     =?  cards  &(?=(%4 -.old-state) =(our.bowl new-pub))
-        [(leave new-pub 'public')]~
+      =?  cards  &(?=(%4 -.old-state) =(our.bowl new-pub))
+          [(leave new-pub 'public')]~
       =?  old-state  ?=(%0 -.old-state)
         ^-  state-1
         :+  %1
@@ -222,10 +223,12 @@
         [%4 +.old-state]
       =?  old-state  ?=(%4 -.old-state)
         [%5 +.old-state]
-      ?>  ?=(%5 -.old-state)
+      =?  old-state  ?=(%5 -.old-state)
+        [%6 ~ +.old-state]
+      ?>  ?=(%6 -.old-state)
       [cards this(state old-state)]
       ::
-      ++  app-states  $%(state-0 state-1 state-2-3-4 app-state)
+      ++  app-states  $%(state-0 state-1 state-2-3-4-5 app-state)
       ++  state-0
         $:  %0
             gallery=(map location canvas-0)
@@ -237,8 +240,8 @@
             artists=(map location (map ship @ud))
         ==
       ::
-      ++  state-2-3-4
-        $:  ?(%2 %3 %4)
+      ++  state-2-3-4-5
+        $:  ?(%2 %3 %4 %5)
             gallery=(map location canvas)
             artists=(map location (map ship @ud))
         ==
@@ -401,9 +404,11 @@
   =/  canvas=(unit canvas)           (~(get by gallery) location)
   =/  artists=(unit (map ship @ud))  (~(get by artists) location)
   ?~  canvas  ~
-  ~&  >  [src.bowl 'subscribing to' name private+private.metadata.u.canvas]
+  ?:  (~(has in banned) src.bowl)
+    ~|([%banned-ship name src.bowl] !!)
   ?:  private.metadata.u.canvas
     ~|([%subs-not-allowed name] !!)
+  ~&  >  [src.bowl 'subscribing to' name private+private.metadata.u.canvas]
   =;  =vase
     [%give %fact ~ %canvas-diff vase]~
   !>([%load name u.canvas ?~(artists ~ u.artists)])
@@ -422,6 +427,8 @@
     %unlock  (handle-unlock +.act)
     %remove  (handle-remove +.act)
     %expand  (handle-expand +.act)
+    %ban     (handle-ban +.act)
+    %unban   (handle-unban +.act)
   ==
   ::
   ++  handle-init
@@ -433,6 +440,9 @@
   ++  handle-paint
     |=  [=location strokes=(list stroke)]
     ^-  (quip card _state)
+    ?:  (~(has in banned) src.bowl)
+      ~&  >>  "banned {<src.bowl>} tries to paint..."
+      `state
     ::  TODO: only accept strokes from subscribers
     ::
     (process-paint location strokes src.bowl)
@@ -552,6 +562,26 @@
     %+  weld  [(send-expand-diff location `width height)]~
     %-  send-frontend
     (canvas-view-response-to-json %expand location `width height)
+  ::
+  ++  handle-ban
+    |=  [=location =ship]
+    ^-  (quip card _state)
+    ?>  =(our.bowl src.bowl)
+    ?.  =(host.location our.bowl)
+      ~&  >>>  "[ only owners can ban a ship ]"
+      `state
+    ~&  >  "[ {<ship>} banned from {<name.location>} ]"
+    `state(banned (~(put in banned) ship))
+  ::
+  ++  handle-unban
+    |=  [=location =ship]
+    ^-  (quip card _state)
+    ?>  =(our.bowl src.bowl)
+    ?.  =(host.location our.bowl)
+      ~&  >>>  "[ only owners can unban a ship ]"
+      `state
+    ~&  >  "[ {<ship>} unbanned from {<name.location>} ]"
+    `state(banned (~(del in banned) ship))
   ::
   --
 ::

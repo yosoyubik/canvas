@@ -8,7 +8,7 @@
       'https://yosoyubik.fra1.digitaloceanspaces.com/canvas/glob-0v7.nl3g9.oqcdp.6qnaa.5esj2.p6cpn.glob'
     0v7.nl3g9.oqcdp.6qnaa.5esj2.p6cpn
   ::
-    version+[0 0 9]
+    version+[0 0 10]
     website+'https://github.com/yosoyubik/canvas'
     license+'MIT'
 ==
