@@ -184,7 +184,11 @@
       =.  gallery.state  (~(put by gallery) [our.bowl name]^canvas)
       :_  this
       ?:  =(our.bowl pub)  ~
-      [(subscribe pub 'public')]~
+      :_  ~
+      %+  subscribe  pub
+      ?.  ?=(%pawn (clan:title our.bowl))
+        'public'
+      'asteroid-belt'
     ::
     ++  on-save  !>(state)
     ::
@@ -316,7 +320,7 @@
       ^-  (quip card _this)
       |^
       ?+  wire  (on-agent:def wire sign)
-        [%subscribe @ @ *]    (handle-sub i.t.wire i.t.t.wire sign)
+        [%subscribe @ @ *]  (handle-sub i.t.wire i.t.t.wire sign)
       ==
       ::
       ++  handle-sub
