@@ -23,7 +23,7 @@
     InlineLoading
   } from 'carbon-components-svelte';
 
-  import Info from 'carbon-icons-svelte/lib/InformationFilled16';
+  import Info from 'carbon-icons-svelte/lib/InformationFilled.svelte';
   import MeshPreview from './MeshPreview.svelte';
 
   function logo() {

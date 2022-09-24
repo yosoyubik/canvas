@@ -17,7 +17,7 @@ import type { S3Configuration, S3Credentials } from './types/s3';
 
 import { S3Client } from '@aws-sdk/client-s3';
 
-import { browser } from '$app/env';
+import { browser } from '$app/environment';
 // import type { StringChain } from 'lodash';
 
 const initStore: StoreState = {

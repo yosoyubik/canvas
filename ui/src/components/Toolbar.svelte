@@ -13,11 +13,11 @@
 
 <script lang="ts">
   import { Button } from 'carbon-components-svelte';
-  import PaintBrushAlt16 from 'carbon-icons-svelte/lib/PaintBrushAlt16';
-  import Erase16 from 'carbon-icons-svelte/lib/Erase16';
-  import Eyedropper16 from 'carbon-icons-svelte/lib/Eyedropper16';
-  import TextFill16 from 'carbon-icons-svelte/lib/TextFill16';
-  import Search16 from 'carbon-icons-svelte/lib/Search16';
+  import PaintBrushAlt16 from 'carbon-icons-svelte/lib/PaintBrushAlt.svelte';
+  import Erase16 from 'carbon-icons-svelte/lib/Erase.svelte';
+  import Eyedropper16 from 'carbon-icons-svelte/lib/Eyedropper.svelte';
+  import TextFill16 from 'carbon-icons-svelte/lib/TextFill.svelte';
+  import Search16 from 'carbon-icons-svelte/lib/Search.svelte';
 
   import { Tool } from '../types/canvas';
 

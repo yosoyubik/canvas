@@ -13,7 +13,7 @@
     Column,
     TextInput
   } from 'carbon-components-svelte';
-  import UserFollow32 from 'carbon-icons-svelte/lib/UserFollow32';
+  import UserFollow32 from 'carbon-icons-svelte/lib/UserFollow.svelte';
   import { Sveltik, Field, ErrorMessage } from 'sveltik';
   import type { CanvasForm } from '../types/canvas';
 

@@ -16,7 +16,7 @@
     SelectItemGroup,
     Form
   } from 'carbon-components-svelte';
-  import Paint32 from 'carbon-icons-svelte/lib/PaintBrush32';
+  import Paint32 from 'carbon-icons-svelte/lib/PaintBrush.svelte';
 
   import { Sveltik, Field } from 'sveltik';
   import store from '../store';
