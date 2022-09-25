@@ -33,7 +33,7 @@ Come and join the group to share your creations and see what others are doing:
 
 1. Clone the repo, of course
 2. Create a new desk in Urbit to install canvas in
-    - `$ ./urbit -F zod` - Spin up a fake zod, if you haven't already (should be running on port 8080. If not, you'll need to edit [`ui/svelte.config.js`](ui/svelte.config.js))
+    - `$ ./urbit -F zod` - Spin up a fake zod, if you haven't already (should be running on port 8080. If not, you'll need to edit [`ui/vite.config.js`](ui/vite.config.js))
     - `dojo> +code` - Get an access code and use it to sign in to your ship at http://localhost:8080
     - `dojo> |mount %base` - Mount `%base`, if you haven't already
     - `dojo> |merge %canvas our %base` - Create a `%canvas` desk
