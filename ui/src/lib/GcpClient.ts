@@ -5,7 +5,6 @@
 // it. We don't care about any of the other methods on ManagedUpload, so we
 // just do the work in its promise() method.
 //
-import querystring from 'querystring';
 import type {
   StorageClient,
   StorageUpload,
@@ -33,7 +32,7 @@ class GcpUpload implements StorageUpload {
     };
     const url =
       `https://${ENDPOINT}/upload/storage/v1/b/${Bucket}/o?` +
-      querystring.stringify(urlParams);
+      new URLSearchParams(urlParams).toString()
     const headers = new Headers();
     headers.append('Authorization', `Bearer ${this.#accessKey}`);
     headers.append('Content-Type', ContentType);
