@@ -9,6 +9,9 @@ nus
 # OS X
 .DS_Store
 
+# ignore urbit clone
+urbit
+
 # Ignore everything in canvas-desk...
 #
 canvas-desk/app/*

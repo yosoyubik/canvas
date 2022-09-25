@@ -1,0 +1,15 @@
+{
+    "%base": {
+        "mar": {
+            "/": [
+                "hoon.hoon",
+                "kelvin.hoon",
+                "mime.hoon",
+                "noun.hoon",
+                "txt-diff.hoon",
+                "txt.hoon"
+            ]
+        }
+    },
+    "%garden": {}
+}

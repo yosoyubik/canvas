@@ -10,7 +10,7 @@ const config = {
   kit: {
     // hydrate the <div id="svelte"> element in src/app.html
     files: { lib: './src/lib' },
-    // paths: { base: '/apps/canvas' }, // FIXME: idk if this path was important but can't find what it did
+    paths: { base: '/apps/canvas' },
     adapter: adapter({
       pages: 'dist'
     })
