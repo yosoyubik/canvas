@@ -2,6 +2,7 @@
     "%base": {
         "mar": {
             "/": [
+                "bill.hoon",
                 "hoon.hoon",
                 "kelvin.hoon",
                 "mime.hoon",
@@ -9,7 +10,37 @@
                 "txt-diff.hoon",
                 "txt.hoon"
             ]
+        },
+        "lib": {
+            "/": [
+                "dbug.hoon",
+                "default-agent.hoon",
+                "server.hoon",
+                "skeleton.hoon",
+                "verb.hoon"
+            ]
+        },
+        "sur": {
+            "/": [
+                "verb.hoon"
+            ]
         }
     },
-    "%garden": {}
+    "%garden": {
+        "mar": {
+            "/": [
+                "docket-0.hoon"
+            ]
+        },
+        "lib": {
+            "/": [
+                "docket.hoon"
+            ]
+        },
+        "sur": {
+            "/": [
+                "docket.hoon"
+            ]
+        }
+    }
 }

@@ -111,6 +111,13 @@ with open("./dev-desk-files.json") as f:
 
 # TODO: add ignore-files section to settings file (and prob change name of file to urbit.config.json)
 
+# FIXME: temporarily adding all files bc idk which one(s) are missing
+# 
+# HMMMM, LOOKS LIKE I GET THE 8080 ERROR WHEN ALL FILES ARE IN TOO, SO PROB 
+# ABLE TO DELETE BELOW 2 LINES
+system(f"rsync -r --copy-links --exclude-from={THIS_DIR}/ignore_files.txt {THIS_DIR}/urbit/pkg/base-dev/* {PIER_DESK}/")
+system(f"rsync -r --copy-links --exclude-from={THIS_DIR}/ignore_files.txt {THIS_DIR}/urbit/pkg/garden-dev/* {PIER_DESK}/")
+
 if NUM_ARGS == 1:
     system(f"""
         rsync -r --copy-links --exclude-from={THIS_DIR}/ignore_files.txt {THIS_DIR}/canvas-desk/* {PIER_DESK}/""")

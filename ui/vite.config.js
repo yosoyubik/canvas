@@ -6,15 +6,15 @@ const config = {
 	server: {
 		proxy: {
 			'^/session.js': {
-				target: 'http://localhost:8080',
+				target: 'http://localhost:8080/',
 				changeOrigin: true,
 			},
 			'^/spider/.*': {
-				target: 'http://localhost:8080',
+				target: 'http://localhost:8080/',
 				changeOrigin: true,
 			},
 			'^/~/.*': {
-				target: 'http://localhost:8080',
+				target: 'http://localhost:8080/',
 				changeOrigin: true,
 			}
 		},
