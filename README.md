@@ -38,11 +38,9 @@ Come and join the group to share your creations and see what others are doing:
     - `dojo> |mount %base` - Mount `%base`, if you haven't already
     - `dojo> |merge %canvas our %base` - Create a `%canvas` desk
     - `dojo> |mount %canvas` - Mount the desk so it appears in your pier
-    - `$ rm -r zod/canvas/*` - Clear out your new desk to make room for the actual desk
-    - Follow the instructions [here](https://urbit.org/docs/userspace/dist/guide#create-desk) to merge the `base-dev` and `garden-dev` desks into your desk
-3. Copy canvas desk to Urbit
-    From the repo folder, run `./install.sh <PATH_TO_THE_MOUNTED_DESK>` where `<PATH_TO_THE_MOUNTED_DESK>` might be something like `~/urbit/zod/canvas`
-    You can alse run `./install.sh -w <PATH_TO_THE_MOUNTED_DESK>` if you want to watch for changes.
+3. Run install script to merge the `base-dev` and `garden-dev` desks into your desk, and copy canvas desk to Urbit
+    From the repo folder, run `./install.py <PATH_TO_THE_MOUNTED_DESK>` where `<PATH_TO_THE_MOUNTED_DESK>` might be something like `~/urbit/zod/canvas`
+    You can alse run `./install.py -w <PATH_TO_THE_MOUNTED_DESK>` if you want to watch for changes.
 4. Install `%canvas` in Dojo with
     - `dojo> |commit %canvas` (do this after every change to see it reflected in Urbit)
     - `dojo> |install our %canvas`(only necessary the first time, I think)
