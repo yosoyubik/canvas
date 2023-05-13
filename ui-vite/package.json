@@ -1,0 +1,161 @@
+{
+  "name": "canvas-ui",
+  "version": "0.0.1",
+  "description": "A P2P paint app for Urbit",
+  "scripts": {
+    "dev": "vite --port 4000 --host",
+    "build": "svelte-kit build",
+    "preview": "svelte-kit preview",
+    "check": "svelte-check --tsconfig ./tsconfig.json",
+    "check:watch": "svelte-check --tsconfig ./tsconfig.json --watch",
+    "format": "prettier --write ./src/**/*.{js,svelte,html,ts}",
+    "lint": "eslint './src/**/*.{js,ts,svelte}'",
+    "lint:fix": "eslint --fix './src/**/*.{js,ts,svelte}'",
+    "prelint": "npm run format"
+  },
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^2.2.0",
+    "@holium/vite-plugin-urbit": "^0.8.0",
+    "@aws-sdk/client-s3": "3.18.0",
+    "@aws-sdk/s3-request-presigner": "3.18.0",
+    "@observablehq/runtime": "4.12.0",
+    "@sveltejs/adapter-static": "1.0.0-next.13",
+    "@sveltejs/kit": "next",
+    "@types/cookie": "^0.4.0",
+    "@types/topojson": "3.2.3",
+    "@typescript-eslint/eslint-plugin": "^4.19.0",
+    "@typescript-eslint/parser": "^4.19.0",
+    "@urbit/api": "^2.1.0",
+    "@urbit/http-api": "^2.1.0",
+    "any-ascii": "0.2.0",
+    "buffer": "^6.0.3",
+    "carbon-components-svelte": "0.39.0",
+    "carbon-pictograms-svelte": "11.3.0",
+    "clipboard-copy": "3.2.0",
+    "d3": "7.0.0",
+    "eslint": "^7.22.0",
+    "eslint-config-prettier": "^8.1.0",
+    "eslint-plugin-svelte3": "^3.2.0",
+    "prettier": "~2.2.1",
+    "prettier-plugin-svelte": "^2.3.1",
+    "querystring": "0.2.1",
+    "svelte": "^3.48.0",
+    "svelte-check": "^2.2.7",
+    "svelte-preprocess": "^4.9.8",
+    "svelte-spa-router": "^3.2.0",
+    "svelte-color": "1.0.2",
+    "svelte-color-picker": "1.0.7",
+    "sveltik": "0.1.16",
+    "topojson-client": "3.1.0",
+    "tslib": "^2.0.0",
+    "typescript": "^4.0.0",
+    "vite": "^4.1.0"
+  },
+  "type": "module",
+  "author": "~norsyr-torryn",
+  "license": "MIT",
+  "dependencies": {
+    "lodash": "^4.17.21"
+  },
+  "exports": {
+    "./package.json": "./package.json",
+    "./GcpClient": {
+      "types": "./package/GcpClient.d.ts",
+      "default": "./package/GcpClient.js"
+    },
+    "./canvasApi": {
+      "types": "./package/canvasApi.d.ts",
+      "default": "./package/canvasApi.js"
+    },
+    "./canvasSubscription": {
+      "types": "./package/canvasSubscription.d.ts",
+      "default": "./package/canvasSubscription.js"
+    },
+    "./channel": {
+      "types": "./package/channel.d.ts",
+      "default": "./package/channel.js"
+    },
+    "./exportCanvas": {
+      "types": "./package/exportCanvas.d.ts",
+      "default": "./package/exportCanvas.js"
+    },
+    "./freeHand": {
+      "types": "./package/freeHand.d.ts",
+      "default": "./package/freeHand.js"
+    },
+    "./gcp": {
+      "types": "./package/gcp.d.ts",
+      "default": "./package/gcp.js"
+    },
+    "./gcpManager": {
+      "types": "./package/gcpManager.d.ts",
+      "default": "./package/gcpManager.js"
+    },
+    "./mousing": {
+      "types": "./package/mousing.d.ts",
+      "default": "./package/mousing.js"
+    },
+    "./topology": {
+      "types": "./package/topology.d.ts",
+      "default": "./package/topology.js"
+    },
+    "./urbit/api": {
+      "types": "./package/urbit/api.d.ts",
+      "default": "./package/urbit/api.js"
+    },
+    "./urbit/subscription": {
+      "types": "./package/urbit/subscription.d.ts",
+      "default": "./package/urbit/subscription.js"
+    },
+    "./utils": {
+      "types": "./package/utils.d.ts",
+      "default": "./package/utils.js"
+    }
+  },
+  "files": [
+    "package"
+  ],
+  "typesVersions": {
+    ">4.0": {
+      "GcpClient": [
+        "./package/GcpClient.d.ts"
+      ],
+      "canvasApi": [
+        "./package/canvasApi.d.ts"
+      ],
+      "canvasSubscription": [
+        "./package/canvasSubscription.d.ts"
+      ],
+      "channel": [
+        "./package/channel.d.ts"
+      ],
+      "exportCanvas": [
+        "./package/exportCanvas.d.ts"
+      ],
+      "freeHand": [
+        "./package/freeHand.d.ts"
+      ],
+      "gcp": [
+        "./package/gcp.d.ts"
+      ],
+      "gcpManager": [
+        "./package/gcpManager.d.ts"
+      ],
+      "mousing": [
+        "./package/mousing.d.ts"
+      ],
+      "topology": [
+        "./package/topology.d.ts"
+      ],
+      "urbit/api": [
+        "./package/urbit/api.d.ts"
+      ],
+      "urbit/subscription": [
+        "./package/urbit/subscription.d.ts"
+      ],
+      "utils": [
+        "./package/utils.d.ts"
+      ]
+    }
+  }
+}
