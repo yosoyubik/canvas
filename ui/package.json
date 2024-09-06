@@ -50,6 +50,7 @@
   "author": "~norsyr-torryn",
   "license": "MIT",
   "dependencies": {
+    "@urbit/http-api": "2.3.0",
     "lodash": "^4.17.21"
   }
 }

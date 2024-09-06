@@ -1,5 +1,11 @@
-import Api from './urbit/api';
+import Api from '@urbit/http-api';
 import type { Patp } from '../types/noun';
+import { updateConnection,
+         wipeStore,
+         createCanvasStore,
+         loadCanvas,
+         paintCanvas, expandCanvas
+} from '../store';
 
 export default class CanvasApi extends Api {
   /**
@@ -115,10 +121,49 @@ export default class CanvasApi extends Api {
   }
 
   async isSubscribed(location: string): Promise<unknown> {
-    return this.scry('canvas', `/subscribed/${location}`);
+    return this.scry({app: 'canvas', path: `/subscribed/${location}`});
   }
 
   private async sendPoke(action: unknown): Promise<unknown> {
-    return this.action('canvas', 'json', action);
+    return this.poke({app: 'canvas', mark: 'json', json: action});
+  }
+
+  start(): void {
+    console.log('subscribing');
+    updateConnection('reconnecting');
+    this.subscribe({
+      app: 'canvas',
+      path: '/frontend',
+      event: this.handleEvent.bind(this),
+      quit: this.start.bind(this),
+      err: this.handleError.bind(this)
+    });
+  }
+
+  handleError(): void {
+    updateConnection('disconnected');
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  handleEvent(json: any): void {
+    // const json = data.data;
+    if (json === null || json === undefined) {
+      return;
+    }
+
+    updateConnection('connected');
+
+    if ('clear' in json) {
+      wipeStore();
+    } else if ('init-frontend' in json) {
+      createCanvasStore(json['init-frontend'].canvas);
+    } else if ('load' in json) {
+      loadCanvas(json['load']);
+    } else if ('paint' in json) {
+      paintCanvas(json['paint']);
+    } else if ('expand' in json) {
+      expandCanvas(json['expand']);
+    }
+    return;
   }
 }

@@ -8,14 +8,7 @@ import type { Paint, Expand } from './types/canvasAction';
 
 import { topology as calculateTopology } from '$lib/topology';
 
-// import type { Path, Patp, Enc } from '@urbit/api';
-// import type { Group, Resource, Tags, GroupPolicy } from '@urbit/api/groups';
-
 import type { ConnectionStatus } from './types/connection';
-import type { GcpToken } from './types/gcp-state';
-import type { S3Configuration, S3Credentials } from './types/s3';
-
-import { S3Client } from '@aws-sdk/client-s3';
 
 import { browser } from '$app/env';
 // import type { StringChain } from 'lodash';
@@ -43,11 +36,11 @@ const initStore: StoreState = {
 const { subscribe, update } = writable(initStore);
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function isToken(token: any): token is GcpToken {
-  return (
-    typeof token.accessKey === 'string' && typeof token.expiresIn === 'number'
-  );
-}
+// function isToken(token: any): token is GcpToken {
+//   return (
+//     typeof token.accessKey === 'string' && typeof token.expiresIn === 'number'
+//   );
+// }
 
 // function resourceFromPath(path: Path): Resource {
 //   const [, , ship, name] = path.split('/');
@@ -142,65 +135,65 @@ export function createCanvasStore(canvasStore: Canvas): void {
   );
 }
 
-export function saveGCPToken(token: unknown): void {
-  if (isToken(token)) {
-    console.log('[loadGCPToken]');
-    update(
-      ($store): StoreState => {
-        return {
-          ...$store,
-          gcp: { gcpToken: token as GcpToken }
-        };
-      }
-    );
-  }
-}
+// export function saveGCPToken(token: unknown): void {
+//   if (isToken(token)) {
+//     console.log('[loadGCPToken]');
+//     update(
+//       ($store): StoreState => {
+//         return {
+//           ...$store,
+//           gcp: { gcpToken: token as GcpToken }
+//         };
+//       }
+//     );
+//   }
+// }
 
-export function saveS3credentials(credentials: S3Credentials): void {
-  console.log('[loadS3Creds]');
-  const endpoint =
-    credentials.endpoint.search('http://') !== -1
-      ? credentials.endpoint
-      : `https://${credentials.endpoint}`;
+// export function saveS3credentials(credentials: S3Credentials): void {
+//   console.log('[loadS3Creds]');
+//   const endpoint =
+//     credentials.endpoint.search('http://') !== -1
+//       ? credentials.endpoint
+//       : `https://${credentials.endpoint}`;
 
-  update(
-    ($store): StoreState => {
-      return credentials.endpoint === ''
-        ? $store
-        : {
-            ...$store,
-            s3: {
-              ...$store.s3,
-              credentials,
-              client: new S3Client({
-                credentials,
-                endpoint:
-                  credentials.endpoint.search('http://') !== -1
-                    ? credentials.endpoint
-                    : `https://${credentials.endpoint}`,
-                //https://github.com/aws/aws-sdk-js-v3/issues/1845#issuecomment-754832210
-                region: 'us-east-1'
-              })
-            }
-          };
-    }
-  );
-}
+//   update(
+//     ($store): StoreState => {
+//       return credentials.endpoint === ''
+//         ? $store
+//         : {
+//             ...$store,
+//             s3: {
+//               ...$store.s3,
+//               credentials,
+//               client: new S3Client({
+//                 credentials,
+//                 endpoint:
+//                   credentials.endpoint.search('http://') !== -1
+//                     ? credentials.endpoint
+//                     : `https://${credentials.endpoint}`,
+//                 //https://github.com/aws/aws-sdk-js-v3/issues/1845#issuecomment-754832210
+//                 region: 'us-east-1'
+//               })
+//             }
+//           };
+//     }
+//   );
+// }
 
-export function saveS3config(configuration: S3Configuration): void {
-  console.log('[loadS3Config]');
-  update(
-    ($store): StoreState => {
-      return {
-        ...$store,
-        s3: {
-          ...$store.s3,
-          configuration
-        }
-      };
-    }
-  );
-}
+// export function saveS3config(configuration: S3Configuration): void {
+//   console.log('[loadS3Config]');
+//   update(
+//     ($store): StoreState => {
+//       return {
+//         ...$store,
+//         s3: {
+//           ...$store.s3,
+//           configuration
+//         }
+//       };
+//     }
+//   );
+// }
 
 export function loadCanvas(canvas: LoadCanvas): void {
   const name = `${canvas.location}/${canvas.name}`;

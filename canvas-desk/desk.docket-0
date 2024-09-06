@@ -5,10 +5,10 @@
     base+'canvas'
   ::
     :+  %glob-http
-      'https://yosoyubik.fra1.digitaloceanspaces.com/canvas/glob-0v7.nl3g9.oqcdp.6qnaa.5esj2.p6cpn.glob'
-    0v7.nl3g9.oqcdp.6qnaa.5esj2.p6cpn
+      'https://yosoyubik.fra1.digitaloceanspaces.com/canvas/glob-0v6.qm11t.us7m2.4np9e.akkdj.rars6.glob'
+    0v6.qm11t.us7m2.4np9e.akkdj.rars6
   ::
-    version+[0 0 11]
+    version+[0 0 12]
     website+'https://github.com/yosoyubik/canvas'
     license+'MIT'
 ==
