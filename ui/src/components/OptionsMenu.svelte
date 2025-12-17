@@ -18,11 +18,11 @@
     ContextMenuDivider,
     ContextMenuGroup
   } from 'carbon-components-svelte';
-  import Copy from 'carbon-icons-svelte/lib/CopyFile16';
-  import Trash from 'carbon-icons-svelte/lib/TrashCan16';
-  import Leave from 'carbon-icons-svelte/lib/Unlink16';
-  import Share from 'carbon-icons-svelte/lib/Share16';
-  import Public from 'carbon-icons-svelte/lib/Unlocked16';
+  import Copy from 'carbon-icons-svelte/lib/CopyFile.svelte';
+  import Trash from 'carbon-icons-svelte/lib/TrashCan.svelte';
+  import Leave from 'carbon-icons-svelte/lib/Unlink.svelte';
+  import Share from 'carbon-icons-svelte/lib/Share.svelte';
+  import Public from 'carbon-icons-svelte/lib/Unlocked.svelte';
 
   import exportSvg from '../lib/exportCanvas';
   import {

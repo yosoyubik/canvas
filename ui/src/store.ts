@@ -10,7 +10,7 @@ import { topology as calculateTopology } from '$lib/topology';
 
 import type { ConnectionStatus } from './types/connection';
 
-import { browser } from '$app/env';
+import { browser } from '$app/environment';
 // import type { StringChain } from 'lodash';
 
 const initStore: StoreState = {

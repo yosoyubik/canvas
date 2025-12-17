@@ -16,7 +16,7 @@
     SelectItemGroup,
     Form
   } from 'carbon-components-svelte';
-  import Paint32 from 'carbon-icons-svelte/lib/PaintBrush32';
+  import Paint from 'carbon-icons-svelte/lib/PaintBrush.svelte';
 
   import { Sveltik, Field } from 'sveltik';
   import store from '../store';
@@ -126,7 +126,7 @@
   // }
 </script>
 
-<Button icon={Paint32} kind="ghost" size="small" on:click={() => (open = true)}>
+<Button icon={Paint} kind="ghost" size="small" on:click={() => (open = true)}>
   New
 </Button>
 

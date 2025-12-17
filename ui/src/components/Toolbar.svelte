@@ -13,11 +13,11 @@
 
 <script lang="ts">
   import { Button } from 'carbon-components-svelte';
-  import PaintBrushAlt16 from 'carbon-icons-svelte/lib/PaintBrushAlt16';
-  import Erase16 from 'carbon-icons-svelte/lib/Erase16';
-  import Eyedropper16 from 'carbon-icons-svelte/lib/Eyedropper16';
-  import TextFill16 from 'carbon-icons-svelte/lib/TextFill16';
-  import Search16 from 'carbon-icons-svelte/lib/Search16';
+  import PaintBrushAlt from 'carbon-icons-svelte/lib/PaintBrushAlt.svelte';
+  import Erase from 'carbon-icons-svelte/lib/Erase.svelte';
+  import Eyedropper from 'carbon-icons-svelte/lib/Eyedropper.svelte';
+  import TextFill from 'carbon-icons-svelte/lib/ColorPalette.svelte';
+  import Search from 'carbon-icons-svelte/lib/Search.svelte';
 
   import { Tool } from '../types/canvas';
 
@@ -26,23 +26,23 @@
   let tools = [
     {
       name: Tool.Brush,
-      icon: PaintBrushAlt16
+      icon: PaintBrushAlt
     },
     {
       name: Tool.Eraser,
-      icon: Erase16
+      icon: Erase
     },
     {
       name: Tool.Eyedropper,
-      icon: Eyedropper16
+      icon: Eyedropper
     },
     {
       name: Tool.Fill,
-      icon: TextFill16
+      icon: TextFill
     },
     {
       name: Tool.Snoop,
-      icon: Search16
+      icon: Search
     }
   ];
 

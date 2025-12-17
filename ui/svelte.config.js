@@ -1,46 +1,26 @@
-import preprocess from 'svelte-preprocess';
-import { optimizeCarbonImports } from 'carbon-components-svelte/preprocess/index.js';
 import adapter from '@sveltejs/adapter-static';
+import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
-  // Consult https://github.com/sveltejs/svelte-preprocess
+  // Consult https://svelte.dev/docs/kit/integrations
   // for more information about preprocessors
-  preprocess: [preprocess(), optimizeCarbonImports()],
+  preprocess: vitePreprocess(),
+
   kit: {
-    // hydrate the <div id="svelte"> element in src/app.html
-    target: '#svelte',
-    files: { lib: './src/lib' },
-    vite: {
-      server: {
-        proxy: {
-          '^/session.js': {
-            target: 'http://localhost:8080/',
-            changeOrigin: true
-          },
-          '^/spider/.*': {
-            target: 'http://localhost:8080/',
-            changeOrigin: true
-          },
-          '^/~/.*': {
-            target: 'http://localhost:8080/',
-            changeOrigin: true
-          }
-        },
-        cors: true
-      },
-      build: {},
-      resolve: {
-        alias: {
-          './runtimeConfig': './runtimeConfig.browser'
-        }
-      }
-    },
-    paths: { base: '/apps/canvas' },
-    ssr: false,
     adapter: adapter({
-      pages: 'dist'
-    })
+      pages: 'dist',
+      assets: 'dist',
+      fallback: 'index.html',
+      precompress: false,
+      strict: true
+    }),
+    paths: {
+      base: '/apps/canvas'
+    },
+    alias: {
+      $lib: './src/lib'
+    }
   }
 };
 
